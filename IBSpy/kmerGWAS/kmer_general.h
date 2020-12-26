@@ -3,6 +3,7 @@
 
 #ifndef KMER_GENERAL_H
 #define KMER_GENERAL_H
+#include <stdint.h>
 
 typedef uint64_t kmerGWAS_kmer;
 

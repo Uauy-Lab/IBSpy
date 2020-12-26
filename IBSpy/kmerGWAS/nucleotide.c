@@ -1,4 +1,5 @@
 #include "nucleotide.h"
+
 Nucleotide char_to_binary_nucleotide(char c)
 {
 	switch (c) {
