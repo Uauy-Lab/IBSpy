@@ -1,12 +1,9 @@
 import os
 import sys
 #import pathlib
-
-
-add_path = os.path.dirname(os.path.abspath(__file__))+ "/.." 
-
-print(add_path)
-sys.path.insert(0, add_path)
+#add_path = os.path.dirname(os.path.abspath(__file__))+ "/.." 
+#print(add_path)
+#sys.path.insert(0, add_path)
 
 import logging
 import operator
