@@ -15,9 +15,9 @@ class KmerBuilder(ABC):
 		self.kmer_size = kmer_size
 
 	@abstractmethod
-	def string_to_kmer(sequence):
+	def string_to_kmer(self,sequence):
 		raise NotImplementedError
 
 	@abstractmethod
-	def kmer_to_string(sequence):
+	def kmer_to_string(self,sequence):
 		raise NotImplementedError

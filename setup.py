@@ -1,5 +1,6 @@
 import setuptools
 from distutils.core import setup, Extension
+from Cython.Build import cythonize
 
 module1 = Extension('kmerGWAS',
                     sources = ['IBSpy/kmerGWAS/nucleotide.c', 'IBSpy/kmerGWAS/kmer_general.c'])
@@ -23,5 +24,9 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    ext_modules=[module1]
+    #ext_modules=[module1]
+    ext_modules = cythonize(
+        [Extension("kmerGWAS", 
+            ["IBSpy/kmerGWAS/kmer_general.pyx"])],
+        compiler_directives={'language_level' : "3"})
 )
