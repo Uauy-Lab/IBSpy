@@ -39,7 +39,6 @@ kmerGWAS_kmer kmer2bits(char * kmer, uint8_t kmer_size) {
 	//kmerGWAS_kmer cur_dubit;
 	for(size_t i=0; i < kmer_size; i++) {
 		Nucleotide n = char_to_binary_nucleotide(kmer[kmer_size - i - 1]);
-		
 		b |= (n << (i*2));
 	}
 	//kmerGWAS_kmer bt = kmer2bits(b, k.size());  

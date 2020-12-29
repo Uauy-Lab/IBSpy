@@ -1,6 +1,12 @@
 import setuptools
 from distutils.core import setup, Extension
 from Cython.Build import cythonize
+import unittest
+
+def unit_tests():
+    test_loader = unittest.TestLoader()
+    test_suite = test_loader.discover('tests', pattern='test_*.py')
+    return test_suite
 
 # See https://stackoverflow.com/a/51272967/5188860
 module1 = Extension('kmerGWAS',
@@ -26,6 +32,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
+    test_suite='setup.unit_tests',
     #ext_modules=[module1]
     ext_modules = cythonize(
         [module1],

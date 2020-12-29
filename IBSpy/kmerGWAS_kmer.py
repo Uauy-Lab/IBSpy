@@ -1,32 +1,24 @@
 from .kmer_database import KmerDB, KmerBuilder
-from ctypes import *
+#from ctypes import *
 import os
-
-#libname = os.path.abspath(
-#	os.path.join(os.path.dirname(__file__), "kmerGWAS.cpython-39-darwin.so"))
-#print(libname)
-
-
-#libk = cdll.LoadLibrary("build/lib.macosx-11-x86_64-3.9/kmerGWAS.cpython-39-darwin.so") 
-#libk = cdll.LoadLibrary(libname) 
-#from .kmerGWAS import kmer_string_alloc
+import inspect
 import kmerGWAS
-
-print(kmerGWAS)
-print(kmerGWAS.__dict__)
-#str_alloc = kmerGWAS.kmer_string_alloc
+import cython
 
 class KmerGWASDB(KmerDB):
 	pass
 
 class KmerGWASDBBuilder(KmerBuilder):
+	#cdef char* _builder
 	def __init__(self, kmer_size):
-		self.kmer_size = kmer_size;
-		self.buffer = kmerGWAS.kmer_general.KmerGWAS_builder(kmer_size);
-		print(self.buffer);
+		self.kmer_size = kmer_size
+		self._builder = kmerGWAS.KmerGWAS_builder(kmer_size)
+		#print(self._builder);
 
 	def string_to_kmer(self, sequence):
-		print(sequence)
+		binary_kmer = self._builder.string_to_kmer(sequence)
+		return binary_kmer
 
-	def kmer_to_string(self, sequence):
-		raise NotImplementedError
+
+	def kmer_to_string(self, binary_kmer):
+		return self._builder.kmer_to_string(binary_kmer).decode('UTF-8')

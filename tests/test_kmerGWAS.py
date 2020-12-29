@@ -22,20 +22,24 @@ class TestKmerGWAS(unittest.TestCase):
 	def test_build_kmer(self):
 		self.assertEqual(1,1)
 		test = [
-		"AAAAAAAAA",
-		"AAAAAAAAT",
-		"AAAAAAATA",
-		"AAAAAATAA",
-		"AAAAATAAA",
-		"AAAATAAAA",
-		"AAATAAAAA",
-		"AATAAAAAA",
-		"ATAAAAAAA",
-		"TAAAAAAAA",
-		"TTTTTTTTT"]
+		'AAAAAAAAA',
+		'AAAAAAAAT',
+		'AAAAAAATA',
+		'AAAAAATAA',
+		'AAAAATAAA',
+		'AAAATAAAA',
+		'AAATAAAAA',
+		'AATAAAAAA',
+		'ATAAAAAAA',
+		'TAAAAAAAA',
+		'TTTTTTTTT'
+		]
 
 		kmer_builder = KmerGWASDBBuilder(9)
-		tested = kmer_builder.string_to_kmer(test[0])
+		for x in test:
+			tested = kmer_builder.string_to_kmer(x)
+			back = kmer_builder.kmer_to_string(tested)
+			print (x +  "->"  + str(tested)  + "->"  + back) 
 
 
 

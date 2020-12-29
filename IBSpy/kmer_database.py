@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class KmerDB(ABC):
 	@abstractmethod
 	def __contains__(self, key):

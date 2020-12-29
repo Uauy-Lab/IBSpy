@@ -20,6 +20,6 @@ inline kmerGWAS_kmer kmer_reverse_complement(kmerGWAS_kmer x, const uint8_t k_le
 kmerGWAS_kmer kmer2bits(char * k, uint8_t kmer_size);
 char * kmer_string_alloc(const uint8_t kmer_size);
 void kmer_string_free(char * res);
-kmerGWAS_kmer kmer2bits(char * kmer, uint8_t kmer_size);
+void bits2kmer31(kmerGWAS_kmer w, const uint8_t kmer_size, char * res);
 #endif
 

@@ -1,11 +1,13 @@
 [[source]]
-url = "https://pypi.org/simple"
+url        = "https://pypi.org/simple"
 verify_ssl = true
-name = "pypi"
+name       = "pypi"
 
 [packages]
-cython = "*"
-pysam  = "*"
+cython    = "*"
+pysam     = "*"
+biopython = "*"
+
 
 [dev-packages]
 
