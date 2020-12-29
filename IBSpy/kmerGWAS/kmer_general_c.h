@@ -4,6 +4,7 @@
 #ifndef KMER_GENERAL_H
 #define KMER_GENERAL_H
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef uint64_t kmerGWAS_kmer;
 
@@ -21,5 +22,6 @@ kmerGWAS_kmer kmer2bits(char * k, uint8_t kmer_size);
 char * kmer_string_alloc(const uint8_t kmer_size);
 void kmer_string_free(char * res);
 void bits2kmer31(kmerGWAS_kmer w, const uint8_t kmer_size, char * res);
+bool kmer_is_canonical(kmerGWAS_kmer b, const uint8_t kmer_size);
 #endif
 
