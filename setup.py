@@ -2,8 +2,10 @@ import setuptools
 from distutils.core import setup, Extension
 from Cython.Build import cythonize
 
+# See https://stackoverflow.com/a/51272967/5188860
 module1 = Extension('kmerGWAS',
-                    sources = ['IBSpy/kmerGWAS/nucleotide.c', 'IBSpy/kmerGWAS/kmer_general.c'])
+                    sources = ['IBSpy/kmerGWAS/nucleotide.c', 'IBSpy/kmerGWAS/kmer_general.pyx',
+                               'IBSpy/kmerGWAS/kmer_general_c.c'])
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -26,7 +28,6 @@ setuptools.setup(
     python_requires='>=3.6',
     #ext_modules=[module1]
     ext_modules = cythonize(
-        [Extension("kmerGWAS", 
-            ["IBSpy/kmerGWAS/kmer_general.pyx"])],
-        compiler_directives={'language_level' : "3"})
+        [module1],
+        compiler_directives={'language_level': "3"})
 )
