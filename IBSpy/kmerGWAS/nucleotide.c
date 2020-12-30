@@ -1,25 +1,25 @@
 #include "nucleotide.h"
 
+int char2bin[] = {
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Adenine, Undefined, Cytosine, Undefined, Undefined, Undefined, Guanine, Undefined,
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Thymine, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Adenine, Undefined, Cytosine, Undefined, Undefined, Undefined, Guanine, Undefined,
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Thymine, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+    Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined,
+};
+
 Nucleotide char_to_binary_nucleotide(char c)
 {
-	switch (c) {
-		case 'A':
-			return Adenine;
-		case 'C':
-			return Cytosine;
-		case 'G':
-			return Guanine;
-		case 'T':
-			return Thymine;
-		case 'a':
-			return Adenine;
-		case 'c':
-			return Cytosine;
-		case 'g':
-			return Guanine;
-		case 't':
-			return Thymine;
-		default:
-			return Undefined;
-	}
+	return char2bin[(int) c];
 }
