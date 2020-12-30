@@ -6,6 +6,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define KMERGWAS_FORWARD 0x4000000000000000
+#define KMERGWAS_REVERSE 0x8000000000000000
+#define KMERGWAS_MASK             0x0000000000000003 
+#define KMERGWAS_ORIENTATION_MASK 0x3FFFFFFFFFFFFFFF
 typedef uint64_t kmerGWAS_kmer;
 
 // Func: kmer reverse complement

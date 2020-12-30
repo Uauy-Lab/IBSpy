@@ -13,7 +13,7 @@
  */
 void bits2kmer31(kmerGWAS_kmer w, const uint8_t kmer_size, char * res) {
 	const static char dict_bp[] = {'A','C','G','T'};
-	const static kmerGWAS_kmer mask2bits = 0x0000000000000003;
+	const static kmerGWAS_kmer mask2bits = KMERGWAS_MASK;
 	uint8_t i;
 	if(!kmer_is_canonical(w, kmer_size))
 		w = kmer_reverse_complement(w, kmer_size);
@@ -26,15 +26,14 @@ void bits2kmer31(kmerGWAS_kmer w, const uint8_t kmer_size, char * res) {
 }
 
 bool kmer_is_canonical(kmerGWAS_kmer b, const uint8_t kmer_size){
-	kmerGWAS_kmer flag1 = b & 0x4000000000000000;
-	kmerGWAS_kmer flag2 = b & 0x8000000000000000;
-	if(flag1)
+	kmerGWAS_kmer flag_forward = b & KMERGWAS_FORWARD;
+	kmerGWAS_kmer flag_reverse = b & KMERGWAS_REVERSE;
+	if(flag_forward)
 		return true;
-	if(flag2)
+	if(flag_reverse)
 		return false;
 	kmerGWAS_kmer bt = kmer_reverse_complement(b,  kmer_size);
 	return b < bt;
-
 }
 
 char * kmer_string_alloc(const uint8_t kmer_size){
@@ -47,24 +46,31 @@ void kmer_string_free(char * res){
 	free(res);
 }
 
+kmerGWAS_kmer kmer_shift_and_insert(kmerGWAS_kmer kmer, char base, uint8_t kmer_size){
+	kmerGWAS_kmer n = (kmerGWAS_kmer) char_to_binary_nucleotide(base);
+	kmerGWAS_kmer kmer2 = kmer << 2;
+	kmerGWAS_kmer wall  = (kmerGWAS_kmer)  KMERGWAS_MASK << kmer_size * 2;
+	kmer2 |= (kmerGWAS_kmer) n;
+	kmer2 &= ~wall;
+	//fprintf(stderr, "shifting %llu %llu %c %llu %llu\n", kmer, kmer2, base, n, wall);
+	return kmer2 ;
+}
+
 kmerGWAS_kmer kmer2bits(char * kmer, uint8_t kmer_size) {
 	kmerGWAS_kmer b  = 0;
 	kmerGWAS_kmer bt = 0;
-	
-	for(uint64_t i=0; i < kmer_size; i++) {
-		Nucleotide n = char_to_binary_nucleotide(kmer[kmer_size - i - 1]);
-		b |= ((uint64_t) n << (i*2));
-		// if(kmer_size > 10){
-		// 	char * tmp = kmer_string_alloc(kmer_size);
-		// 	bits2kmer31(b, kmer_size, tmp);
-		// 	fprintf(stderr, "%i: %s %llu %llu\n", i, tmp, n, (n << (i*2)) );
-		// 	kmer_string_free(tmp);
-		// }
+	for(int i=0; i < kmer_size; i++) {
+		b = kmer_shift_and_insert(b, kmer[i], kmer_size);
 	}
+	b &= KMERGWAS_ORIENTATION_MASK;
+	// for(uint64_t i=0; i < kmer_size; i++) {
+	// 	Nucleotide n = char_to_binary_nucleotide(kmer[kmer_size - i - 1]);
+	// 	b |= ((uint64_t) n << (i*2));
+	// }
 	
 	bt = kmer_reverse_complement(b,  kmer_size);
 	if (bt < b)
-		return bt | 0x8000000000000000;
+		return bt | KMERGWAS_REVERSE;
 	else
-		return b  | 0x4000000000000000;
+		return b  | KMERGWAS_FORWARD;
 }
