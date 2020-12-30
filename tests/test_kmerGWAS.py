@@ -50,6 +50,9 @@ class TestKmerGWAS(unittest.TestCase):
 			tested = kmer_builder.string_to_kmer(x)
 			back = kmer_builder.kmer_to_string(tested)
 			self.assertEqual(x, back)
+			tested = kmer_builder.string_to_kmer(x.lower())
+			back = kmer_builder.kmer_to_string(tested)
+			self.assertEqual(x, back)
 			#print (x +  "->"  + str(tested)  + "->"  + back) 
 		test = [
 		'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
