@@ -8,7 +8,7 @@ import sys
 import logging
 import operator
 import unittest
-from IBSpy import KmerGWASDBBuilder 
+from IBSpy import KmerGWASDBBuilder, KmerGWASDB 
 
 class TestKmerGWAS(unittest.TestCase):
 
@@ -16,8 +16,7 @@ class TestKmerGWAS(unittest.TestCase):
 	logger.setLevel(logging.DEBUG)
 
 	def setUp(self):
-		self.assertEqual(1, 1)
-		
+		self.data_path="./tests/data/"
 
 	def test_build_kmer(self):
 		test = [
@@ -94,7 +93,9 @@ class TestKmerGWAS(unittest.TestCase):
 			#print (x +  "->"  + str(tested)  + "->"  + back)
 			self.assertEqual(x, back)
 			 
-
+	def test_build_kmer_db(self):
+		kmerdb = KmerGWASDB(63)
+		kmerdb.load_from_fasta(self.data_path + "/short_test.fa")
 
 
 if __name__ == '__main__':

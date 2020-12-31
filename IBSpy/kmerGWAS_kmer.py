@@ -4,8 +4,24 @@ import os
 import inspect
 import kmerGWAS
 import cython
+import pysam
 
 class KmerGWASDB(KmerDB):
+
+	def __init__(self, kmer_size):
+		self._builder = KmerGWASDBBuilder(kmer_size)
+
+	def load_from_fasta(self, filename, buffer_size=100):
+		fasta = pysam.FastaFile(filename)
+		references = fasta.references
+		print(references)
+
+	def __len__(self):
+		raise NotImplementedError
+
+	def __contains__(self, key):
+		raise NotImplementedError
+
 	pass
 
 class KmerGWASDBBuilder(KmerBuilder):
