@@ -4,17 +4,26 @@ import os
 import inspect
 import kmerGWAS
 import cython
-import pysam
+#from Bio import SeqIO
+#import pysam
+from pyfaidx import Fasta
 
 class KmerGWASDB(KmerDB):
 
 	def __init__(self, kmer_size):
 		self._builder = KmerGWASDBBuilder(kmer_size)
 
-	def load_from_fasta(self, filename, buffer_size=100):
-		fasta = pysam.FastaFile(filename)
-		references = fasta.references
+	def load_from_fasta(self, filename, buffer_size=10000):
+		#fasta = pysam.FastaFile(filename)
+		fasta = Fasta(filename)
+		references = fasta.keys()
+		for ref in references:
+			max_width = len(ref)
+
 		print(references)
+
+	#def load_kmers_from_sequence(self, string):
+
 
 	def __len__(self):
 		raise NotImplementedError
