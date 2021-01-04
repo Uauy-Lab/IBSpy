@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "kmer_general_c.h"
+#include "kmer_general.h"
 #include "nucleotide.h"
 
 

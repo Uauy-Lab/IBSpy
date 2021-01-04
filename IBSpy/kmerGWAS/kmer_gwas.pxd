@@ -2,7 +2,7 @@ cdef extern from "stdint.h":
 	ctypedef unsigned long long uint64_t
 	ctypedef unsigned short uint8_t
 
-cdef extern from "kmer_general_c.h":
+cdef extern from "kmer_general.h":
 	ctypedef uint64_t kmerGWAS_kmer
 
 	kmerGWAS_kmer kmer2bits(char * k, uint8_t kmer_size)

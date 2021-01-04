@@ -10,8 +10,8 @@ def unit_tests():
 
 # See https://stackoverflow.com/a/51272967/5188860
 module1 = Extension('kmerGWAS',
-                    sources = ['IBSpy/kmerGWAS/nucleotide.c', 'IBSpy/kmerGWAS/kmer_general.pyx',
-                               'IBSpy/kmerGWAS/kmer_general_c.c'])
+                    sources = ['IBSpy/kmerGWAS/nucleotide.c', 'IBSpy/kmerGWAS/kmer_gwas.pyx',
+                               'IBSpy/kmerGWAS/kmer_general.c'])
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()

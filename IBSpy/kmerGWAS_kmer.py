@@ -1,4 +1,4 @@
-from .kmer_database import KmerDB, KmerBuilder
+from .kmer_database import KmerDB, KmerBuilder, FastaChunkReader
 #from ctypes import *
 import os
 import inspect
@@ -12,15 +12,19 @@ class KmerGWASDB(KmerDB):
 
 	def __init__(self, kmer_size):
 		self._builder = KmerGWASDBBuilder(kmer_size)
+		self.kmer_size = kmer_size
 
 	def load_from_fasta(self, filename, buffer_size=10000):
 		#fasta = pysam.FastaFile(filename)
-		fasta = Fasta(filename)
-		references = fasta.keys()
-		for ref in references:
-			max_width = len(ref)
+		fasta_iter = FastaChunkReader(filename, 
+			chunk_size = buffer_size, 
+			kmer_size  = self.kmer_size)
+		for chunk in fasta_iter:
+			print(chunk)
+			#max_width = len(ref)
 
-		print(references)
+
+		#print(references)
 
 	#def load_kmers_from_sequence(self, string):
 
@@ -31,7 +35,6 @@ class KmerGWASDB(KmerDB):
 	def __contains__(self, key):
 		raise NotImplementedError
 
-	pass
 
 class KmerGWASDBBuilder(KmerBuilder):
 	#cdef char* _builder
