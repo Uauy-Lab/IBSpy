@@ -1,6 +1,6 @@
 
-#ifndef NUCLEOTIDE_H
-#define NUCLEOTIDE_H
+#ifndef NUCLEOTIDE_KMER_GWAS_H
+#define NUCLEOTIDE_KMER_GWAS_H
 
 typedef enum {
 	Adenine = 0, Cytosine = 1, Guanine = 2, Thymine = 3, Undefined = 4

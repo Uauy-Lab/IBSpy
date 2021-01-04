@@ -1,8 +1,8 @@
 //Minimal kmer functions from https://github.com/voichek/kmersGWAS
 //Original code released under GPL-3.0
 
-#ifndef KMER_GENERAL_H
-#define KMER_GENERAL_H
+#ifndef KMER_GWAS_GENERAL_H
+#define KMER_GWAS_GENERAL_H
 #include <stdint.h>
 #include <stdbool.h>
 
