@@ -23,6 +23,22 @@ class KmerBuilder(ABC):
 	def kmer_to_string(self,sequence):
 		raise NotImplementedError
 
+	def sequence_to_kmers(self, sequence, filter_ambiguity = True):
+		ret = [None] * (len(sequence) - self.kmer_size + 1)
+		sequence = sequence.upper()
+		for start in range(0, len(sequence) - self.kmer_size + 1):
+			end = start + self.kmer_size
+			kmer = sequence[start:end]
+			count =  kmer.count('A')
+			count += kmer.count('T')
+			count += kmer.count('G')
+			count += kmer.count('C') 
+			if filter_ambiguity and count != self.kmer_size:
+				continue 
+			ret[start] = kmer
+		return  [i for i in ret if i] 
+
+
 class FastaChunkReader:
 	
 	def __init__(self, filename, chunk_size=10000 , kmer_size=31):

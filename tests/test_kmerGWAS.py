@@ -92,7 +92,7 @@ class TestKmerGWAS(unittest.TestCase):
 			#print(len(x))
 			#print (x +  "->"  + str(tested)  + "->"  + back)
 			self.assertEqual(x, back)
-			 
+
 	def test_build_kmer_db(self):
 		kmerdb = KmerGWASDB(63)
 		kmerdb.load_from_fasta(self.data_path + "/short_test.fa")
