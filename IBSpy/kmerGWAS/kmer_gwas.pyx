@@ -56,6 +56,9 @@ cdef class KmerGWAS_database:
 		py_byte_string = sequence.encode('UTF-8')
 		kmer_gwas.kmer_gwas_table_add_kmers_from_string(py_byte_string, self._kgt)
 
+	def sort_unique(self):
+		return kmer_gwas.kmer_gwas_sort_and_filter_unique(self._kgt)
+
 	def __len__(self):
 		return self._kgt.number_of_kmers
 

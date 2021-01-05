@@ -16,5 +16,5 @@ KmerGwasTable * kmer_gwas_table_new(uint8_t kmer_size);
 void kmer_gwas_table_free(KmerGwasTable * * kgt);
 void kmer_gwas_table_add_kmers_from_string(char * sequence, KmerGwasTable * kgt);
 kmerGWAS_kmer kmer_gwas_table_get(uint64_t index, KmerGwasTable * kgt);
-
+uint64_t kmer_gwas_sort_and_filter_unique(KmerGwasTable * kgt);
 #endif

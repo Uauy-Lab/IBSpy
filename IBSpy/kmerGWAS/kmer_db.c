@@ -34,7 +34,6 @@ void kmer_gwas_table_push_kmer(kmerGWAS_kmer kmer, KmerGwasTable * kgt){
 
 	if(kmer_is_canonical(cannonical_kmer, kgt->kmer_size)){
 		cannonical_kmer |= KMERGWAS_FORWARD;
-		cannonical_kmer |= 0;
 	}else{
 		cannonical_kmer = kmer_reverse_complement(cannonical_kmer, kgt->kmer_size);
 		cannonical_kmer |= KMERGWAS_REVERSE;
@@ -44,11 +43,41 @@ void kmer_gwas_table_push_kmer(kmerGWAS_kmer kmer, KmerGwasTable * kgt){
 	kgt->number_of_kmers++;
 }
 
+uint64_t kmer_gwas_sort_and_filter_unique(KmerGwasTable * kgt){
+	uint64_t new_total_kmers = 0L;
+	kmerGWAS_kmer last_kmer = 0L;
+	kmerGWAS_kmer current_kmer = 0L;
+	int cmp = 0;
+	
+	if(kgt->number_of_kmers < 2){
+		return kgt->number_of_kmers;
+	}
+	qsort(kgt->kmer, kgt->number_of_kmers, sizeof(* kgt->kmer), kmer_compare_internal);
+	last_kmer = kgt->kmer[0];
+	for(uint64_t i=1; i < kgt->number_of_kmers; i++ ){
+		current_kmer = kgt->kmer[i];
+		cmp = kmer_compare_internal(&last_kmer, &current_kmer);
+		assert(cmp >= 0);
+		if(cmp == 0){
+			last_kmer |= current_kmer;
+		}else{
+			kgt->kmer[new_total_kmers++] = last_kmer;
+			last_kmer = current_kmer;
+		}
+	}
+	kgt->kmer[new_total_kmers++] = last_kmer;
+	kgt->number_of_kmers = new_total_kmers;
+	kgt->kmer = realloc(kgt->kmer, sizeof(kmerGWAS_kmer) * kgt->number_of_kmers);
+	kgt->capacity = new_total_kmers;
+	return new_total_kmers;
+}
+
 void kmer_gwas_table_add_kmers_from_string(char * sequence, KmerGwasTable * kgt){
 	uint8_t  kmer_size = kgt->kmer_size;
 	uint64_t len = strlen(sequence);
 	uint64_t total_kmers = len - kmer_size + 1;
 	uint64_t current_stretch = 0;
+	assert(kgt->readonly == false);
 	Nucleotide n;
 	kgt->capacity    = kgt->number_of_kmers +  total_kmers;
 	kgt->kmer = realloc(kgt->kmer, sizeof(kmerGWAS_kmer) * kgt->capacity );
@@ -66,8 +95,7 @@ void kmer_gwas_table_add_kmers_from_string(char * sequence, KmerGwasTable * kgt)
 			kmer_gwas_table_push_kmer(tmp_kmer, kgt);
 		}
 	}
-	kgt->kmer = realloc(kgt->kmer, sizeof(kmerGWAS_kmer) * kgt->number_of_kmers);
-	qsort(kgt->kmer, kgt->number_of_kmers, sizeof(* kgt->kmer), kmer_compare_internal);
+	//kmer_gwas_sort_and_filter_unique(kgt);
 }
 
 kmerGWAS_kmer kmer_gwas_table_get(uint64_t index, KmerGwasTable * kgt){

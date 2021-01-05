@@ -24,12 +24,9 @@ class KmerGWASDB(KmerDB):
         )
         
         for chunk in fasta_iter:
-            print("Adding")
-            print(chunk['seq'])
             self.db.add_kmers(chunk['seq'])
-            print(len(self))
+        self.db.sort_unique()
 
-        print(self.db)
 
     def __getitem__(self, index):
         return self.db[index]
