@@ -95,8 +95,25 @@ class TestKmerGWAS(unittest.TestCase):
 
 	def test_build_kmer_db(self):
 		kmerdb = KmerGWASDB(31)
-		kmerdb.load_from_fasta(self.data_path + "/short_test.fa")
+		kmer_builder = KmerGWASDBBuilder(31)
+		kmerdb.load_from_fasta(self.data_path + "/short_test_duplicate.fa")
 		print("Size: " + str(len(kmerdb)))
+		for i in range(0,len(kmerdb)):
+			#print(kmerdb[i])
+			print(kmer_builder.kmer_to_string(kmerdb[i]))
+			
+	def test_compare_kmers(self):
+		kmer_builder = KmerGWASDBBuilder(31)
+		tests = ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+		'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
+		'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
+		'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
+		'AAAAAAAAAGGGAAAGGGAAGAGGGAAAGGG']
+		print(kmer_builder.compare(tests[0], tests[1]))
+		print(kmer_builder.compare(tests[2], tests[1]))
+		print(kmer_builder.compare(tests[1], tests[2]))
+
+
 
 
 if __name__ == '__main__':

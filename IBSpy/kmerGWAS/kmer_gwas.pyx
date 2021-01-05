@@ -36,6 +36,9 @@ cdef class KmerGWAS_builder:
 		kmer_gwas.bits2kmer31(self._kmer, self._kmer_size, self._buffer)
 		return self._buffer
 
+	def compare(self, a, b):
+		return kmer_gwas.kmer_compare(a,b)
+
 	def __dealloc__(self):
 		if self._buffer is not NULL:
 			kmer_gwas.kmer_string_free(self._buffer)
@@ -57,7 +60,7 @@ cdef class KmerGWAS_database:
 		return self._kgt.number_of_kmers
 
 	def  __getitem__(self, index):
-		kmer_gwas.kmer_gwas_table_get(index, self._kgt)
+		return kmer_gwas.kmer_gwas_table_get(index, self._kgt)
 
 	def __dealloc__(self):
 			kmer_gwas.kmer_gwas_table_free(&self._kgt)

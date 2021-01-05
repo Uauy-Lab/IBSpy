@@ -37,7 +37,6 @@ class KmerGWASDB(KmerDB):
     def kmers(self):
        return (e for e in range(len(self)) if not e % 3)
 
-
     def __len__(self):
         return len(self.db)
 
@@ -58,3 +57,8 @@ class KmerGWASDBBuilder(KmerBuilder):
 
     def kmer_to_string(self, binary_kmer):
         return self._builder.kmer_to_string(binary_kmer).decode("UTF-8")
+
+    def compare(self, a, b):
+        ka = self.string_to_kmer(a)
+        kb = self.string_to_kmer(b)
+        return self._builder.compare(ka, kb)

@@ -74,3 +74,17 @@ kmerGWAS_kmer kmer2bits(char * kmer, uint8_t kmer_size) {
 	else
 		return b  | KMERGWAS_FORWARD;
 }
+
+int kmer_compare_internal (const void * a, const void * b) {
+	kmerGWAS_kmer ak = *(kmerGWAS_kmer*)a;
+	kmerGWAS_kmer bk = *(kmerGWAS_kmer*)b; 
+	ak &= KMERGWAS_ORIENTATION_MASK;
+	bk &= KMERGWAS_ORIENTATION_MASK;
+	return (ak > bk) - (ak < bk);
+	//return ( ak - bk );
+}
+
+int kmer_compare (kmerGWAS_kmer  a, kmerGWAS_kmer  b){
+	return kmer_compare_internal( &a, &b );
+} 
+

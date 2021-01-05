@@ -9,6 +9,7 @@ cdef extern from "kmer_general.h":
 	char * kmer_string_alloc(const uint8_t kmer_size)
 	void kmer_string_free(char * res)
 	void bits2kmer31(kmerGWAS_kmer kmer, uint8_t kmer_size, char * res)
+	int kmer_compare (kmerGWAS_kmer a, kmerGWAS_kmer b)
 
 cdef extern from "kmer_db.h":
 	ctypedef struct KmerGwasTable:

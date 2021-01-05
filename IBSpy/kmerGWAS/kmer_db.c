@@ -30,9 +30,11 @@ void kmer_gwas_table_free(KmerGwasTable ** kgt){
 
 void kmer_gwas_table_push_kmer(kmerGWAS_kmer kmer, KmerGwasTable * kgt){
 	assert(kgt->number_of_kmers < kgt->capacity);
-	kmerGWAS_kmer cannonical_kmer = kmer & KMERGWAS_ORIENTATION_MASK;;
+	kmerGWAS_kmer cannonical_kmer = kmer & KMERGWAS_ORIENTATION_MASK;
+
 	if(kmer_is_canonical(cannonical_kmer, kgt->kmer_size)){
 		cannonical_kmer |= KMERGWAS_FORWARD;
+		cannonical_kmer |= 0;
 	}else{
 		cannonical_kmer = kmer_reverse_complement(cannonical_kmer, kgt->kmer_size);
 		cannonical_kmer |= KMERGWAS_REVERSE;
@@ -59,13 +61,13 @@ void kmer_gwas_table_add_kmers_from_string(char * sequence, KmerGwasTable * kgt)
 		}else{
 			current_stretch++;
 		}
-		fprintf(stderr, "%llu %llu\n",i, tmp_kmer);
 		tmp_kmer = kmer_shift_and_insert(tmp_kmer, sequence[i], kmer_size);
 		if(current_stretch >= kmer_size){
 			kmer_gwas_table_push_kmer(tmp_kmer, kgt);
 		}
 	}
 	kgt->kmer = realloc(kgt->kmer, sizeof(kmerGWAS_kmer) * kgt->number_of_kmers);
+	qsort(kgt->kmer, kgt->number_of_kmers, sizeof(* kgt->kmer), kmer_compare_internal);
 }
 
 kmerGWAS_kmer kmer_gwas_table_get(uint64_t index, KmerGwasTable * kgt){
