@@ -94,8 +94,9 @@ class TestKmerGWAS(unittest.TestCase):
 			self.assertEqual(x, back)
 
 	def test_build_kmer_db(self):
-		kmerdb = KmerGWASDB(63)
+		kmerdb = KmerGWASDB(31)
 		kmerdb.load_from_fasta(self.data_path + "/short_test.fa")
+		print("Size: " + str(len(kmerdb)))
 
 
 if __name__ == '__main__':

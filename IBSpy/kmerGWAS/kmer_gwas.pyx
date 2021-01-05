@@ -8,6 +8,13 @@ cdef extern from "stdint.h":
 
 ctypedef uint64_t kmerGWAS_kmer
 
+cdef struct KmerGwasTable:
+	uint64_t number_of_kmers
+	uint64_t capacity
+	kmerGWAS_kmer * kmer
+	uint8_t kmer_size
+	uint8_t readonly
+
 cdef class KmerGWAS_builder:
 	cdef short _kmer_size
 	cdef char * _buffer
@@ -32,3 +39,27 @@ cdef class KmerGWAS_builder:
 	def __dealloc__(self):
 		if self._buffer is not NULL:
 			kmer_gwas.kmer_string_free(self._buffer)
+
+cdef class KmerGWAS_database: 
+	cdef KmerGwasTable * _kgt
+
+	def __cinit__(self, kmer_size): 
+		self._kgt = <KmerGwasTable *> kmer_gwas.kmer_gwas_table_new(kmer_size)
+
+	def kmer_size(self):
+		return self._kgt.kmer_size
+
+	def add_kmers(self, sequence):
+		py_byte_string = sequence.encode('UTF-8')
+		kmer_gwas.kmer_gwas_table_add_kmers_from_string(py_byte_string, self._kgt)
+
+	def __len__(self):
+		return self._kgt.number_of_kmers
+
+	def  __getitem__(self, index):
+		kmer_gwas.kmer_gwas_table_get(index, self._kgt)
+
+	def __dealloc__(self):
+			kmer_gwas.kmer_gwas_table_free(&self._kgt)
+
+

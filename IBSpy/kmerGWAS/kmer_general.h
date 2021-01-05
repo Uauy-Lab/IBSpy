@@ -27,5 +27,6 @@ char * kmer_string_alloc(const uint8_t kmer_size);
 void kmer_string_free(char * res);
 void bits2kmer31(kmerGWAS_kmer w, const uint8_t kmer_size, char * res);
 bool kmer_is_canonical(kmerGWAS_kmer b, const uint8_t kmer_size);
+kmerGWAS_kmer kmer_shift_and_insert(kmerGWAS_kmer kmer, char base, uint8_t kmer_size);
 #endif
 
