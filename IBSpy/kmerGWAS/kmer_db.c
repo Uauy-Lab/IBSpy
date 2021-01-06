@@ -1,8 +1,12 @@
 #include <assert.h>
+#include <fcntl.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <unistd.h>
 #include "kmer_general.h"
 #include "nucleotide.h"
 #include "kmer_db.h"
@@ -16,6 +20,7 @@ KmerGwasTable * kmer_gwas_table_new(uint8_t kmer_size){
 	kgt->kmer_size = kmer_size;
 	kgt->readonly = false;
 	kgt->kmer = NULL;
+	kgt->mem_table = 0;
 	return kgt;
 }
 
@@ -118,5 +123,26 @@ void kmer_gwas_table_save(char * filename, KmerGwasTable * kgt){
 }
 
 void kmer_gwas_table_mmap_read(char * file, KmerGwasTable * kgt ){
+	struct stat s;
+	int size;
+	//FILE * fd = fopen (file, "rb");
+	int fd = open (file, O_RDONLY);
+	/* Get the size of the file. */
+    int status = fstat (fd, & s);
+    assert(status == 0);
+    size = s.st_size;
+    kgt->kmer = (kmerGWAS_kmer *) mmap (NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+	kgt->number_of_kmers = size / sizeof(kmerGWAS_kmer);
+	kgt->readonly = true;
+	kgt->mem_table = fd;
 	return;
 }
+
+void kmer_gwas_table_mmap_close(KmerGwasTable * kgt){
+	struct stat s;
+	int status = fstat (kgt->mem_table, & s);
+	assert(status == 0);
+	munmap(kgt->kmer, s.st_size);
+	close(kgt->mem_table);
+}
+

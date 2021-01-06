@@ -12,7 +12,7 @@ cdef extern from "kmer_general.h":
 	int kmer_compare (kmerGWAS_kmer a, kmerGWAS_kmer b)
 
 cdef extern from "kmer_db.h":
-	ctypedef struct KmerGwasTable:
+	struct KmerGwasTable:
 		uint64_t number_of_kmers
 		uint64_t capacity
 		kmerGWAS_kmer * kmer

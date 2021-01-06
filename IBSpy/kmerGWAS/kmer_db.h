@@ -10,6 +10,7 @@ typedef struct KmerGwasTable{
     kmerGWAS_kmer * kmer;
     uint8_t kmer_size;
     uint8_t readonly;
+    int mem_table;
 } KmerGwasTable;
 
 KmerGwasTable * kmer_gwas_table_new(uint8_t kmer_size);
