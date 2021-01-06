@@ -110,3 +110,13 @@ kmerGWAS_kmer kmer_gwas_table_get(uint64_t index, KmerGwasTable * kgt){
 	assert(kgt->number_of_kmers > 0);
 	return kgt->kmer[index];
 }
+
+void kmer_gwas_table_save(char * filename, KmerGwasTable * kgt){
+	FILE *file = fopen(filename, "wb");
+	fwrite(kgt->kmer, sizeof(kmerGWAS_kmer), kgt->number_of_kmers, file);
+	fclose(file);
+}
+
+void kmer_gwas_table_mmap_read(char * file, KmerGwasTable * kgt ){
+	return;
+}
