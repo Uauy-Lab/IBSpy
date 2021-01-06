@@ -77,6 +77,7 @@ class FastaChunkReader:
 
     def __next__(self):
         if len(self.seqnames) == self.current_ref:
+            self.fasta.close()
             raise StopIteration
         # print(self.seqnames)
         # print(self.current_ref)
