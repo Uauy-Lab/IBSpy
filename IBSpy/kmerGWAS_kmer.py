@@ -16,22 +16,22 @@ class KmerGWASDB(KmerDB):
         self._builder = KmerGWASDBBuilder(kmer_size)
         self.kmer_size = kmer_size
         self.db  = kmerGWAS.KmerGWAS_database(kmer_size) 
+        self.builder = KmerGWASDBBuilder(kmer_size)
+
+    def builder(self):
+        return self.builder
 
     def load_from_fasta(self, filename, buffer_size=10000):
         # fasta = pysam.FastaFile(filename)
         fasta_iter = FastaChunkReader(
             filename, chunk_size=buffer_size, kmer_size=self.kmer_size
-        )
-        
+        )        
         for chunk in fasta_iter:
             self.db.add_kmers(chunk['seq'])
         self.db.sort_unique()
 
     def __getitem__(self, index):
         return self.db[index]
-
-    def kmers(self):
-       return (e for e in range(len(self)) if not e % 3)
 
     def __len__(self):
         return len(self.db)

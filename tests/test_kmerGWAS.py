@@ -8,7 +8,7 @@ import sys
 import logging
 import operator
 import unittest
-from IBSpy import KmerGWASDBBuilder, KmerGWASDB 
+from IBSpy import KmerGWASDBBuilder, KmerGWASDB, FastaChunkReader 
 
 class TestKmerGWAS(unittest.TestCase):
 
@@ -129,10 +129,41 @@ class TestKmerGWAS(unittest.TestCase):
 		'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
 		'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
 		'AAAAAAAAAGGGAAAGGGAAGAGGGAAAGGG']
-
 		self.assertEqual(kmer_builder.compare(tests[0], tests[1]),  0)
 		self.assertEqual(kmer_builder.compare(tests[2], tests[1]),  1)
 		self.assertEqual(kmer_builder.compare(tests[1], tests[2]), -1)
+
+	def test_kmer_db(self):
+		kmerdb = KmerGWASDB(31)
+		kmerdb.load_from_fasta(self.data_path + "/test4B.jagger.fa")
+		
+		references=['jagger', 'arinalrfor', 'julius', 'lancer', 'landmark', 'mace', 'norin61', 'spelta', 'stanley', 'sy_mattis']
+		
+		expected = [
+		[2970, 2201], [2939, 2170], [2970, 2201], [2609],
+		[2970, 2201], [2970, 2201], [2970, 2201], [2970, 2201],
+		[2879, 2176], [2970, 2201]
+		]
+		i = 0
+		for r in references:	
+			path = self.data_path + "/test4B." + r + ".fa"
+			windows = kmerdb.kmers_in_windows(path, window_size=3000)
+			obs =  map(lambda w: w['observed_kmers'], windows)
+			j = 0
+			#print(list(obs))
+			#print(expected[i])
+			#print("..")
+			for o in obs:
+				#print(o)
+				self.assertEqual(expected[i][j], o)
+				j += 1
+			i += 1
+			
+			#for w in windows:
+			#	print(w)
+
+
+
 
 
 

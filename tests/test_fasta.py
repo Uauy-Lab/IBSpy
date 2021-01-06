@@ -64,9 +64,6 @@ class TestFasta(unittest.TestCase):
 			kmers = builder.sequence_to_kmers(seq['seq'])
 			self.assertEqual(sizes[i], len(kmers))
 			i += 1
-			#print(len(kmers))
-			#for kmer in kmers:
-			#	print(kmer)
 			
 			
 

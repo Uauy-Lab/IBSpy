@@ -1,8 +1,13 @@
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
 from pyfaidx import Fasta
-
+from functools import reduce 
 
 class KmerDB(ABC):
+    
+    @abstractproperty
+    def builder(self):
+        return None
+
     @abstractmethod
     def __contains__(self, key):
         raise NotImplementedError
@@ -12,9 +17,23 @@ class KmerDB(ABC):
         raise NotImplementedError
 
     def count_kmers_from_sequence(self, kmers): 
-        return len(filter(lambda k: k in self, kmers))
+        f = filter(lambda k: k in self, kmers)
+        return reduce(lambda x, y: x + 1 , f, 0)
 
-#kmers = self.sequence_to_kmers(sequence, filter_ambiguity = True, convert=True)
+    def kmers_in_windows(self, path, window_size=1000):
+        def window_summary(seq):
+            kmers = self.builder.sequence_to_kmers(seq['seq'], convert=True)
+            total = self.count_kmers_from_sequence(kmers)
+            return {
+            'seqname': seq['seqname'],
+            'start': seq['start'],
+            'end': seq['end'],
+            'total_kmers': len(kmers),
+            'observed_kmers': total
+            }
+        fasta_iter = FastaChunkReader(path, 
+            chunk_size = window_size, kmer_size=self.kmer_size)
+        return map(window_summary, fasta_iter )
 
 class KmerBuilder(ABC):
     def __init__(self, kmer_size):
