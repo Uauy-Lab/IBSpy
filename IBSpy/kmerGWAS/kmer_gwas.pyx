@@ -59,6 +59,10 @@ cdef class KmerGWAS_database:
 	def sort_unique(self):
 		return kmer_gwas.kmer_gwas_sort_and_filter_unique(self._kgt)
 
+	def __contains__(self, kmer):
+		ret = kmer_gwas.kmer_gwas_table_find(kmer, self._kgt) 
+		return ret is not NULL
+
 	def __len__(self):
 		return self._kgt.number_of_kmers
 
@@ -66,6 +70,6 @@ cdef class KmerGWAS_database:
 		return kmer_gwas.kmer_gwas_table_get(index, self._kgt)
 
 	def __dealloc__(self):
-			kmer_gwas.kmer_gwas_table_free(&self._kgt)
+		kmer_gwas.kmer_gwas_table_free(&self._kgt)
 
 

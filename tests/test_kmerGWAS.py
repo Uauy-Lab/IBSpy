@@ -98,24 +98,41 @@ class TestKmerGWAS(unittest.TestCase):
 		kmer_builder = KmerGWASDBBuilder(31)
 		kmerdb.load_from_fasta(self.data_path + "/short_test_duplicate.fa")
 		#Appears twice: GGGCAGGAATAAGAAGAAGAAGGCGCCCGCC GTTTCTTGGTTCTTCAGATTGCGGCGCATGA
-		print("Size: " + str(len(kmerdb)))
+		#print("Size: " + str(len(kmerdb)))
 		self.assertEqual(len(kmerdb), 120)
 
-		for i in range(0,len(kmerdb)):
+		#for i in range(0,len(kmerdb)):
 			#print(kmerdb[i])
 			#print(kmer_builder.kmer_to_string(kmerdb[i]))
-			pass
+		#	pass
+		
+		kmer_builder2 = KmerGWASDBBuilder(31)
+		
+		test = [
+		"GGGCAGGAATAAGAAGAAGAAGGCGCCCGCC",
+		"GTTTCTTGGTTCTTCAGATTGCGGCGCATGA",
+		'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+		'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT']
+		results = [True, True, False, False]
+		i = 0
+		for x in test:
+			tested = kmer_builder2.string_to_kmer(x)
+			#print(x)
+			self.assertEqual (tested in kmerdb ,results[i])
+			i+=1
 			
 	def test_compare_kmers(self):
 		kmer_builder = KmerGWASDBBuilder(31)
-		tests = ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+		tests = [
+		'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 		'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
 		'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',
 		'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
 		'AAAAAAAAAGGGAAAGGGAAGAGGGAAAGGG']
-		print(kmer_builder.compare(tests[0], tests[1]))
-		print(kmer_builder.compare(tests[2], tests[1]))
-		print(kmer_builder.compare(tests[1], tests[2]))
+
+		self.assertEqual(kmer_builder.compare(tests[0], tests[1]),  0)
+		self.assertEqual(kmer_builder.compare(tests[2], tests[1]),  1)
+		self.assertEqual(kmer_builder.compare(tests[1], tests[2]), -1)
 
 
 

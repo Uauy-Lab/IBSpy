@@ -24,4 +24,5 @@ cdef extern from "kmer_db.h":
 	void kmer_gwas_table_add_kmers_from_string(char * sequence, KmerGwasTable * kgt)
 	kmerGWAS_kmer kmer_gwas_table_get(uint64_t index, KmerGwasTable * kgt)
 	uint64_t kmer_gwas_sort_and_filter_unique(KmerGwasTable * kgt)
+	kmerGWAS_kmer * kmer_gwas_table_find(kmerGWAS_kmer kmer, KmerGwasTable * kgt)
 

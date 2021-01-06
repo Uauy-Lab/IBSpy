@@ -11,6 +11,10 @@ class KmerDB(ABC):
     def __len__(self):
         raise NotImplementedError
 
+    def count_kmers_from_sequence(self, kmers): 
+        return len(filter(lambda k: k in self, kmers))
+
+#kmers = self.sequence_to_kmers(sequence, filter_ambiguity = True, convert=True)
 
 class KmerBuilder(ABC):
     def __init__(self, kmer_size):
@@ -24,7 +28,7 @@ class KmerBuilder(ABC):
     def kmer_to_string(self, sequence):
         raise NotImplementedError
 
-    def sequence_to_kmers(self, sequence, filter_ambiguity=True):
+    def sequence_to_kmers(self, sequence, filter_ambiguity=True, convert=False):
         ret = [None] * (len(sequence) - self.kmer_size + 1)
         sequence = sequence.upper()
         for start in range(0, len(sequence) - self.kmer_size + 1):
@@ -36,7 +40,7 @@ class KmerBuilder(ABC):
             count += kmer.count("C")
             if filter_ambiguity and count != self.kmer_size:
                 continue
-            ret[start] = kmer
+            ret[start] = self.string_to_kmer(kmer) if convert else kmer 
         return [i for i in ret if i]
 
 

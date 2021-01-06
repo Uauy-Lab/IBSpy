@@ -27,7 +27,6 @@ class KmerGWASDB(KmerDB):
             self.db.add_kmers(chunk['seq'])
         self.db.sort_unique()
 
-
     def __getitem__(self, index):
         return self.db[index]
 
@@ -38,15 +37,13 @@ class KmerGWASDB(KmerDB):
         return len(self.db)
 
     def __contains__(self, key):
-        raise NotImplementedError
-
+        return key in self.db
 
 class KmerGWASDBBuilder(KmerBuilder):
     # cdef char* _builder
     def __init__(self, kmer_size):
         self.kmer_size = kmer_size
         self._builder = kmerGWAS.KmerGWAS_builder(kmer_size)
-        # print(self._builder);
 
     def string_to_kmer(self, sequence):
         binary_kmer = self._builder.string_to_kmer(sequence)

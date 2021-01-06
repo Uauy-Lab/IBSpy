@@ -43,6 +43,15 @@ void kmer_gwas_table_push_kmer(kmerGWAS_kmer kmer, KmerGwasTable * kgt){
 	kgt->number_of_kmers++;
 }
 
+kmerGWAS_kmer * kmer_gwas_table_find(kmerGWAS_kmer kmer, KmerGwasTable * kgt){
+	if(kgt->number_of_kmers == 0){
+		return NULL;
+	}
+	return bsearch(&kmer, kgt->kmer, kgt->number_of_kmers ,
+		sizeof(* kgt->kmer), kmer_compare_internal);
+}
+
+
 uint64_t kmer_gwas_sort_and_filter_unique(KmerGwasTable * kgt){
 	uint64_t new_total_kmers = 0L;
 	kmerGWAS_kmer last_kmer = 0L;
