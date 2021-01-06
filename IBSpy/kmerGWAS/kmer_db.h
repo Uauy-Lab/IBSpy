@@ -19,4 +19,7 @@ void kmer_gwas_table_add_kmers_from_string(char * sequence, KmerGwasTable * kgt)
 kmerGWAS_kmer kmer_gwas_table_get(uint64_t index, KmerGwasTable * kgt);
 uint64_t kmer_gwas_sort_and_filter_unique(KmerGwasTable * kgt);
 kmerGWAS_kmer * kmer_gwas_table_find(kmerGWAS_kmer kmer, KmerGwasTable * kgt);
+void kmer_gwas_table_mmap_close(KmerGwasTable * kgt);
+void kmer_gwas_table_mmap_read(char * file, KmerGwasTable * kgt );
+void kmer_gwas_table_save(char * filename, KmerGwasTable * kgt);
 #endif

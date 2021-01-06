@@ -133,12 +133,8 @@ class TestKmerGWAS(unittest.TestCase):
 		self.assertEqual(kmer_builder.compare(tests[2], tests[1]),  1)
 		self.assertEqual(kmer_builder.compare(tests[1], tests[2]), -1)
 
-	def test_kmer_db(self):
-		kmerdb = KmerGWASDB(31)
-		kmerdb.load_from_fasta(self.data_path + "/test4B.jagger.fa")
-		
+	def run_db_tests(self, kmerdb):
 		references=['jagger', 'arinalrfor', 'julius', 'lancer', 'landmark', 'mace', 'norin61', 'spelta', 'stanley', 'sy_mattis']
-		
 		expected = [
 		[2970, 2201], [2939, 2170], [2970, 2201], [2609],
 		[2970, 2201], [2970, 2201], [2970, 2201], [2970, 2201],
@@ -154,6 +150,25 @@ class TestKmerGWAS(unittest.TestCase):
 				self.assertEqual(expected[i][j], o)
 				j += 1
 			i += 1
+
+
+
+	def test_kmer_db(self):
+		kmerdb = KmerGWASDB(31)
+		kmerdb.load_from_fasta(self.data_path + "/test4B.jagger.fa")
+		self.run_db_tests(kmerdb)
+		
+		saved_file = self.data_path + "test4B.jagger.temp.kmerGWAS_k31"
+		kmerdb.save(saved_file)
+		kmerdb_read = KmerGWASDB(31)
+		kmerdb_read.load(saved_file)
+		self.run_db_tests(kmerdb_read)
+
+		saved_file = self.data_path + "test4B.jagger.kmerGWAS_k31"
+		kmerdb.save(saved_file)
+		kmerdb_read = KmerGWASDB(31)
+		kmerdb_read.load(saved_file)
+		self.run_db_tests(kmerdb_read)
 
 if __name__ == '__main__':
 	unittest.main()

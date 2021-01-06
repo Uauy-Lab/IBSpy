@@ -26,6 +26,10 @@ KmerGwasTable * kmer_gwas_table_new(uint8_t kmer_size){
 
 
 void kmer_gwas_table_free(KmerGwasTable ** kgt){
+	
+	if((*kgt)->mem_table != 0){
+		kmer_gwas_table_mmap_close((*kgt));
+	}
 	if((*kgt)->kmer == NULL){
 		free((*kgt)->kmer);
 	}
@@ -143,6 +147,7 @@ void kmer_gwas_table_mmap_close(KmerGwasTable * kgt){
 	int status = fstat (kgt->mem_table, & s);
 	assert(status == 0);
 	munmap(kgt->kmer, s.st_size);
+	kgt->kmer = NULL;
 	close(kgt->mem_table);
 }
 

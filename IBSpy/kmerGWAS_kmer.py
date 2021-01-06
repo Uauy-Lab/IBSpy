@@ -39,6 +39,13 @@ class KmerGWASDB(KmerDB):
     def __contains__(self, key):
         return key in self.db
 
+    def save(self, filename):
+        self.db.save(filename)
+
+    def load(self, filename):
+    	self.db.read_mmap(filename)
+
+
 class KmerGWASDBBuilder(KmerBuilder):
     # cdef char* _builder
     def __init__(self, kmer_size):

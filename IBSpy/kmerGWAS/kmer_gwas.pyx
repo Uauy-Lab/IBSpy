@@ -8,12 +8,14 @@ cdef extern from "stdint.h":
 
 ctypedef uint64_t kmerGWAS_kmer
 
-cdef struct KmerGwasTable:
-	uint64_t number_of_kmers
-	uint64_t capacity
-	kmerGWAS_kmer * kmer
-	uint8_t kmer_size
-	uint8_t readonly
+cdef extern from "kmer_db.h":
+	struct KmerGwasTable:
+		uint64_t number_of_kmers
+		uint64_t capacity
+		kmerGWAS_kmer * kmer
+		uint8_t kmer_size
+		uint8_t readonly
+
 
 cdef class KmerGWAS_builder:
 	cdef short _kmer_size
@@ -46,7 +48,7 @@ cdef class KmerGWAS_database:
 	cdef KmerGwasTable * _kgt
 
 	def __cinit__(self, kmer_size): 
-		self._kgt = <KmerGwasTable *> kmer_gwas.kmer_gwas_table_new(kmer_size)
+		self._kgt = kmer_gwas.kmer_gwas_table_new(kmer_size)
 
 	def kmer_size(self):
 		return self._kgt.kmer_size
@@ -54,6 +56,14 @@ cdef class KmerGWAS_database:
 	def add_kmers(self, sequence):
 		py_byte_string = sequence.encode('UTF-8')
 		kmer_gwas.kmer_gwas_table_add_kmers_from_string(py_byte_string, self._kgt)
+
+	def read_mmap(self, filename):
+		py_byte_string = filename.encode('UTF-8')
+		kmer_gwas.kmer_gwas_table_mmap_read(py_byte_string, self._kgt)
+
+	def save(self, filename):
+		py_byte_string = filename.encode('UTF-8')
+		kmer_gwas.kmer_gwas_table_save(py_byte_string, self._kgt)
 
 	def sort_unique(self):
 		return kmer_gwas.kmer_gwas_sort_and_filter_unique(self._kgt)
