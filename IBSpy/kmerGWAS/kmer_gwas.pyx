@@ -24,7 +24,6 @@ cdef class KmerGWAS_builder:
 		self._kmer_size = kmer_size
 		self._buffer = kmer_gwas.kmer_string_alloc(kmer_size)
 
-
 	def string_to_kmer(self, sequence):
 		py_byte_string = sequence.encode('UTF-8')
 		strcpy(self._buffer, py_byte_string)

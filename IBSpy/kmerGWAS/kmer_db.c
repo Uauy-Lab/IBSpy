@@ -104,7 +104,6 @@ void kmer_gwas_table_add_kmers_from_string(char * sequence, KmerGwasTable * kgt)
 			kmer_gwas_table_push_kmer(tmp_kmer, kgt);
 		}
 	}
-	//kmer_gwas_sort_and_filter_unique(kgt);
 }
 
 kmerGWAS_kmer kmer_gwas_table_get(uint64_t index, KmerGwasTable * kgt){
