@@ -40,5 +40,10 @@ setuptools.setup(
     #ext_modules=[module1]
     ext_modules = cythonize(
         [module1],
-        compiler_directives={'language_level': "3"})
+        compiler_directives={'language_level': "3"}),
+    entry_points={  # Optional
+        'console_scripts': [
+            'IBSpy=IBSpy:main',
+        ],
+    }
 )

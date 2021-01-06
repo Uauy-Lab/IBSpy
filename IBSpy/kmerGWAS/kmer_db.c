@@ -56,8 +56,9 @@ kmerGWAS_kmer * kmer_gwas_table_find(kmerGWAS_kmer kmer, KmerGwasTable * kgt){
 	if(kgt->number_of_kmers == 0){
 		return NULL;
 	}
+	//fprintf(stderr, "kmers_size %i %llu\n",sizeof(kmer), kgt->number_of_kmers);
 	return bsearch(&kmer, kgt->kmer, kgt->number_of_kmers ,
-		sizeof(* kgt->kmer), kmer_compare_internal);
+		sizeof(kmer), kmer_compare_internal);
 }
 
 
@@ -128,15 +129,19 @@ void kmer_gwas_table_save(char * filename, KmerGwasTable * kgt){
 
 void kmer_gwas_table_mmap_read(char * file, KmerGwasTable * kgt ){
 	struct stat s;
-	int size;
+	uint64_t size;
 	//FILE * fd = fopen (file, "rb");
 	int fd = open (file, O_RDONLY);
 	/* Get the size of the file. */
     int status = fstat (fd, & s);
     assert(status == 0);
+    kmerGWAS_kmer kmer;
     size = s.st_size;
+
+    //fprintf(stderr, "%llu, %lu, %i\n", size, sizeof(kmer), sizeof(s.st_size));
+
     kgt->kmer = (kmerGWAS_kmer *) mmap (NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
-	kgt->number_of_kmers = size / sizeof(kmerGWAS_kmer);
+	kgt->number_of_kmers = size / sizeof(kmer);
 	kgt->readonly = true;
 	kgt->mem_table = fd;
 	return;
