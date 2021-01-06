@@ -150,23 +150,10 @@ class TestKmerGWAS(unittest.TestCase):
 			windows = kmerdb.kmers_in_windows(path, window_size=3000)
 			obs =  map(lambda w: w['observed_kmers'], windows)
 			j = 0
-			#print(list(obs))
-			#print(expected[i])
-			#print("..")
 			for o in obs:
-				#print(o)
 				self.assertEqual(expected[i][j], o)
 				j += 1
 			i += 1
-			
-			#for w in windows:
-			#	print(w)
-
-
-
-
-
-
 
 if __name__ == '__main__':
 	unittest.main()
