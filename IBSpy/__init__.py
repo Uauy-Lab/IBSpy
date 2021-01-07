@@ -1,6 +1,6 @@
 from .kmer_database import KmerDB, KmerBuilder, FastaChunkReader
 from .kmerGWAS_kmer import KmerGWASDB, KmerGWASDBBuilder
-from .programs.IBSpy_window_count import window_count
+from .IBSpy_window_count import window_count
 import argparse
 
 
