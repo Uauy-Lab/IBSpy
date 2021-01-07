@@ -1,6 +1,6 @@
 from .kmer_database import KmerDB, KmerBuilder, FastaChunkReader
 from .kmerGWAS_kmer import KmerGWASDB, KmerGWASDBBuilder
-from .programs import IBSpy_window_count
+from .programs.IBSpy_window_count import window_count
 import argparse
 
 
@@ -19,7 +19,7 @@ def main():
 	parser.add_argument("-o", "--output", default=None, 
 		help="Output file. If missing, the ouptut is sent to stdout")
 	args = parser.parse_args()
-	IBSpy_window_count.window_count(args)
+	window_count(args)
 
 if __name__ == '__main__':
 	main()
