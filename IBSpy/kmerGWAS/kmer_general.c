@@ -59,7 +59,8 @@ kmerGWAS_kmer kmer_shift_and_insert(kmerGWAS_kmer kmer, char base, uint8_t kmer_
 kmerGWAS_kmer kmer2bits(char * kmer, uint8_t kmer_size) {
 	kmerGWAS_kmer b  = 0;
 	kmerGWAS_kmer bt = 0;
-	for(int i=0; i < kmer_size; i++) {
+	int i;
+	for(i=0; i < kmer_size; i++) {
 		b = kmer_shift_and_insert(b, kmer[i], kmer_size);
 	}
 	b &= KMERGWAS_ORIENTATION_MASK;

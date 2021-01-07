@@ -73,7 +73,8 @@ uint64_t kmer_gwas_sort_and_filter_unique(KmerGwasTable * kgt){
 	}
 	qsort(kgt->kmer, kgt->number_of_kmers, sizeof(* kgt->kmer), kmer_compare_internal);
 	last_kmer = kgt->kmer[0];
-	for(uint64_t i=1; i < kgt->number_of_kmers; i++ ){
+	uint64_t i;
+	for(i=1; i < kgt->number_of_kmers; i++ ){
 		current_kmer = kgt->kmer[i];
 		cmp = kmer_compare_internal(&last_kmer, &current_kmer);
 		assert(cmp >= 0);
@@ -96,12 +97,14 @@ void kmer_gwas_table_add_kmers_from_string(char * sequence, KmerGwasTable * kgt)
 	uint64_t len = strlen(sequence);
 	uint64_t total_kmers = len - kmer_size + 1;
 	uint64_t current_stretch = 0;
+	uint64_t i;
 	assert(kgt->readonly == false);
 	Nucleotide n;
 	kgt->capacity    = kgt->number_of_kmers +  total_kmers;
 	kgt->kmer = realloc(kgt->kmer, sizeof(kmerGWAS_kmer) * kgt->capacity );
 	kmerGWAS_kmer tmp_kmer = 0L;
-	for(uint64_t i = 0; i < len; i++){
+
+	for(i = 0; i < len; i++){
 		n = char_to_binary_nucleotide(sequence[i]);
 		if(n == Undefined){
 			current_stretch = 0;
