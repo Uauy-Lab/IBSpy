@@ -13,7 +13,7 @@
 typedef uint64_t kmerGWAS_kmer;
 
 // Func: kmer reverse complement
-inline kmerGWAS_kmer kmer_reverse_complement(kmerGWAS_kmer x, const uint8_t k_len) {
+static inline kmerGWAS_kmer kmer_reverse_complement(kmerGWAS_kmer x, const uint8_t k_len) {
 	x = ((x & 0xFFFFFFFF00000000) >> 32) | ((x & 0x00000000FFFFFFFF) << 32);
 	x = ((x & 0xFFFF0000FFFF0000) >> 16) | ((x & 0x0000FFFF0000FFFF) << 16);
 	x = ((x & 0xFF00FF00FF00FF00) >> 8)  | ((x & 0x00FF00FF00FF00FF) << 8);
