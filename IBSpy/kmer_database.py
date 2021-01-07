@@ -20,7 +20,7 @@ class KmerDB(ABC):
         f = filter(lambda k: k in self, kmers)
         return reduce(lambda x, y: x + 1 , f, 0)
 
-    def kmers_in_windows(self, path, window_size=1000):
+    def kmers_in_windows(self, path, window_size=1000, chunk=0, total_chunks=1):
         def window_summary(seq):
             kmers = self.builder.sequence_to_kmers(seq['seq'], convert=True)
             total = self.count_kmers_from_sequence(kmers)
@@ -32,7 +32,7 @@ class KmerDB(ABC):
             'observed_kmers': total
             }
         fasta_iter = FastaChunkReader(path, 
-            chunk_size = window_size, kmer_size=self.kmer_size)
+            chunk_size = window_size, kmer_size=self.kmer_size, chunk=0, total_chunks=1)
         return map(window_summary, fasta_iter )
 
 class KmerBuilder(ABC):
@@ -64,13 +64,16 @@ class KmerBuilder(ABC):
 
 
 class FastaChunkReader:
-    def __init__(self, filename, chunk_size=10000, kmer_size=31):
-        self.fasta = Fasta(filename)
-        self.current_ref = 0
+    def __init__(self, filename, chunk_size=10000, kmer_size=31, 
+        chunk=0, total_chunks=1):
+        self.fasta         = Fasta(filename)
+        self.current_ref   = 0
         self.current_start = 0
-        self.chunk_size = chunk_size
-        self.kmer_size = kmer_size
-        self.seqnames = list(self.fasta.keys())
+        self.chunk_size    = chunk_size
+        self.kmer_size     = kmer_size
+        self.seqnames      = list(self.fasta.keys())
+        self.chunk         = chunk
+        self.total_chunks  = total_chunks
 
     def __iter__(self):
         return self

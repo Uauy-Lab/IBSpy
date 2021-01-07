@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import gzip
 from sys import stdout
@@ -38,19 +40,8 @@ def window_count(args):
 	if(args.output is not None):
 		out.close()
 
-if __name__ == '__main__':
 
-	# args = {
-	# window_size : 1000000,
-	# kmers_path  : "./tests/data/test4B.jagger.kmerGWAS_k31",
-	# reference   : "./tests/data/test4B.stanley.fa",
-	# kmer_size   : 31,
-	# compress    : True,
-	# output      : None
-	# }
-
-	#We need to add the different databases
-
+def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-w", "--window_size", default=500000,
 		help="window size to analyze", type=int)
@@ -65,9 +56,26 @@ if __name__ == '__main__':
 	parser.add_argument("-o", "--output", default=None, 
 		help="Output file. If missing, the ouptut is sent to stdout")
 	args = parser.parse_args()
+	window_count(args)
+
+if __name__ == '__main__':
+	main()
+
+	# args = {
+	# window_size : 1000000,
+	# kmers_path  : "./tests/data/test4B.jagger.kmerGWAS_k31",
+	# reference   : "./tests/data/test4B.stanley.fa",
+	# kmer_size   : 31,
+	# compress    : True,
+	# output      : None
+	# }
+
+	#We need to add the different databases
+
+	
 
 	
 	#parser = argparse.ArgumentParser()
 	#parser.parse_args()
 
-	window_count(args)
+	

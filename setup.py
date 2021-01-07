@@ -22,9 +22,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="IBSpy", # Replace with your own username
-    version="0.0.1",
+    version="0.0.2",
     author="Ricardo H. Ramirez-Gonzalez",
-    author_email="ricardo.ramirez-gonzalez@jic.ac.ul",
+    author_email="ricardo.ramirez-gonzalez@jic.ac.uk",
     description="A package to detect IBS regions",
     long_description=long_description,
     long_description_content_type="text/markdown",
