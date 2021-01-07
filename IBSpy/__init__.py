@@ -1,6 +1,8 @@
 from .kmer_database import KmerDB, KmerBuilder, FastaChunkReader
 from .kmerGWAS_kmer import KmerGWASDB, KmerGWASDBBuilder
-from .bin/IBSpy_window_count import window_count
+from .bin.IBSpy_window_count import window_count
+import argparse
+
 
 def main():
 	parser = argparse.ArgumentParser()
