@@ -3,7 +3,7 @@
 import argparse
 import gzip
 from sys import stdout
-from IBSpy import KmerGWASDBBuilder, KmerGWASDB, FastaChunkReader 
+from ..IBSpy import KmerGWASDBBuilder, KmerGWASDB, FastaChunkReader 
 
 def window_count(args):
 	window_size = 1000
