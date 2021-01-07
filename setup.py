@@ -11,7 +11,7 @@ def unit_tests():
 # See https://stackoverflow.com/a/51272967/5188860
 module1 = Extension('kmerGWAS',
                    #sources = ['IBSpy/kmerGWAS/kmer_gwas.pyx']
-                     sources = ['IBSpy/kmerGWAS/nucleotide.c', 
+                     sources = ['IBSpy/kmerGWAS/nucleotide.c',
                                 'IBSpy/kmerGWAS/kmer_gwas.pyx',
                                 'IBSpy/kmerGWAS/kmer_general.c',
                                 'IBSpy/kmerGWAS/kmer_db.c']
@@ -22,7 +22,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="IBSpy", # Replace with your own username
-    version="0.0.2",
+    version="0.0.6",
     author="Ricardo H. Ramirez-Gonzalez",
     author_email="ricardo.ramirez-gonzalez@jic.ac.uk",
     description="A package to detect IBS regions",

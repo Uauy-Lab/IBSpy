@@ -75,6 +75,8 @@ class FastaChunkReader:
         self.chunk         = chunk
         self.total_chunks  = total_chunks
 
+        
+
     def __iter__(self):
         return self
 

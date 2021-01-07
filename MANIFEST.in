@@ -1,0 +1,10 @@
+include README.md
+include LICENSE
+recursive-include IBSpy *pyx
+recursive-include IBSpy *pxd
+recursive-include IBSpy *.h
+recursive-include IBSpy *.c
+recursive-include IBSPy *.py
+recursive-include tests *
+global-exclude *.pyc
+global-exclude .DS_Store
