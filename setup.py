@@ -43,7 +43,8 @@ setuptools.setup(
         compiler_directives={'language_level': "3"}),
     entry_points={  # Optional
         'console_scripts': [
-            'IBSpy=IBSpy:main',
+            'IBSpy_wcount=IBSpy.bin.IBSpy_window_count:main',
+            'IBSpy=IBSpy:main'
         ],
     }
 )
