@@ -34,7 +34,8 @@ const int nucelotide_char2bin_table[] = {
 int nucleotide_table_printed = 0;
 
 void nucleotide_print_table(){
-    for(int i = 0; i < 128; i++){
+    int i;
+    for(i = 0; i < 128; i++){
         fprintf(stderr, "%i: %c %i\n",i, i, nucelotide_char2bin_table[(int) i]) ; 
     }  
 }
