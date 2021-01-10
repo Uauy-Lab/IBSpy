@@ -30,13 +30,14 @@ jobs:
         wget https://github.com/gmarcais/Jellyfish/releases/download/v2.3.0/jellyfish-2.3.0.tar.gz
         tar -xzf jellyfish-2.3.0.tar.gz
         cd jellyfish-2.3.0 
-        ./configure --prefix=$HOME
+        ./configure --enable-python-binding
         make -j 4
         make install
-        cd swig/python
-        python setup.py build
-        python setup.py install 
-        cd ../../..
+        #cd swig/python
+        #python setup.py build
+        #python setup.py install 
+        #cd ../../..
+        cd ..
         python -m pip install --upgrade pip
         python -m pip install flake8 cython pysam biopython pyfaidx
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
