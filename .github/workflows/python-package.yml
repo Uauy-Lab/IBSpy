@@ -32,7 +32,7 @@ jobs:
         cd jellyfish-2.3.0 
         ./configure --enable-python-binding
         make -j 4
-        make install
+        sudo make install
         #cd swig/python
         #python setup.py build
         #python setup.py install 
