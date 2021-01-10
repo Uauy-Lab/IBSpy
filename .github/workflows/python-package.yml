@@ -25,11 +25,15 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        sudo apt update
-        sudo apt install jellyfish wget
+        #sudo apt update
+        #sudo apt install jellyfish wget
         wget https://github.com/gmarcais/Jellyfish/releases/download/v2.3.0/jellyfish-2.3.0.tar.gz
         tar -xzf jellyfish-2.3.0.tar.gz
-        cd jellyfish-2.3.0/swig/python
+        cd jellyfish-2.3.0 
+        ./configure --prefix=$HOME
+        make -j 4
+        make install
+        cd swig/python
         python setup.py build
         python setup.py install 
         cd ../../..
