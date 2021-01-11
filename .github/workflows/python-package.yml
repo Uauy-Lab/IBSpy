@@ -32,7 +32,7 @@ jobs:
         cd jellyfish-2.3.0 
         ./configure --enable-python-binding
         make -j 4
-        sudo make install
+        sudo  make install
         #cd swig/python
         #python setup.py build
         #python setup.py install 
@@ -41,6 +41,9 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install flake8 cython pysam biopython pyfaidx
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        #export PYTHONPATH=$PYTHONPATH:/opt/hostedtoolcache/Python/3.8.6/x64/lib/python3.8/site-packages
+        echo $PYTHONPATH
+        env
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
