@@ -61,9 +61,10 @@ class TestJellyfish(unittest.TestCase):
 	def test_kmer_db(self):
 		if not loaded:
 			print("JellyFish python module not installed", file=sys.stderr)
-		kmerdb = JellyfishSDB(31)
-		kmerdb.load(self.data_path + "/test4B.jagger.fa.k31.jf")
-		self.run_db_tests(kmerdb)
+		else:
+			kmerdb = JellyfishSDB(31)
+			kmerdb.load(self.data_path + "/test4B.jagger.fa.k31.jf")
+			self.run_db_tests(kmerdb)
 
 
 if __name__ == '__main__':
