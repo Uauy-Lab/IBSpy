@@ -3,11 +3,18 @@ from .kmer_database import KmerDB, KmerBuilder, FastaChunkReader
 # from ctypes import *
 import os
 import inspect
-import dna_jellyfish as jf
+loaded=False
+try:
+    import dna_jellyfish as jf
+    loaded=True
+except ImportError, e:
+    pass
 
 
 class JellyfishSDB(KmerDB):
     def __init__(self, kmer_size):
+        if not loaded:
+            raise "Jellyfish not loaded"
         self.kmer_size = kmer_size
         #self.db  = kmerGWAS.KmerGWAS_database(kmer_size) 
         self.db = None
@@ -41,6 +48,8 @@ class JellyfishSDB(KmerDB):
 
 class JellyfishBuilder(KmerBuilder):
     def __init__(self, kmer_size):
+        if not loaded:
+            raise "Jellyfish not loaded"
         self.kmer_size = kmer_size
 
     def string_to_kmer(self, sequence):
