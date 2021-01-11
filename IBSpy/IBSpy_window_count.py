@@ -9,7 +9,13 @@ def window_count(args):
 	reference  = "./tests/data/test4B.stanley.fa"
 	kmer_size   = 31
 
-	kmerdb = KmerGWASDB(args.kmer_size)
+	kmerdb = None
+
+	if(args.database_format=="kmerGWAS"):
+		kmerdb = KmerGWASDB(args.kmer_size)
+	if(args.database_format=="jellyfish"):
+		kmerdb = JellyfishSDB(args.kmer_size)
+	
 	kmerdb.load(args.database)
 	windows = kmerdb.kmers_in_windows(args.reference, window_size=args.window_size)
 	printed = False
@@ -53,6 +59,8 @@ def main():
 		help="When an ouput file is present, it is compressed as .gz")
 	parser.add_argument("-o", "--output", default=None, 
 		help="Output file. If missing, the ouptut is sent to stdout")
+	parser.add_argument("-f". "--database_format", default="kmerGWAS", choices=["kmerGWAS", "jellyfish"],
+		help="Database format (kmerGWAS, jellyfish)")
 	args = parser.parse_args()
 	window_count(args)
 
