@@ -7,7 +7,7 @@ loaded=False
 try:
     import dna_jellyfish as jf
     loaded=True
-except ImportError, e:
+except ImportError:
     pass
 
 
