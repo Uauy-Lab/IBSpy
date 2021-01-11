@@ -18,7 +18,7 @@ def main():
 		help="When an ouput file is present, it is compressed as .gz")
 	parser.add_argument("-o", "--output", default=None, 
 		help="Output file. If missing, the ouptut is sent to stdout")
-	parser.add_argument("-f". "--database_format", default="kmerGWAS", choices=["kmerGWAS", "jellyfish"],
+	parser.add_argument("-f", "--database_format", default="kmerGWAS", choices=["kmerGWAS", "jellyfish"],
 		help="Database format (kmerGWAS, jellyfish)")
 	args = parser.parse_args()
 	window_count(args)
