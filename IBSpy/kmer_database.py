@@ -3,7 +3,7 @@ from pyfaidx import Fasta
 from functools import reduce 
 
 class WindowStats:
-    __slots__ = ['seqname', 'start', 'end','total_kmers', 'observed_kmers', 'variations', 'edit_distance']
+    __slots__ = ['seqname', 'start', 'end','total_kmers', 'observed_kmers', 'variations', 'bubble_distance']
 
 class KmerDB(ABC):
     
@@ -27,11 +27,13 @@ class KmerDB(ABC):
         stats = WindowStats()
         stats.observed_kmers = 0
         stats.variations     = 0
-        stats.edit_distance  = 0
+        stats.bubble_distance  = 0
         stats.total_kmers = len(kmers)
         last_present = True
         gap_size = 0
+        i = 0
         for k in kmers: 
+            i += 1
             present = k in self 
             if not present:
                 gap_size += 1
@@ -39,10 +41,16 @@ class KmerDB(ABC):
                 stats.observed_kmers += 1
                 if gap_size > 0:
                     stats.variations += 1
+                    bubble_distance = gap_size - (self.kmer_size -1)
+                    #print(str(i) + ": " + str(gap_size) + ": "+ str(bubble_distance))
+                    if bubble_distance <= 0:
+                        bubble_distance = abs(bubble_distance + 1)
+                    #print(str(i) + ": " + str(gap_size) + ": "+ str(bubble_distance))
+                    stats.bubble_distance += bubble_distance
                 gap_size = 0;
 
             last_present = present
-
+        #print(".....")
         return stats
 
     def kmers_in_windows(self, path, window_size=1000, chunk=0, total_chunks=1):
