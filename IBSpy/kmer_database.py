@@ -51,6 +51,12 @@ class KmerDB(ABC):
 
             last_present = present
         #print(".....")
+        if gap_size > 0:
+            stats.variations += 1
+            bubble_distance = gap_size - (self.kmer_size -1)
+            if bubble_distance <= 0:
+                bubble_distance = abs(bubble_distance + 1)
+            stats.bubble_distance += bubble_distance
         return stats
 
     def kmers_in_windows(self, path, window_size=1000, chunk=0, total_chunks=1):
