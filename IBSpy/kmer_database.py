@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod, abstractproperty
 from pyfaidx import Fasta
 from functools import reduce 
 
+class WindowStats:
+    __slots__ = ['seqname', 'start', 'end','total_kmers', 'observed_kmers', 'variations', 'edit_distance']
+
 class KmerDB(ABC):
     
     @abstractproperty
@@ -20,19 +23,38 @@ class KmerDB(ABC):
         f = filter(lambda k: k in self, kmers)
         return reduce(lambda x, y: x + 1 , f, 0)
 
+    def kmers_stats_from_sequence(self, kmers): 
+        stats = WindowStats()
+        stats.observed_kmers = 0
+        stats.variations     = 0
+        stats.edit_distance  = 0
+        stats.total_kmers = len(kmers)
+        last_present = True
+        gap_size = 0
+        for k in kmers: 
+            present = k in self 
+            if not present:
+                gap_size += 1
+            else:
+                stats.observed_kmers += 1
+                if gap_size > 0:
+                    stats.variations += 1
+                gap_size = 0;
+
+            last_present = present
+
+        return stats
+
     def kmers_in_windows(self, path, window_size=1000, chunk=0, total_chunks=1):
         def window_summary(seq):
             kmers = self.builder.sequence_to_kmers(seq['seq'], convert=True)
-            total = self.count_kmers_from_sequence(kmers)
-            return {
-            'seqname': seq['seqname'],
-            'start': seq['start'],
-            'end': seq['end'],
-            'total_kmers': len(kmers),
-            'observed_kmers': total
-            }
-        fasta_iter = FastaChunkReader(path, 
-            chunk_size = window_size, kmer_size=self.kmer_size, chunk=0, total_chunks=1)
+            stats = self.kmers_stats_from_sequence(kmers)
+            stats.seqname = seq['seqname']
+            stats.start   = seq['start']
+            stats.end     = seq['end']
+            return stats
+        fasta_iter = FastaChunkReader(path, chunk_size = window_size, 
+            kmer_size=self.kmer_size, chunk=chunk, total_chunks=total_chunks)
         return map(window_summary, fasta_iter )
 
 class KmerBuilder(ABC):

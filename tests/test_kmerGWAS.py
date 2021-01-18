@@ -140,14 +140,25 @@ class TestKmerGWAS(unittest.TestCase):
 		[2970, 2201], [2970, 2201], [2970, 2201], [2970, 2201],
 		[2879, 2176], [2970, 2201]
 		]
+
+		expected_variations = [
+		[0, 0], [1, 1], [0, 0], [0],
+		[0, 0], [0, 0], [0, 0], [0, 0],
+		[2, 1], [0, 0]
+		]
 		i = 0
 		for r in references:	
 			path = self.data_path + "/test4B." + r + ".fa"
 			windows = kmerdb.kmers_in_windows(path, window_size=3000)
-			obs =  map(lambda w: w['observed_kmers'], windows)
+			obs =  map(lambda w: w.observed_kmers, windows)
+			variations = map(lambda w: w.variations, windows)
 			j = 0
 			for o in obs:
 				self.assertEqual(expected[i][j], o)
+				j += 1
+			j = 0
+			for v in variations:
+				self.assertEqual(expected_variations[i][j], v)
 				j += 1
 			i += 1
 

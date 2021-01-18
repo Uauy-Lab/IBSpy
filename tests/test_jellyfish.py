@@ -49,7 +49,7 @@ class TestJellyfish(unittest.TestCase):
 		for r in references:	
 			path = self.data_path + "/test4B." + r + ".fa"
 			windows = kmerdb.kmers_in_windows(path, window_size=3000)
-			obs =  map(lambda w: w['observed_kmers'], windows)
+			obs =  map(lambda w: w.observed_kmers, windows)
 			j = 0
 			for o in obs:
 				self.assertEqual(expected[i][j], o)
@@ -58,7 +58,7 @@ class TestJellyfish(unittest.TestCase):
 
 
 
-	def test_kmer_db(self):
+	def test_jellyfish_db(self):
 		if not loaded:
 			print("JellyFish python module not installed", file=sys.stderr)
 		else:
