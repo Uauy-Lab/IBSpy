@@ -164,34 +164,20 @@ class TestKmerGWAS(unittest.TestCase):
 			windows = kmerdb.kmers_in_windows(path, window_size=3000)
 			bubble_distance2 = list(map(lambda w: w.bubble_distance, windows))
 			j = 0
-			#print(obs)
-			#print(variations)
-			#print(bubble_distance2)
 			for v in bubble_distance2:
-				#print("----")
-				#print(str(v) + "==" + str(expected_bubble_distance[i][j]) )
 				self.assertEqual(expected_bubble_distance[i][j], v)
 				j += 1
 				total += 1
-			#print(str(list(bubble_distance2)), ",")
 			j = 0
 			for o in obs:
 				self.assertEqual(expected[i][j], o)
-				#print(str(o) + "--" + str(expected[i][j]) )
 				j += 1
 				total += 1
 			j = 0
 			for v in variations:
 				self.assertEqual(expected_variations[i][j], v)
-				#print(str(v) + ".." + str(expected_variations[i][j]) )
 				j += 1
-				total += 1
-			
-			#print(j)
-			#bubble_distance2 = map(lambda w: w.bubble_distance, windows)
-			#print(str(list(bubble_distance2)), ",")
-			#print(".-.-.")
-			
+				total += 1			
 			i += 1
 		self.assertEqual(57, total) #If this fails, not all the tests are being run
 
