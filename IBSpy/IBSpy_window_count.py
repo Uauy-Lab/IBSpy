@@ -3,49 +3,56 @@ import gzip
 from sys import stdout
 from IBSpy import KmerGWASDBBuilder, KmerGWASDB, FastaChunkReader, JellyfishSDB, JellyfishBuilder 
 
+
+def print_line(out, line, compress):
+	line += "\n"
+	if compress:
+		line=line.encode()
+	out.write(line)
+
+def open_out(args):
+	out = stdout
+	if(args.compress and args.output is not None) :
+		out = gzip.open(args.output + ".gz", 'w') 
+	if(not args.compress and args.output is not None) :
+		out = open(args.output , 'w')
+	return out
+
+def close_out(out, args):
+	if(args.output is not None):
+		out.close()
+
+def open_db(args):
+	kmerdb = None
+	if(args.database_format=="kmerGWAS"):
+		kmerdb = KmerGWASDB(args.kmer_size)
+	if(args.database_format=="jellyfish"):
+		kmerdb = JellyfishSDB(args.kmer_size)
+	kmerdb.load(args.database)
+	return kmerdb
+
+
 def window_count(args):
 	window_size = 1000
 	kmers_path  = "./tests/data/test4B.jagger.kmerGWAS_k31"
 	reference  = "./tests/data/test4B.stanley.fa"
 	kmer_size   = 31
-
-	kmerdb = None
-
-	if(args.database_format=="kmerGWAS"):
-		kmerdb = KmerGWASDB(args.kmer_size)
-	if(args.database_format=="jellyfish"):
-		kmerdb = JellyfishSDB(args.kmer_size)
-	
-	kmerdb.load(args.database)
+	kmerdb = open_db(args)
 	windows = kmerdb.kmers_in_windows(args.reference, window_size=args.window_size)
 	printed = False
-	out = stdout
-
-	if(args.compress and args.output is not None) :
-		out = gzip.open(args.output + ".gz", 'w') 
-
-	if(not args.compress and args.output is not None) :
-		out = open(args.output , 'w') 
+	out = open_out(args)
 
 	for w in windows:
 		if not printed:
 			line = w.header()
-			line += "\n"
-			if args.compress:
-				line=line.encode()
-			out.write(line)
+			print_line(out, line, args.compress)
 			printed = True
 		line = w.csv()
-		line += "\n"  
-		if args.compress:
-			line=line.encode()
-		out.write(line)
+		print_line(out, line, args.compress)
+	close_out(out, args)
+	
 
-	if(args.output is not None):
-		out.close()
-
-
-def main():
+def parse_arguments():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-w", "--window_size", default=500000,
 		help="window size to analyze", type=int)
@@ -62,26 +69,12 @@ def main():
 	parser.add_argument("-f", "--database_format", default="kmerGWAS", choices=["kmerGWAS", "jellyfish"],
 		help="Database format (kmerGWAS, jellyfish)")
 	args = parser.parse_args()
+	return args
+
+
+def main():
+	args = parse_arguments()
 	window_count(args)
 
 if __name__ == '__main__':
 	main()
-
-	# args = {
-	# window_size : 1000000,
-	# kmers_path  : "./tests/data/test4B.jagger.kmerGWAS_k31",
-	# reference   : "./tests/data/test4B.stanley.fa",
-	# kmer_size   : 31,
-	# compress    : True,
-	# output      : None
-	# }
-
-	#We need to add the different databases
-
-	
-
-	
-	#parser = argparse.ArgumentParser()
-	#parser.parse_args()
-
-	
