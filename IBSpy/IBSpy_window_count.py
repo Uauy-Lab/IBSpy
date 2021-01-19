@@ -29,13 +29,13 @@ def window_count(args):
 
 	for w in windows:
 		if not printed:
-			line = "\t".join(w.keys())
+			line = w.header()
 			line += "\n"
 			if args.compress:
 				line=line.encode()
 			out.write(line)
 			printed = True
-		line = "\t".join(map(str,w.values()))
+		line = w.csv()
 		line += "\n"  
 		if args.compress:
 			line=line.encode()

@@ -3,7 +3,15 @@ from pyfaidx import Fasta
 from functools import reduce 
 
 class WindowStats:
-    __slots__ = ['seqname', 'start', 'end','total_kmers', 'observed_kmers', 'variations', 'bubble_distance']
+    __dict__ = ['seqname', 'start', 'end','total_kmers', 
+    'observed_kmers', 'variations', 'kmer_distance']
+
+    def header(self, sep="\t"):
+        return sep.join(vars(self))
+
+    def csv(self, sep="\t"):
+        vs = map(lambda w: getattr(self, w), vars(self))
+        return sep.join(map(str, vs))
 
 class KmerDB(ABC):
     
@@ -27,7 +35,7 @@ class KmerDB(ABC):
         stats = WindowStats()
         stats.observed_kmers = 0
         stats.variations     = 0
-        stats.bubble_distance  = 0
+        stats.kmer_distance  = 0
         stats.total_kmers = len(kmers)
         last_present = True
         gap_size = 0
@@ -41,22 +49,22 @@ class KmerDB(ABC):
                 stats.observed_kmers += 1
                 if gap_size > 0:
                     stats.variations += 1
-                    bubble_distance = gap_size - (self.kmer_size -1)
-                    #print(str(i) + ": " + str(gap_size) + ": "+ str(bubble_distance))
-                    if bubble_distance <= 0:
-                        bubble_distance = abs(bubble_distance + 1)
-                    #print(str(i) + ": " + str(gap_size) + ": "+ str(bubble_distance))
-                    stats.bubble_distance += bubble_distance
+                    kmer_distance = gap_size - (self.kmer_size -1)
+                    #print(str(i) + ": " + str(gap_size) + ": "+ str(kmer_distance))
+                    if kmer_distance <= 0:
+                        kmer_distance = abs(kmer_distance + 1)
+                    #print(str(i) + ": " + str(gap_size) + ": "+ str(kmer_distance))
+                    stats.kmer_distance += kmer_distance
                 gap_size = 0;
 
             last_present = present
         #print(".....")
         if gap_size > 0:
             stats.variations += 1
-            bubble_distance = gap_size - (self.kmer_size -1)
-            if bubble_distance <= 0:
-                bubble_distance = abs(bubble_distance + 1)
-            stats.bubble_distance += bubble_distance
+            kmer_distance = gap_size - (self.kmer_size -1)
+            if kmer_distance <= 0:
+                kmer_distance = abs(kmer_distance + 1)
+            stats.kmer_distance += kmer_distance
         return stats
 
     def kmers_in_windows(self, path, window_size=1000, chunk=0, total_chunks=1):

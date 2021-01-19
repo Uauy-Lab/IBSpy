@@ -147,7 +147,7 @@ class TestKmerGWAS(unittest.TestCase):
 		[2, 1], [0, 0]
 		]
 
-		expected_bubble_distance=[
+		expected_kmer_distance=[
 		[0, 0], [1, 1], [0, 0], [0],
 		[0, 0], [0, 0], [0, 0], [0, 0],
 		[31, 2], [0, 0]
@@ -157,15 +157,14 @@ class TestKmerGWAS(unittest.TestCase):
 		total = 0
 		for r in references:	
 			path = self.data_path + "/test4B." + r + ".fa"
-			windows = kmerdb.kmers_in_windows(path, window_size=3000)
+			windows = list(kmerdb.kmers_in_windows(path, window_size=3000))
 			obs =  list(map(lambda w: w.observed_kmers, windows))
-			windows = kmerdb.kmers_in_windows(path, window_size=3000)
 			variations = list(map(lambda w: w.variations, windows))
-			windows = kmerdb.kmers_in_windows(path, window_size=3000)
-			bubble_distance2 = list(map(lambda w: w.bubble_distance, windows))
+			kmer_distance2 = list(map(lambda w: w.kmer_distance, windows))
+			#print(windows[0].csv())
 			j = 0
-			for v in bubble_distance2:
-				self.assertEqual(expected_bubble_distance[i][j], v)
+			for v in kmer_distance2:
+				self.assertEqual(expected_kmer_distance[i][j], v)
 				j += 1
 				total += 1
 			j = 0
