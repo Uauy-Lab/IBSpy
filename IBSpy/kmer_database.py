@@ -50,15 +50,11 @@ class KmerDB(ABC):
                 if gap_size > 0:
                     stats.variations += 1
                     kmer_distance = gap_size - (self.kmer_size -1)
-                    #print(str(i) + ": " + str(gap_size) + ": "+ str(kmer_distance))
                     if kmer_distance <= 0:
                         kmer_distance = abs(kmer_distance + 1)
-                    #print(str(i) + ": " + str(gap_size) + ": "+ str(kmer_distance))
                     stats.kmer_distance += kmer_distance
                 gap_size = 0;
-
             last_present = present
-        #print(".....")
         if gap_size > 0:
             stats.variations += 1
             kmer_distance = gap_size - (self.kmer_size -1)
@@ -118,8 +114,6 @@ class FastaChunkReader:
         self.seqnames      = list(self.fasta.keys())
         self.chunk         = chunk
         self.total_chunks  = total_chunks
-
-        
 
     def __iter__(self):
         return self
