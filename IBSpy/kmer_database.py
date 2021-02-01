@@ -87,6 +87,11 @@ class KmerBuilder(ABC):
     def kmer_to_string(self, sequence):
         raise NotImplementedError
 
+    def compare(self, a, b):
+        ka = self.string_to_kmer(a)
+        kb = self.string_to_kmer(b)
+        return self._builder.compare(ka, kb)
+
     def sequence_to_kmers(self, sequence, filter_ambiguity=True, convert=False):
         ret = [None] * (len(sequence) - self.kmer_size + 1)
         sequence = sequence.upper()
