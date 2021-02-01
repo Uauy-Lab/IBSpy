@@ -63,7 +63,7 @@ class KmerDB(ABC):
             stats.kmer_distance += kmer_distance
         return stats
 
-    def kmers_in_windows(self, path, window_size=1000, chunk=0, total_chunks=1):
+    def kmers_in_windows(self, path, window_size=1000):
         def window_summary(seq):
             kmers = self.builder.sequence_to_kmers(seq['seq'], convert=True)
             stats = self.kmers_stats_from_sequence(kmers)
@@ -72,7 +72,7 @@ class KmerDB(ABC):
             stats.end     = seq['end']
             return stats
         fasta_iter = FastaChunkReader(path, chunk_size = window_size, 
-            kmer_size=self.kmer_size, chunk=chunk, total_chunks=total_chunks)
+            kmer_size=self.kmer_size)
         return map(window_summary, fasta_iter )
 
 class KmerBuilder(ABC):
@@ -93,9 +93,10 @@ class KmerBuilder(ABC):
         return self._builder.compare(ka, kb)
 
     def sequence_to_kmers(self, sequence, filter_ambiguity=True, convert=False):
-        ret = [None] * (len(sequence) - self.kmer_size + 1)
+        total_kmers = len(sequence) - self.kmer_size + 1
+        ret = [None] * (total_kmers)
         sequence = sequence.upper()
-        for start in range(0, len(sequence) - self.kmer_size + 1):
+        for start in range(0, total_kmers):
             end = start + self.kmer_size
             kmer = sequence[start:end]
             count = kmer.count("A")
@@ -109,16 +110,15 @@ class KmerBuilder(ABC):
 
 
 class FastaChunkReader:
-    def __init__(self, filename, chunk_size=10000, kmer_size=31, 
-        chunk=0, total_chunks=1):
+    def __init__(self, filename, chunk_size=10000, kmer_size=31):
         self.fasta         = Fasta(filename)
         self.current_ref   = 0
         self.current_start = 0
         self.chunk_size    = chunk_size
         self.kmer_size     = kmer_size
         self.seqnames      = list(self.fasta.keys())
-        self.chunk         = chunk
-        self.total_chunks  = total_chunks
+        #self.chunk         = chunk
+        #self.total_chunks  = total_chunks
 
     def __iter__(self):
         return self
