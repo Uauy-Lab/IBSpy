@@ -9,11 +9,18 @@ class WindowStats:
     def header(self, sep="\t"):
         return sep.join(vars(self))
 
+    def __init__(self):
+        self.observed_kmers = 0
+        self.variations     = 0
+        self.kmer_distance  = 0
+
     def csv(self, sep="\t"):
         vs = map(lambda w: getattr(self, w), vars(self))
         return sep.join(map(str, vs))
 
     def add_variation(self, gap_size, kmer_size):
+        if gap_size == 0:
+            return
         self.variations += 1
         kmer_distance = gap_size - (kmer_size - 1)
         if kmer_distance <= 0:
@@ -40,9 +47,6 @@ class KmerDB(ABC):
 
     def kmers_stats_from_sequence(self, kmers): 
         stats = WindowStats()
-        stats.observed_kmers = 0
-        stats.variations     = 0
-        stats.kmer_distance  = 0
         stats.total_kmers = len(kmers)
         last_present = True
         gap_size = 0
@@ -54,12 +58,11 @@ class KmerDB(ABC):
                 gap_size += 1
             else:
                 stats.observed_kmers += 1
-                if gap_size > 0:
-                    stats.add_variation(gap_size, self.kmer_size)
+                stats.add_variation(gap_size, self.kmer_size)
                 gap_size = 0;
             last_present = present
-        if gap_size > 0:
-            stats.add_variation(gap_size, self.kmer_size)
+        
+        stats.add_variation(gap_size, self.kmer_size)
         return stats
 
     def kmers_in_windows(self, path, window_size=1000):
