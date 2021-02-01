@@ -24,8 +24,10 @@ def close_out(out, args):
 
 def open_db(args):
 	kmerdb = None
-	if(args.database_format=="kmerGWAS"):
+	if(args.database_format=="kmerGWAS", mmap=False):
 		kmerdb = KmerGWASDB(args.kmer_size)
+	if(args.database_format=="kmerGWAS_mmap"):
+		kmerdb = KmerGWASDB(args.kmer_size, mmap=True)
 	if(args.database_format=="jellyfish"):
 		kmerdb = JellyfishSDB(args.kmer_size)
 	kmerdb.load(args.database)
@@ -66,7 +68,7 @@ def parse_arguments():
 		help="When an ouput file is present, it is compressed as .gz")
 	parser.add_argument("-o", "--output", default=None, 
 		help="Output file. If missing, the ouptut is sent to stdout")
-	parser.add_argument("-f", "--database_format", default="kmerGWAS", choices=["kmerGWAS", "jellyfish"],
+	parser.add_argument("-f", "--database_format", default="kmerGWAS", choices=["kmerGWAS", "kmerGWAS_mmap","jellyfish"],
 		help="Database format (kmerGWAS, jellyfish)")
 	args = parser.parse_args()
 	return args

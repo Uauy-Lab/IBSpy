@@ -61,6 +61,10 @@ cdef class KmerGWAS_database:
 		py_byte_string = filename.encode('UTF-8')
 		kmer_gwas.kmer_gwas_table_mmap_read(py_byte_string, self._kgt)
 
+	def read(self, filename):
+		py_byte_string = filename.encode('UTF-8')
+		kmer_gwas.kmer_gwas_table_read(py_byte_string, self._kgt)
+
 	def save(self, filename):
 		py_byte_string = filename.encode('UTF-8')
 		kmer_gwas.kmer_gwas_table_save(py_byte_string, self._kgt)

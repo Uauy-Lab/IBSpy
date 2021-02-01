@@ -22,4 +22,6 @@ kmerGWAS_kmer * kmer_gwas_table_find(kmerGWAS_kmer kmer, KmerGwasTable * kgt);
 void kmer_gwas_table_mmap_close(KmerGwasTable * kgt);
 void kmer_gwas_table_mmap_read(char * file, KmerGwasTable * kgt );
 void kmer_gwas_table_save(char * filename, KmerGwasTable * kgt);
+void kmer_gwas_table_read(char * file, KmerGwasTable * kgt );
+void kmer_gwas_table_close(KmerGwasTable * kgt);
 #endif

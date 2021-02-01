@@ -195,7 +195,13 @@ class TestKmerGWAS(unittest.TestCase):
 
 		saved_file = self.data_path + "test4B.jagger.kmerGWAS_k31"
 		kmerdb.save(saved_file)
-		kmerdb_read = KmerGWASDB(31)
+		kmerdb_read = KmerGWASDB(31, mmap=True)
+		kmerdb_read.load(saved_file)
+		self.run_db_tests(kmerdb_read)
+
+		saved_file = self.data_path + "test4B.jagger.kmerGWAS_k31"
+		kmerdb.save(saved_file)
+		kmerdb_read = KmerGWASDB(31, mmap=False)
 		kmerdb_read.load(saved_file)
 		self.run_db_tests(kmerdb_read)
 

@@ -159,3 +159,24 @@ void kmer_gwas_table_mmap_close(KmerGwasTable * kgt){
 	close(kgt->mem_table);
 }
 
+void kmer_gwas_table_read(char * file, KmerGwasTable * kgt ){
+	struct stat s;
+	uint64_t size;
+	int fd = open (file, O_RDONLY);
+	/* Get the size of the file. */
+    int status = fstat (fd, & s);
+    assert(status == 0);
+    kmerGWAS_kmer kmer;
+    size = s.st_size;
+    close(fd);
+    FILE * f = fopen (file, "rb");
+    kgt->number_of_kmers = size / sizeof(kmer);
+    kgt->readonly = true;
+    kmerGWAS_kmer * p = realloc(kgt->kmer, sizeof(kmerGWAS_kmer) * kgt->number_of_kmers);
+	size_t n = fread(p, sizeof(kmerGWAS_kmer), kgt->number_of_kmers, f );
+	fclose(f);
+	assert(n == kgt->number_of_kmers);
+	kgt->kmer = p;
+	return;
+}
+

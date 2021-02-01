@@ -12,11 +12,12 @@ from pyfaidx import Fasta
 
 
 class KmerGWASDB(KmerDB):
-    def __init__(self, kmer_size):
+    def __init__(self, kmer_size, mmap = False):
         self._builder = KmerGWASDBBuilder(kmer_size)
         self.kmer_size = kmer_size
         self.db  = kmerGWAS.KmerGWAS_database(kmer_size) 
         self.builder = KmerGWASDBBuilder(kmer_size)
+        self.mmap    = mmap
 
     def builder(self):
         return self.builder
@@ -43,7 +44,10 @@ class KmerGWASDB(KmerDB):
         self.db.save(filename)
 
     def load(self, filename):
-    	self.db.read_mmap(filename)
+        if self.mmap:
+        	self.db.read_mmap(filename)
+        else:
+            self.db.read(filename)
 
 
 class KmerGWASDBBuilder(KmerBuilder):
