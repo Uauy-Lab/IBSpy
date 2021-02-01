@@ -24,8 +24,8 @@ def close_out(out, args):
 
 def open_db(args):
 	kmerdb = None
-	if(args.database_format=="kmerGWAS", mmap=False):
-		kmerdb = KmerGWASDB(args.kmer_size)
+	if(args.database_format=="kmerGWAS"):
+		kmerdb = KmerGWASDB(args.kmer_size, mmap=False)
 	if(args.database_format=="kmerGWAS_mmap"):
 		kmerdb = KmerGWASDB(args.kmer_size, mmap=True)
 	if(args.database_format=="jellyfish"):

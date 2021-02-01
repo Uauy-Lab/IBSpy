@@ -143,7 +143,7 @@ void kmer_gwas_table_mmap_read(char * file, KmerGwasTable * kgt ){
 
     //fprintf(stderr, "%llu, %lu, %i\n", size, sizeof(kmer), sizeof(s.st_size));
 
-    kgt->kmer = (kmerGWAS_kmer *) mmap (NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+    kgt->kmer = (kmerGWAS_kmer *) mmap (NULL, size, PROT_READ, MAP_SHARED, fd, 0);
 	kgt->number_of_kmers = size / sizeof(kmer);
 	kgt->readonly = true;
 	kgt->mem_table = fd;
