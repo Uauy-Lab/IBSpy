@@ -69,7 +69,7 @@ def parse_arguments():
 	parser.add_argument("-o", "--output", default=None, 
 		help="Output file. If missing, the ouptut is sent to stdout")
 	parser.add_argument("-f", "--database_format", default="kmerGWAS", choices=["kmerGWAS", "kmerGWAS_mmap","jellyfish"],
-		help="Database format (kmerGWAS, jellyfish)")
+		help="Database format")
 	args = parser.parse_args()
 	return args
 
