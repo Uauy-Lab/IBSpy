@@ -60,7 +60,7 @@ optional arguments:
 To generate the table with the number of observed kmers and variants run the following command, using the kmer database from kmerGWAS use the following command:
 
 ```sh
- IBSpy --output "kmer_windows_LineXXX.tsv.gz" -z --database kmers_with_strand  --reference arinaLrFor.fa --window_size 50000 --compress
+ IBSpy --output "kmer_windows_LineXXX.tsv.gz" -z --database kmers_with_strand  --reference arinaLrFor.fa --window_size 50000 --compress --database_format kmerGWAS
 ```
 
 

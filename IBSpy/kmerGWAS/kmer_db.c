@@ -136,14 +136,11 @@ void kmer_gwas_table_mmap_read(char * file, KmerGwasTable * kgt ){
 	//FILE * fd = fopen (file, "rb");
 	int fd = open (file, O_RDONLY);
 	/* Get the size of the file. */
-    int status = fstat (fd, & s);
-    assert(status == 0);
-    kmerGWAS_kmer kmer;
-    size = s.st_size;
-
-    //fprintf(stderr, "%llu, %lu, %i\n", size, sizeof(kmer), sizeof(s.st_size));
-
-    kgt->kmer = (kmerGWAS_kmer *) mmap (NULL, size, PROT_READ, MAP_SHARED, fd, 0);
+	int status = fstat (fd, & s);
+	assert(status == 0);
+	kmerGWAS_kmer kmer;
+	size = s.st_size;
+	kgt->kmer = (kmerGWAS_kmer *) mmap (NULL, size, PROT_READ, MAP_SHARED, fd, 0);
 	kgt->number_of_kmers = size / sizeof(kmer);
 	kgt->readonly = true;
 	kgt->mem_table = fd;
@@ -164,15 +161,15 @@ void kmer_gwas_table_read(char * file, KmerGwasTable * kgt ){
 	uint64_t size;
 	int fd = open (file, O_RDONLY);
 	/* Get the size of the file. */
-    int status = fstat (fd, & s);
-    assert(status == 0);
-    kmerGWAS_kmer kmer;
-    size = s.st_size;
-    close(fd);
-    FILE * f = fopen (file, "rb");
-    kgt->number_of_kmers = size / sizeof(kmer);
-    kgt->readonly = true;
-    kmerGWAS_kmer * p = realloc(kgt->kmer, sizeof(kmerGWAS_kmer) * kgt->number_of_kmers);
+	int status = fstat (fd, & s);
+	assert(status == 0);
+	kmerGWAS_kmer kmer;
+	size = s.st_size;
+	close(fd);
+	FILE * f = fopen (file, "rb");
+	kgt->number_of_kmers = size / sizeof(kmer);
+	kgt->readonly = true;
+	kmerGWAS_kmer * p = realloc(kgt->kmer, sizeof(kmerGWAS_kmer) * kgt->number_of_kmers);
 	size_t n = fread(p, sizeof(kmerGWAS_kmer), kgt->number_of_kmers, f );
 	fclose(f);
 	assert(n == kgt->number_of_kmers);
