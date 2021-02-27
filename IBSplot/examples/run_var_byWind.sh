@@ -1,17 +1,17 @@
 #!/bin/bash
 
-scrip_dir='path/to/scripts'
-db_dir='path/to/database'
-chr_dir='path/to/chromosome_lengths_folder'
-out_dir='path/to/output_folder'
-
-IN_WINDOWS=100000
+REF=Jagger
+QUERY=Flame
+IN_WINDOWS=50000
 OUT_WINDOWS=500000
-REF=symattis
-QUERY=flame
 
-python $scrip_dir/var_byWind.py \
-	-db $db_dir/${QUERY}_${REF}_${IN_WINDOWS}.tsv.gz \
-	-cl $chr_dir/chr_sizes_${REF}.genome.txt \
+scrip_dir='path/to/scripts'
+in_dir='path/to/database'
+out_dir='path/to/output_folder'
+chr_dir='path/to/genome_sizes_folder'
+
+python $scrip_dir/var_byWind.v2.py \
+	-db $in_dir/kmeribs-Wheat_${REF}-${QUERY}.tsv.gz.gz \
+	-cl $chr_dir/chr_sizes_Jagger.genome.txt \
 	-w ${OUT_WINDOWS} \
-	-o $out_dir/${QUERY}_${REF}_${OUT_WINDOWS}.tsv
+	-o $out_dir/kmeribs-Wheat_${REF}-${QUERY}_${OUT_WINDOWS}.tsv.gz

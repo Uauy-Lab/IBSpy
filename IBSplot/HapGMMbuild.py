@@ -1,119 +1,104 @@
-import sys
 import argparse
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.mixture import GaussianMixture
-from matplotlib.ticker import (MultipleLocator, NullFormatter, ScalarFormatter)
 
 
-if __name__ == '__main__':
+def read_db():
+	inDB = pd.read_csv(args.db_file, delimiter='\t')
+	return inDB
 
-	parser = argparse.ArgumentParser(description = "build GMM mode for IBS and non-IBS classification using variation count per windows")
-
-	db_p = parser.add_argument_group('Sample name parameters')
-	db_p.add_argument('-db', '--db_file',  required=True, help='Tab separated file with variations genetared by IBSpy output')
-	db_p.add_argument('-rf', '--refId',  required=True, help='Name of the genome reference used')
-	db_p.add_argument('-qr', '--qryId',  required=True, help='Name of the query sample')
-
-	gmm_p = parser.add_argument_group('GMM model parameters')
-	gmm_p.add_argument('-w', '--windSize',  required=True, help='Windows size to count variations within')
-	gmm_p.add_argument('-vf', '--varfltr',  required=True, help='Filter variations above this threshold to compute GMM model')
-	gmm_p.add_argument('-nc', '--comNumber',  required=True, help='Number of componenets for the GMM model')
-
-	out_files = parser.add_argument_group('Output files')
-	out_files.add_argument('-gmf','--output', help='GMM model output file grouped by IBS (1) and non-IBS (0)')
-	out_files.add_argument('-hr','--out_hist_raw', help='Create histogram distribution of the whole genome using variations count raw data per windows')
-	out_files.add_argument('-hg','--out_hist_gmm', help='Histogram of the GMM grouped by IBS and non-IBS')
+#### prepare input data ####
+def prepare_data(args):
+	inDB = read_db()
+	filtered_inDB = inDB[inDB['variations'] <= int(args.varfltr)]
+	varDF = pd.DataFrame(filtered_inDB[['seqname','start','variations']])
+	varDF.reset_index(drop=True, inplace=True)
+	varArray = np.array(varDF['variations'])
+	log_varArray = np.log(varArray, where=(varArray != 0))
+	log_varArray = np.nan_to_num(log_varArray, nan=0.0)
+	log_varArray = log_varArray.reshape((len(log_varArray),1))
+	return log_varArray, varDF
 	
-#### command line arguments ####
-	args = parser.parse_args()
-	
-	db_file = args.db_file
-	refId = args.refId
-	qryId = args.qryId
-	windSize = args.windSize
-	varfltr = int(args.varfltr)
-
-#### prepare the input data ####
-inFile = pd.read_csv(db_file, delimiter='\t')
-filtered_inFile = inFile[inFile['variations'] <= varfltr]
-varDF = pd.DataFrame(filtered_inFile[['seqname','start','variations']])
-varDF.reset_index(drop=True, inplace=True)
-varArray = np.array(varDF['variations'])
-log_varArray = np.log(varArray, where=(varArray != 0))
-log_varArray = np.nan_to_num(log_varArray, nan=0.0)
-log_varArray = log_varArray.reshape((len(log_varArray),1))
-
-
 #### build GMM model ####
-def GMM_build(comNumber, output):
+def GMM_build(args):
+	comNumber = int(args.comNumber)
 	model = GaussianMixture(n_components=comNumber, covariance_type='full')
+	log_varArray, varDF = prepare_data(args)
 	model.fit(log_varArray)
 	varGMM_predict = model.predict(log_varArray)
 	varGMM_predict = varGMM_predict.reshape((len(varGMM_predict),1)) 
-	varGMM_predict = pd.DataFrame({'gauss_mx_IBS': varGMM_predict[:, 0]})         
+	varGMM_predict = pd.DataFrame({'gauss_mx_IBS': varGMM_predict[:, 0]})     
 	varDF['gauss_mx_IBS'] = varGMM_predict['gauss_mx_IBS']                                   
-	get_IBS = varDF.groupby(by=['gauss_mx_IBS'])
+	gmmIBS_DF = varDF.groupby(by=['gauss_mx_IBS'])
+	return gmmIBS_DF, varDF
+
+def transform_gmm(args):
+	gmmIBS_DF, varDF = GMM_build(args)
 	key_group = []
 	value_group = []
-	for key, group in get_IBS:
+	for key, group in gmmIBS_DF:
 	    key_group.append(key)
 	    value_group.append(group['variations'].median())
 	dic_grupby = dict(zip(key_group, value_group))
 	IBS_group = min(dic_grupby, key=dic_grupby.get)
 	varDF['gauss_mx_IBS'] = np.where(varDF['gauss_mx_IBS'] == IBS_group, 1, 0)
-	varDF.to_csv(output, index=False,  sep='\t')
+	return varDF
 
+def gmm_by_chromosome():
+	inDB = transform_gmm(args)
+	byChrDf = inDB[inDB['seqname'].str.contains(args.chrNme)].copy()
+	byChrDf.reset_index(drop=True, inplace=True)
+	return byChrDf
 
-################### plots #################
-#### all variations count histogram before GMM model classification ####
-# data
-def plot_histo_raw(db_file, out_hist_raw):
-	varCntFile = pd.read_csv(db_file, delimiter='\t')
-	X_a = varCntFile.loc[varCntFile['variations']]
-	X_a = varCntFile['variations'].astype(int)
+#### stitching haplotypes: number of non-IBS "outliers" that must a appear consecutively in a windows to be called non-IBS ####
+def stitch_haploBlocks(args):
+    byChrDf = gmm_by_chromosome()
+    gmmDta = byChrDf['gauss_mx_IBS'].copy()
+    StitchVarNum = int(args.StitchVarNum)
+    for i in range(len(gmmDta)):
+        if gmmDta[i] == 1:
+            if i < (len(gmmDta) - StitchVarNum):
+                count = 0
+                for n in range(1, (StitchVarNum+1)):
+                    if gmmDta[i+n] == 0:
+                        count += 1
+                if count == StitchVarNum:
+                    continue
+                else:
+                    gmmDta[i+1] = 1
+    hapBlock = gmmDta
+    hapBlock = pd.Series(hapBlock)
+    byChrDf['hap_block'] = hapBlock.values
+    # put back full dataset of data for final haplo blocks
+    hapCntFile = read_db()
+    hapCntFile = hapCntFile[['seqname', 'start', 'variations']].copy()
+    hapCntFile = hapCntFile[hapCntFile['seqname'].str.contains(args.chrNme)].copy()
+    byChrDf = pd.merge(hapCntFile, byChrDf, left_on='start', right_on='start', how='left')
+    byChrDf.loc[:,'gauss_mx_IBS':'hap_block'] = np.where(byChrDf.loc[:, 'gauss_mx_IBS':'hap_block'] == 1, 1, 0)
+    byChrDf.rename(columns={'seqname_x':'seqname', 'variations_x':'variations'}, inplace=True)
+    byChrDf = byChrDf[['seqname', 'start', 'variations', 'gauss_mx_IBS', 'hap_block']].copy()
+    return byChrDf
 
-	#plot
-	fig = plt.figure(figsize=(10, 2))
-	plt.hist(X_a, log=False, alpha=1, bins=range(min(X_a), max(X_a)), color='darkred', label='All-regions')
-	plt.title(f'All variations [{refId} vs {qryId}], {windSize}_windows', fontweight="bold", fontsize=12)
-	plt.legend(prop={'size': 15})
-	plt.grid(True)
-	plt.ylabel('Frequency', fontweight="bold", fontsize=11)
-	plt.xlabel('Variations count', fontweight="bold", fontsize=11)
-	plt.xscale('symlog')
-	plt.xlim(0,5000)
-	fig.axes[0].xaxis.set_major_formatter(ScalarFormatter())
-	plt.xticks([0,1,2,3,5,10,20,40,100,300,1000,2000,5000], fontsize = 10)
-	fig.savefig(out_hist_raw, format='pdf', bbox_inches='tight')
+def parse_arguments():
+	parser = argparse.ArgumentParser()
 
-#### GMM variations count histogram after classification ####
-# data
-def plot_histo_gmm(varDF, varfltr, out_hist_gmm):
-	X_b = varDF.loc[varDF['gauss_mx_IBS'] == 1]
-	X_b = X_b['variations'].astype(int)
-	X_c = varDF.loc[varDF['gauss_mx_IBS'] == 0]
-	X_c = X_c['variations'].astype(int)
-
-	# plot
-	fig = plt.figure(figsize=(10, 2))
-	plt.hist(X_b, alpha=0.5, bins=range(min(X_b), max(X_b)), color='darkblue', label='IBS')
-	plt.hist(X_c, alpha=0.5, bins=range(min(X_c), max(X_c)), color='darkgreen', label='non-IBS')
-	plt.title(f'GMM: filtered variations count <= {varfltr} [{refId} vs {qryId}], {windSize}_windows', fontweight="bold", fontsize=12)
-	plt.legend(prop={'size': 15})
-	plt.grid(True)
-	plt.ylabel('Frequency', fontweight="bold", fontsize=11)
-	plt.xlabel('Variations count', fontweight="bold", fontsize=11)
-	plt.xscale('symlog')
-	plt.xlim(0,5000)
-	fig.axes[0].xaxis.set_major_formatter(ScalarFormatter())
-	plt.xticks([0,1,2,3,5,10,20,40,100,300,1000,2000,5000], fontsize=10)
-	fig.savefig(out_hist_gmm, format='pdf', bbox_inches='tight')
-
-#### Write out files ####
-if __name__ == '__main__':
+	parser.add_argument('-db', '--db_file', help='Tab separated file with variations genetared by IBSpy output')
+	parser.add_argument('-rf', '--refId', help='Name of the genome reference used')
+	parser.add_argument('-qr', '--qryId', help='Name of the query sample')
+	parser.add_argument('-chr', '--chrNme', help='Chromosome name to be plotted')
+	parser.add_argument('-w', '--windSize', help='Windows size to count variations within')
+	parser.add_argument('-vf', '--varfltr', help='Filter variations above this threshold to compute GMM model')
+	parser.add_argument('-nc', '--comNumber', help='Number of componenets for the GMM model')
+	parser.add_argument('-st', '--StitchVarNum', help='Consecutive "outliers" in windows to stitch')
+	parser.add_argument('-gm','--output', help='GMM model output file grouped by IBS (1) and non-IBS (0)')
+	parser.add_argument('-ho','--hap_output', help='GMM model output file grouped by IBS (1) and non-IBS (0)')
+	
 	args = parser.parse_args()
-	GMM_build(int(args.comNumber), args.output)
-	plot_histo_raw(args.db_file, args.out_hist_raw)
-	plot_histo_gmm(varDF, int(args.varfltr), args.out_hist_gmm)
+	return args
+
+args = parse_arguments()
+
+transform_gmm(args).to_csv(args.output, index=False,  sep='\t', compression="gzip")
+stitch_haploBlocks(args).to_csv(args.hap_output, index=False,  sep='\t', compression="gzip")
+
