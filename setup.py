@@ -44,7 +44,8 @@ setuptools.setup(
     entry_points={  # Optional
         'console_scripts': [
             'IBSpy_wcount=IBSpy.IBSpy_window_count:main',
-            'IBSpy=IBSpy:main'
+            'IBSpy=IBSpy:main',
+            'IBSplot=IBSpy.IBSpy_plot_window_results:main'
         ],
     }
 )
