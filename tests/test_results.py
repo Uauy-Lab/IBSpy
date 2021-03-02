@@ -19,7 +19,7 @@ class TestResults(unittest.TestCase):
 	def test_windows(self):
 		pd = self.results.count_by_windows()
 
-		#self.assertEqual(pd.iloc[0]['variations'], 243)
+		self.assertEqual(pd.iloc[0]['variations'], 243)
 		self.assertEqual(pd.iloc[1]['variations'], 180)
 		self.assertEqual(pd.iloc[2]['variations'],  48)
 		self.assertEqual(pd.iloc[3]['variations'], 103)
@@ -40,7 +40,7 @@ class TestResults(unittest.TestCase):
 		self.assertEqual(pd.iloc[2]['start'], 400000)
 		self.assertEqual(pd.iloc[3]['start'], 600000)
 		self.assertEqual(pd.iloc[4]['start'], 800000)
-		self.assertEqual(pd.iloc[5]['start'], 800000)
+		self.assertEqual(pd.iloc[5]['start'], 800000)å
 		self.assertEqual(pd.iloc[6]['start'], 1000000)
 
 		#print(pd.iloc[0]['variations'])
