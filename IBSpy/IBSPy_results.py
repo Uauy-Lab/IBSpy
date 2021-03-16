@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+from sklearn.mixture import GaussianMixture
+
 class IBSpyResults:
     # class variables go here
     # filter_counts = 2000
@@ -8,10 +12,10 @@ class IBSpyResults:
         self.db = pd.read_csv(filename, delimiter='\t')
         self.lengths =  pd.read_csv(chromosome_lengths, delimiter='\t', header=None)
         self.window_size = window_size
-        self.filter_counts = int(filter_counts)
+        self.filter_counts = filter_counts
 
     def count_by_windows(self):
-        windSize = int(self.window_size)
+        windSize = self.window_size
         db_DF = self.db[['seqname','start','end','variations']]
         # get the longest chromosome
         chrLen = db_DF['end'].max()
@@ -43,9 +47,9 @@ class IBSpyResults:
         self.tmp_table = db_ByGenom
         return db_ByGenom
     
-    def normalize_data(self):
-        by_windows_db = self.count_by_windows()
-        filtered_by_windows_db = by_windows_db[by_windows_db['variations'] <= int(self.filter_counts)]
+    def normalize_data(self, by_windows_db):
+        #by_windows_db = self.count_by_windows()
+        filtered_by_windows_db = by_windows_db[by_windows_db['variations'] <= self.filter_counts]
         varDF = pd.DataFrame(filtered_by_windows_db[['seqname','window','variations']])
         varDF.reset_index(drop=True, inplace=True)
         varArray = np.array(varDF['variations'])
@@ -56,7 +60,7 @@ class IBSpyResults:
 
     def fit_gmm_model(self, n_components, covariance_type='full'):
         log_varArray, varDF = self.normalize_data() # this DF its filtered, above
-        model = GaussianMixture(n_components=int(n_components), covariance_type=(covariance_type))
+        model = GaussianMixture(n_components=n_components, covariance_type=(covariance_type))
         model.fit(log_varArray)
         varGMM_predict = model.predict(log_varArray)
         varGMM_predict = varGMM_predict.reshape((len(varGMM_predict),1)) 
@@ -76,7 +80,7 @@ class IBSpyResults:
         self.tmp_varDF = varDF
         return varDF
 
-    def stitch_haploBlocks(self, stitch_number):
+    def stitch_haploBlocks(self, n_components,covariance_type,stitch_number):
     # change here, instead of chromosome, full genome
         stitch_db = self.fit_gmm_model(n_components, covariance_type='full')
         gmmDta = stitch_db['v_gmm'].copy()
@@ -105,7 +109,8 @@ class IBSpyResults:
         return stitch_db
     
     def run_analysis(self):
-        self.count_by_windows()
-#         self.normalize_data(filter_counts)
+        #counts     = self.count_by_windows()
+        by_windows_db = self.count_by_windows()
+        normalised = self.normalize_data(by_windows_db)
 #         self.fit_gmm_model()
 #         self.stitch_haploBlocks()
