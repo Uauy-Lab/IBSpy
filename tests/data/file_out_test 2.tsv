@@ -1,0 +1,8 @@
+seqname	window	variations	v_mean	v_median	v_var	v_std	v_gmm	vh_block
+chr1A_WhJag	200000	243	48	51	1030	32	0	0
+chr1A_WhJag	400000	180	60	35	1951	44	0	0
+chr1D_WhJag	800000	41	20	20	4	2	1	1
+chr1D_WhJag	1000000	64	32	32	18	4	0	1
+chr2A_WhJag	400000	48	48	48	0	0	1	1
+chr2A_WhJag	600000	103	25	25	20	4	0	0
+chr2A_WhJag	800000	66	33	33	72	8	0	0

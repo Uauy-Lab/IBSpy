@@ -47,8 +47,8 @@ class IBSpyResults:
         self.tmp_table = db_ByGenom
         return db_ByGenom
     
-    def normalize_data(self, by_windows_db):
-        #by_windows_db = self.count_by_windows()
+    def normalize_data(self):
+        by_windows_db = self.count_by_windows()
         filtered_by_windows_db = by_windows_db[by_windows_db['variations'] <= self.filter_counts]
         varDF = pd.DataFrame(filtered_by_windows_db[['seqname','window','variations']])
         varDF.reset_index(drop=True, inplace=True)
@@ -109,8 +109,8 @@ class IBSpyResults:
         return stitch_db
     
     def run_analysis(self):
-        #counts     = self.count_by_windows()
-        by_windows_db = self.count_by_windows()
-        normalised = self.normalize_data(by_windows_db)
+        counts     = self.count_by_windows()
+        # by_windows_db = self.count_by_windows()
+        # normalised = self.normalize_data(by_windows_db)
 #         self.fit_gmm_model()
 #         self.stitch_haploBlocks()
