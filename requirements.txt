@@ -1,3 +1,6 @@
 cython
 biopython
 pyfaidx
+sklearn
+numpy
+pandas
