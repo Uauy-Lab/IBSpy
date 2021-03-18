@@ -6,11 +6,11 @@ class IBSpyResults:
     # class variables go here
     # filter_counts = 2000
 
-    def __init__(self, filename, chromosome_lengths, window_size, filter_counts):
+    def __init__(self, filename, window_size, filter_counts):
         #instance variables
-        self.filename = filename
+        # self.filename = filename
         self.db = pd.read_csv(filename, delimiter='\t')
-        self.lengths =  pd.read_csv(chromosome_lengths, delimiter='\t', header=None)
+        # self.lengths =  pd.read_csv(chromosome_lengths, delimiter='\t', header=None)
         self.window_size = window_size
         self.filter_counts = filter_counts
 
