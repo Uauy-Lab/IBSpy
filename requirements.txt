@@ -4,3 +4,4 @@ pyfaidx
 sklearn
 numpy
 pandas
+matplotlib

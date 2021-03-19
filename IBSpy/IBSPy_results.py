@@ -4,13 +4,9 @@ from sklearn.mixture import GaussianMixture
 
 class IBSpyResults:
     # class variables go here
-    # filter_counts = 2000
-
     def __init__(self, filename, window_size, filter_counts):
-        #instance variables
-        # self.filename = filename
+
         self.db = pd.read_csv(filename, delimiter='\t')
-        # self.lengths =  pd.read_csv(chromosome_lengths, delimiter='\t', header=None)
         self.window_size = window_size
         self.filter_counts = filter_counts
 
@@ -29,28 +25,21 @@ class IBSpyResults:
             w_pos += windSize
             db_byChr = db_byChr.append(db_DF_ByWind)
 
-        # calculate statistics by chromosome, window, and variations
-        db_ByGenom = db_byChr.groupby(['seqname','window'])['variations'].sum().reset_index()
-        # mean
-        db_byChr_mean = db_byChr.groupby(['seqname','window'])['variations'].mean().reset_index()
-        db_ByGenom['v_mean'] = db_byChr_mean['variations'].astype(int)
-        # median
-        db_byChr_median = db_byChr.groupby(['seqname','window'])['variations'].median().reset_index()
-        db_ByGenom['v_median'] = db_byChr_median['variations'].astype(int)
-        # variance
-        db_byChr_var = db_byChr.groupby(['seqname','window'])['variations'].var().reset_index()
-        db_ByGenom['v_var'] = db_byChr_var['variations'].fillna(0).astype(int)
-        # standar dev
-        db_byChr_std = db_byChr.groupby(['seqname','window'])['variations'].std().reset_index()
-        db_ByGenom['v_std'] = db_byChr_std['variations'].fillna(0).astype(int)
-
-        self.tmp_table = db_ByGenom
-        return db_ByGenom
+        # calculate statistics by chromosome, windows, and variations
+        out_db = db_byChr.groupby(['seqname','window'])['variations'].sum().reset_index()
+        out_db['mean'] = db_byChr.groupby(['seqname','window'])['variations'].mean().values.round(2)
+        out_db['median'] = db_byChr.groupby(['seqname','window'])['variations'].median().values.round(2)
+        out_db['variance'] = db_byChr.groupby(['seqname','window'])['variations'].var().values.round(2)
+        out_db['std'] = db_byChr.groupby(['seqname','window'])['variations'].std().values.round(2)
+        return out_db
     
-    def normalize_data(self):
+    def transform_counts_to_log(self):
         by_windows_db = self.count_by_windows()
-        filtered_by_windows_db = by_windows_db[by_windows_db['variations'] <= self.filter_counts]
-        varDF = pd.DataFrame(filtered_by_windows_db[['seqname','window','variations']])
+        if self.filter_counts is not None:
+            applied_filter = by_windows_db[by_windows_db['variations'] <= self.filter_counts]
+        else:
+            applied_filter = by_windows_db
+        varDF = pd.DataFrame(applied_filter[['seqname','window','variations']])
         varDF.reset_index(drop=True, inplace=True)
         varArray = np.array(varDF['variations'])
         log_varArray = np.log(varArray, where=(varArray != 0))
@@ -58,9 +47,9 @@ class IBSpyResults:
         log_varArray = log_varArray.reshape((len(log_varArray),1))
         return log_varArray, varDF
 
-    def fit_gmm_model(self, n_components, covariance_type='full'):
-        log_varArray, varDF = self.normalize_data() # this DF its filtered, above
-        model = GaussianMixture(n_components=n_components, covariance_type=(covariance_type))
+    def build_gmm_model(self, n_components, covariance_type):
+        log_varArray, varDF = self.transform_counts_to_log()
+        model = GaussianMixture(n_components=n_components, covariance_type=covariance_type)
         model.fit(log_varArray)
         varGMM_predict = model.predict(log_varArray)
         varGMM_predict = varGMM_predict.reshape((len(varGMM_predict),1)) 
@@ -80,9 +69,8 @@ class IBSpyResults:
         self.tmp_varDF = varDF
         return varDF
 
-    def stitch_haploBlocks(self, n_components,covariance_type,stitch_number):
-    # change here, instead of chromosome, full genome
-        stitch_db = self.fit_gmm_model(n_components, covariance_type='full')
+    def stitch_gmm_haplotypes(self, n_components, covariance_type, stitch_number):
+        stitch_db = self.build_gmm_model(n_components, covariance_type)
         gmmDta = stitch_db['v_gmm'].copy()
 
         StitchVarNum = stitch_number
@@ -111,6 +99,6 @@ class IBSpyResults:
     def run_analysis(self):
         counts     = self.count_by_windows()
         # by_windows_db = self.count_by_windows()
-        # normalised = self.normalize_data(by_windows_db)
-#         self.fit_gmm_model()
-#         self.stitch_haploBlocks()
+        # normalised = self.transform_counts_to_log(by_windows_db)
+#         self.build_gmm_model()
+#         self.stitch_gmm_haplotypes()
