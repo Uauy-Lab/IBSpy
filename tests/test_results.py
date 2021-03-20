@@ -14,13 +14,13 @@ class TestResults(unittest.TestCase):
 
     def setUp(self):
         db = "./tests/data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
-        lens= "./tests/data/test_chr_sizes_jagger.tsv"
+        #lens= "./tests/data/test_chr_sizes_jagger.tsv"
         windows = 200000
         v_filter = 500
         self.stitch_number = 3
         self.n_components = 3
         self.covariance_type = 'full'
-        self.results = IBSpyResults(db, lens, windows, v_filter)
+        self.results = IBSpyResults(db, windows, v_filter)
 
     def test_windows(self):
         pd = self.results.count_by_windows()
