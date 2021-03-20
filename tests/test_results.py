@@ -13,7 +13,7 @@ class TestResults(unittest.TestCase):
     logger.setLevel(logging.DEBUG)
 
     def setUp(self):
-        db = "./tests/data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
+        db = "./tests/plots_data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
         #lens= "./tests/data/test_chr_sizes_jagger.tsv"
         windows = 200000
         v_filter = 500
@@ -50,22 +50,22 @@ class TestResults(unittest.TestCase):
         self.assertEqual(pd.iloc[6]['window'], 800000)
 
     def test_normalize_data(self):
-        log_test, pd = self.results.normalize_data()
+        log_test, pd = self.results.transform_counts_to_log()
 #         print(log_test.tolist())
         self.assertEqual(log_test[0], np.array([5.493061443340548]))
         self.assertEqual(log_test[6], np.array([4.189654742026425]))
 
     def test_stitch_haploBlocks(self):
-        hap_pd = self.results.stitch_haploBlocks(self.n_components,self.covariance_type, self.stitch_number)
+        hap_pd = self.results.stitch_gmm_haplotypes(self.n_components,self.covariance_type, self.stitch_number)
         print(hap_pd)
         
-        self.assertEqual(hap_pd.iloc[0]['v_mean'], 48)
-        self.assertEqual(hap_pd.iloc[1]['v_mean'], 60)
-        self.assertEqual(hap_pd.iloc[2]['v_mean'], 20)
-        self.assertEqual(hap_pd.iloc[3]['v_mean'], 32)
-        self.assertEqual(hap_pd.iloc[4]['v_mean'], 48)
-        self.assertEqual(hap_pd.iloc[5]['v_mean'], 25)
-        self.assertEqual(hap_pd.iloc[6]['v_mean'], 33)
+        self.assertEqual(hap_pd.iloc[0]['mean'], 48)
+        self.assertEqual(hap_pd.iloc[1]['mean'], 60)
+        self.assertEqual(hap_pd.iloc[2]['mean'], 20)
+        self.assertEqual(hap_pd.iloc[3]['mean'], 32)
+        self.assertEqual(hap_pd.iloc[4]['mean'], 48)
+        self.assertEqual(hap_pd.iloc[5]['mean'], 25)
+        self.assertEqual(hap_pd.iloc[6]['mean'], 33)
 
 
 		#print(pd.iloc[0]['variations'])
