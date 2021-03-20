@@ -1,0 +1,12 @@
+IBSplot -i test_kmeribs-Wheat_Jagger-Flame.tsv \
+-c chr_sizes_Jagger.genome.txt \
+-w 200000 \
+-f 500 \
+-n 3 \
+-v full \
+-s 3 \
+-o file_out_test.tsv \
+-r Jagger \
+-q Flame \
+-do my_first_file.jpg
+-go GMM_my_first_file.pdf

@@ -3,6 +3,7 @@ from .kmerGWAS_kmer import KmerGWASDB, KmerGWASDBBuilder
 from .jellyfish_kmer_database import JellyfishSDB, JellyfishBuilder
 from .IBSpy_window_count import window_count, parse_arguments
 from .IBSpy_results import IBSpyResults
+from .IBSpy_plot import IBSpyPlots
 import argparse
 
 def main(): 
