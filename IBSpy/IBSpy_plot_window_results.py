@@ -8,16 +8,16 @@ def parse_arguments():
 
     parser.add_argument('-i', '--IBSpy_counts', help='tvs file genetared by IBSpy output')
     parser.add_argument('-w', '--window_size', type=int, help='Windows size to count variations within')
-    parser.add_argument('-f', '--filter_counts', default=None, type=int, help='Filter number of variaitons above this threshold to compute GMM model')
-    parser.add_argument('-n', '--n_components', default=3, type=int, help='Number of componenets for the GMM model')
-    parser.add_argument('-c', '--covariance_type', default='full', help='type of covariance used for GMM model')
-    parser.add_argument('-s', '--stitch_number', default=3, type=int, help='Consecutive "outliers" in windows to stitch')
+    parser.add_argument('-f', '--filter_counts', default=None, type=int, help='Filter number of variaitons above this threshold to compute GMM model, default=None')
+    parser.add_argument('-n', '--n_components', default=3, type=int, help='Number of componenets for the GMM model, default=3')
+    parser.add_argument('-c', '--covariance_type', default='full', help='type of covariance used for GMM model, default="full"')
+    parser.add_argument('-s', '--stitch_number', default=3, type=int, help='Consecutive "outliers" in windows to stitch, default=3')
     parser.add_argument('-o', '--output', help='tsv file with variations count by windows and summary statistics')
 
     # plot arguments
-    parser.add_argument('-r', '--reference_name', help='genome reference name')
-    parser.add_argument('-q', '--query_name', help='query sample')
-    parser.add_argument('-p','--ouput_plot', help=' histograms and ascatter files in .PDF format')
+    parser.add_argument('-r', '--reference', help='genome reference name')
+    parser.add_argument('-q', '--query', help='query sample')
+    parser.add_argument('-p','--plot_output', help=' histograms and ascatter files in .PDF format')
 
     args = parser.parse_args()
     return args
@@ -31,8 +31,8 @@ def main():
     IBS_results.to_csv(args.output, index=False,  sep='\t', compression="gzip")
 
 
-    plots =  IBSpyPlots(IBS_results, args.window_size, args.filter_counts, args.reference_name, args.query_name)
-    with PdfPages(args.ouput_plot) as pdf:
+    plots =  IBSpyPlots(IBS_results, args.window_size, args.filter_counts, args.reference, args.query)
+    with PdfPages(args.plot_output) as pdf:
 
         # histograms
         raw_hist = plots.raw_histogram()
