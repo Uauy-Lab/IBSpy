@@ -13,14 +13,14 @@ class TestResults(unittest.TestCase):
     logger.setLevel(logging.DEBUG)
 
     def setUp(self):
-        db = "./tests/data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
+        db = "./data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
         windows = 200000
         filter_counts = 500
         self.stitch_number = 3
         self.n_components = 3
         self.covariance_type = 'full'
         self.results = IBSpyResults(db, windows, filter_counts)
-
+        # print(self.results.count_by_windows())
     def test_windows(self):
         pd = self.results.count_by_windows()
 
@@ -58,24 +58,13 @@ class TestResults(unittest.TestCase):
         hap_pd = self.results.stitch_gmm_haplotypes(self.n_components,self.covariance_type, self.stitch_number)
         # print(hap_pd)
         
-        self.assertEqual(hap_pd.iloc[0]['mean'], 48)
-        self.assertEqual(hap_pd.iloc[1]['mean'], 60)
-        self.assertEqual(hap_pd.iloc[2]['mean'], 20)
-        self.assertEqual(hap_pd.iloc[3]['mean'], 32)
-        self.assertEqual(hap_pd.iloc[4]['mean'], 48)
-        self.assertEqual(hap_pd.iloc[5]['mean'], 25)
-        self.assertEqual(hap_pd.iloc[6]['mean'], 33)
+        self.assertEqual(hap_pd.iloc[0]['mean'], 48.60)
+        self.assertEqual(hap_pd.iloc[1]['mean'], 60.00)
+        self.assertEqual(hap_pd.iloc[2]['mean'], 20.50)
+        self.assertEqual(hap_pd.iloc[3]['mean'], 32.00)
+        self.assertEqual(hap_pd.iloc[4]['mean'], 48.00)
+        self.assertEqual(hap_pd.iloc[5]['mean'], 25.75)
+        self.assertEqual(hap_pd.iloc[6]['mean'], 33.00)
 
 if __name__ == '__main__':
     unittest.main()
-		#print(pd.iloc[0]['variations'])
-
-#  seqname    start  variations
-# 0  chr1A_WhJag   200000         192
-# 1  chr1A_WhJag   400000         180
-# 0  chr2A_WhJag   400000          48
-# 1  chr2A_WhJag   600000         103
-# 2  chr2A_WhJag   800000          66
-# 0  chr1D_WhJag   800000          41
-# 1  chr1D_WhJag  1000000          64
-
