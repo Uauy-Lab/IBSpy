@@ -6,7 +6,7 @@ import numpy as np
 import logging
 import operator
 import unittest
-from IBSpy import IBSpyResults 
+from IBSpy.IBSpy_results import IBSpyResults 
 
 class TestResults(unittest.TestCase):
     logger = logging.getLogger("test")
