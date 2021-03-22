@@ -6,14 +6,14 @@ import numpy as np
 import logging
 import operator
 import unittest
-from IBSpy.IBSpy_results import IBSpyResults 
+from IBSpy import IBSpyResults 
 
 class TestResults(unittest.TestCase):
     logger = logging.getLogger("test")
     logger.setLevel(logging.DEBUG)
 
     def setUp(self):
-        db = "./data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
+        db = "./plots_data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
         windows = 200000
         filter_counts = 500
         self.stitch_number = 3
