@@ -13,7 +13,8 @@ class TestResults(unittest.TestCase):
     logger.setLevel(logging.DEBUG)
 
     def setUp(self):
-        db = "./plots_data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
+
+        db = "./tests/plots_data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
         windows = 200000
         filter_counts = 500
         self.stitch_number = 3
@@ -48,11 +49,12 @@ class TestResults(unittest.TestCase):
         self.assertEqual(pd.iloc[5]['window'], 600000)
         self.assertEqual(pd.iloc[6]['window'], 800000)
 
+
     def test_transform_counts_to_log(self):
         log_test, pd = self.results.transform_counts_to_log()
 #         print(log_test.tolist())
-        self.assertEqual(log_test[0], np.array([5.493061443340548]))
-        self.assertEqual(log_test[6], np.array([4.189654742026425]))
+        self.assertEqual(log_test[0], 5.493061443340548)
+        self.assertEqual(log_test[6], 4.189654742026425)
 
     def test_stitch_gmm_haplotypes(self):
         hap_pd = self.results.stitch_gmm_haplotypes(self.n_components,self.covariance_type, self.stitch_number)
@@ -65,6 +67,7 @@ class TestResults(unittest.TestCase):
         self.assertEqual(hap_pd.iloc[4]['mean'], 48.00)
         self.assertEqual(hap_pd.iloc[5]['mean'], 25.75)
         self.assertEqual(hap_pd.iloc[6]['mean'], 33.00)
+
 
 if __name__ == '__main__':
     unittest.main()
