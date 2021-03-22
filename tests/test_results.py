@@ -13,7 +13,9 @@ class TestResults(unittest.TestCase):
     logger.setLevel(logging.DEBUG)
 
     def setUp(self):
-        db = "./plots_data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
+        db = "./plots_data/test_kmeribs-Wheat_Jagger-Flame.tsv"
+        # db = "./test/plots_data/test_kmeribs-Wheat_Jagger-Flame.tsv"
+
         windows = 200000
         filter_counts = 500
         self.stitch_number = 3

@@ -41,9 +41,8 @@ class IBSpyResults:
             applied_filter = by_windows_db
         varDF = pd.DataFrame(applied_filter[['seqname','window','variations']])
         varDF.reset_index(drop=True, inplace=True)
-        varArray = np.array(varDF['variations'])
-        log_varArray = np.log(varArray, where=(varArray != 0))
-        log_varArray = np.nan_to_num(log_varArray, nan=0.0)
+        varArray = varDF['variations'].to_numpy()
+        log_varArray = np.log(varArray, where=varArray>0)
         log_varArray = log_varArray.reshape((len(log_varArray),1))
         return log_varArray, varDF
 
