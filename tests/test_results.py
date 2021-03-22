@@ -53,8 +53,8 @@ class TestResults(unittest.TestCase):
         counts = self.results.count_by_windows()
         log_test, pd = self.results.transform_counts_to_log(counts)
 #         print(log_test.tolist())
-        self.assertEqual(log_test[0], 5.493061443340548)
-        self.assertEqual(log_test[6], 4.189654742026425)
+        self.assertEqual( round( log_test[0][0], 2),  round( 5.493061443340548, 2 ) )
+        self.assertEqual( round( log_test[6][0], 2),  round( 4.189654742026425, 2 ) )
 
     def test_build_model(self):
         counts = self.results.count_by_windows()
