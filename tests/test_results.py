@@ -53,8 +53,8 @@ class TestResults(unittest.TestCase):
     def test_transform_counts_to_log(self):
         log_test, pd = self.results.transform_counts_to_log()
 #         print(log_test.tolist())
-        self.assertEqual(log_test[0], np.array([5.493061443340548]))
-        self.assertEqual(log_test[6], np.array([4.189654742026425]))
+        self.assertEqual(log_test[0], 5.493061443340548)
+        self.assertEqual(log_test[6], 4.189654742026425)
 
     def test_stitch_gmm_haplotypes(self):
         hap_pd = self.results.stitch_gmm_haplotypes(self.n_components,self.covariance_type, self.stitch_number)
