@@ -14,7 +14,7 @@ class TestResults(unittest.TestCase):
 
     def setUp(self):
 
-        db = "./tests/data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
+        db = "./tests/plots_data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
         windows = 200000
         filter_counts = 500
         self.stitch_number = 3
