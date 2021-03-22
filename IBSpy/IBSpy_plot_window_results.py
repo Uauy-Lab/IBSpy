@@ -27,7 +27,7 @@ def main():
 
     # count variations by windows from IBS_results
     IBS_results = IBSpyResults(args.IBSpy_counts, args.window_size, args.filter_counts)
-    IBS_results = IBS_results.stitch_gmm_haplotypes(args.n_components, args.covariance_type, args.stitch_number)
+    IBS_results = IBS_results.run_analysis(args.n_components, args.covariance_type, args.stitch_number)
     IBS_results.to_csv(args.output, index=False,  sep='\t', compression="gzip")
 
 

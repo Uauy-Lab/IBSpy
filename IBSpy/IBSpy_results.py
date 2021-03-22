@@ -33,8 +33,9 @@ class IBSpyResults:
         out_db['std'] = db_byChr.groupby(['seqname','window'])['variations'].std().values.round(2)
         return out_db
     
-    def transform_counts_to_log(self):
-        by_windows_db = self.count_by_windows()
+    def transform_counts_to_log(self, counts):
+        by_windows_db = counts 
+        #by_windows_db = self.count_by_windows()
         if self.filter_counts is not None:
             applied_filter = by_windows_db[by_windows_db['variations'] <= self.filter_counts]
         else:
@@ -47,8 +48,8 @@ class IBSpyResults:
         log_varArray = log_varArray.reshape((len(log_varArray),1))
         return log_varArray, varDF
 
-    def build_gmm_model(self, n_components, covariance_type):
-        log_varArray, varDF = self.transform_counts_to_log()
+    def build_gmm_model(self, log_varArray, varDF, n_components, covariance_type):
+        #log_varArray, varDF = self.transform_counts_to_log()
         model = GaussianMixture(n_components=n_components, covariance_type=covariance_type)
         model.fit(log_varArray)
         varGMM_predict = model.predict(log_varArray)
@@ -69,9 +70,9 @@ class IBSpyResults:
         self.tmp_varDF = varDF
         return varDF
 
-    def stitch_gmm_haplotypes(self, n_components, covariance_type, stitch_number):
-        stitch_db = self.build_gmm_model(n_components, covariance_type)
-        gmmDta = stitch_db['v_gmm'].copy()
+    def stitch_gmm_haplotypes(self, model, stitch_number):
+        #model = self.build_gmm_model(n_components, covariance_type)
+        gmmDta = model['v_gmm'].copy()
 
         StitchVarNum = stitch_number
         for i in range(len(gmmDta)):
@@ -87,18 +88,22 @@ class IBSpyResults:
                         gmmDta[i+1] = 1
         hapBlock = gmmDta
         hapBlock = pd.Series(hapBlock)
-        stitch_db['vh_block'] = hapBlock.values
+        model['vh_block'] = hapBlock.values
         # put back filtered data with haploblocks
         hapCntFile = self.count_by_windows()
-        stitch_db = pd.merge(hapCntFile, stitch_db, left_on=['seqname','window'], right_on=['seqname','window'], how='left')
-        stitch_db.loc[:,'v_gmm':'vh_block'] = np.where(stitch_db.loc[:, 'v_gmm':'vh_block'] == 1, 1, 0)
-        stitch_db.rename(columns={'seqname_x':'seqname', 'variations_x':'variations'}, inplace=True)
-        stitch_db = stitch_db.drop(['variations_y'], axis=1)
-        return stitch_db
+        model = pd.merge(hapCntFile, model, left_on=['seqname','window'], right_on=['seqname','window'], how='left')
+        model.loc[:,'v_gmm':'vh_block'] = np.where(model.loc[:, 'v_gmm':'vh_block'] == 1, 1, 0)
+        model.rename(columns={'seqname_x':'seqname', 'variations_x':'variations'}, inplace=True)
+        model = model.drop(['variations_y'], axis=1)
+        return model
     
-    def run_analysis(self):
+    def run_analysis(self, n_components, covariance_type, stitch_number):
         counts     = self.count_by_windows()
-        # by_windows_db = self.count_by_windows()
+        log_test, pd = self.transform_counts_to_log(counts)
+
+        model = self.build_gmm_model(log_test, pd, n_components, covariance_type) 
+        hap_pd = self.stitch_gmm_haplotypes(model, stitch_number)
+        return hap_pd
         # normalised = self.transform_counts_to_log(by_windows_db)
 #         self.build_gmm_model()
 #         self.stitch_gmm_haplotypes()
