@@ -52,7 +52,6 @@ kmerGWAS_kmer kmer_shift_and_insert(kmerGWAS_kmer kmer, char base, uint8_t kmer_
 	kmerGWAS_kmer wall  = (kmerGWAS_kmer)  KMERGWAS_MASK << kmer_size * 2;
 	kmer2 |= (kmerGWAS_kmer) n;
 	kmer2 &= ~wall;
-	//fprintf(stderr, "shifting %llu %llu %c %llu %llu\n", kmer, kmer2, base, n, wall);
 	return kmer2 ;
 }
 
@@ -64,10 +63,6 @@ kmerGWAS_kmer kmer2bits(char * kmer, uint8_t kmer_size) {
 		b = kmer_shift_and_insert(b, kmer[i], kmer_size);
 	}
 	b &= KMERGWAS_ORIENTATION_MASK;
-	// for(uint64_t i=0; i < kmer_size; i++) {
-	// 	Nucleotide n = char_to_binary_nucleotide(kmer[kmer_size - i - 1]);
-	// 	b |= ((uint64_t) n << (i*2));
-	// }
 	
 	bt = kmer_reverse_complement(b,  kmer_size);
 	if (bt < b)
