@@ -76,7 +76,8 @@ class TestResults(unittest.TestCase):
         log_test, pd = self.results.transform_counts_to_log(counts)
         model = self.results.build_gmm_model(log_test, pd,self.n_components, self.covariance_type) 
         hap_pd = self.results.stitch_gmm_haplotypes(model, self.stitch_number)
-        # print(hap_pd)
+        print("\n")
+        print(hap_pd)
         
         self.assertEqual(hap_pd.iloc[0]['mean'], 48.60)
         self.assertEqual(hap_pd.iloc[1]['mean'], 60.00)

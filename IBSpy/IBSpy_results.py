@@ -92,7 +92,10 @@ class IBSpyResults:
         model['vh_block'] = hapBlock.values
         # put back filtered data with haploblocks
         hapCntFile = self.count_by_windows()
-        model = pd.merge(hapCntFile, model, left_on=['seqname','window'], right_on=['seqname','window'], how='left')
+        model = pd.merge(hapCntFile, model, 
+            left_on=['seqname','window'], 
+            right_on=['seqname','window'],
+            how='left')
         model.loc[:,'v_gmm':'vh_block'] = np.where(model.loc[:, 'v_gmm':'vh_block'] == 1, 1, 0)
         model.rename(columns={'seqname_x':'seqname', 'variations_x':'variations'}, inplace=True)
         model = model.drop(['variations_y'], axis=1)
