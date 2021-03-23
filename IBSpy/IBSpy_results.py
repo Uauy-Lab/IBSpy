@@ -25,12 +25,14 @@ class IBSpyResults:
             w_pos += windSize
             db_byChr = db_byChr.append(db_DF_ByWind)
 
+        db_grouped = db_byChr.groupby(['seqname','window'])['variations']
+
         # calculate statistics by chromosome, windows, and variations
-        out_db = db_byChr.groupby(['seqname','window'])['variations'].sum().reset_index()
-        out_db['mean'] = db_byChr.groupby(['seqname','window'])['variations'].mean().values.round(2)
-        out_db['median'] = db_byChr.groupby(['seqname','window'])['variations'].median().values.round(2)
-        out_db['variance'] = db_byChr.groupby(['seqname','window'])['variations'].var().values.round(2)
-        out_db['std'] = db_byChr.groupby(['seqname','window'])['variations'].std().values.round(2)
+        out_db              = db_grouped.sum().reset_index()
+        out_db['mean']      = db_grouped.mean().values
+        out_db['median']    = db_grouped.median().values
+        out_db['variance']  = db_grouped.var().values
+        out_db['std']       = db_grouped.std().values
         return out_db
     
     def transform_counts_to_log(self, counts):
