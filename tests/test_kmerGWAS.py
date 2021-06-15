@@ -4,7 +4,7 @@ import sys
 #add_path = os.path.dirname(os.path.abspath(__file__))+ "/.." 
 #print(add_path)
 #sys.path.insert(0, add_path)
-
+from multiprocessing import freeze_support
 import logging
 import operator
 import unittest
@@ -206,4 +206,5 @@ class TestKmerGWAS(unittest.TestCase):
 		self.run_db_tests(kmerdb_read)
 
 if __name__ == '__main__':
+	freeze_support()
 	unittest.main()
