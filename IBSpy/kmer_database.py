@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod, abstractproperty
 from pyfaidx import Fasta
 from functools import reduce 
+from multiprocessing import Pool, TimeoutError, freeze_support
 
 class WindowStats:
     __dict__ = ['seqname', 'start', 'end','total_kmers', 
@@ -65,17 +66,28 @@ class KmerDB(ABC):
         stats.add_variation(gap_size, self.kmer_size)
         return stats
 
-    def kmers_in_windows(self, path, window_size=1000):
-        def window_summary(seq):
-            kmers = self.builder.sequence_to_kmers(seq['seq'], convert=True)
-            stats = self.kmers_stats_from_sequence(kmers)
-            stats.seqname = seq['seqname']
-            stats.start   = seq['start']
-            stats.end     = seq['end']
-            return stats
+    def kmers_in_windows(self, path, window_size=1000, processes=1, chunksize=1000):
+        
         fasta_iter = FastaChunkReader(path, chunk_size = window_size, 
             kmer_size=self.kmer_size)
-        return map(window_summary, fasta_iter )
+        fasta_iter_wrapper = FastaChunkReaderWrapper(fasta_iter, self)
+        # with Pool(processes=processes) as pool:
+        #     print("We are inside the context of the pool")
+        #     ret = pool.map(window_summary, fasta_iter_wrapper,chunksize=chunksize)
+        # return ret
+        return map(window_summary, fasta_iter_wrapper)
+
+def window_summary(it):
+    # print(it)
+    seq = it[0]
+    kdb = it[1]
+    # print(f'Running: {seq}')
+    kmers = kdb.builder.sequence_to_kmers(seq['seq'], convert=True)
+    stats = kdb.kmers_stats_from_sequence(kmers)
+    stats.seqname = seq['seqname']
+    stats.start   = seq['start']
+    stats.end     = seq['end']
+    return stats
 
 class KmerBuilder(ABC):
     def __init__(self, kmer_size):
@@ -143,3 +155,14 @@ class FastaChunkReader:
             "end": end,
             "seq": self.fasta[seqname][start:end].seq,
         }
+
+class FastaChunkReaderWrapper:
+    def __init__(self, fasta_chunnk_reader, kmer_builder) -> None:
+        self.fasta_chunnk_reader = fasta_chunnk_reader
+        self.kmer_builder = kmer_builder
+
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        return [self.fasta_chunnk_reader.__next__(), self.kmer_builder]
