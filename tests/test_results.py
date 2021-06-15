@@ -13,7 +13,6 @@ class TestResults(unittest.TestCase):
     logger.setLevel(logging.DEBUG)
 
     def setUp(self):
-
         db = "./tests/plots_data/test_kmeribs-Wheat_Jagger-Flame.tsv" 
         windows = 200000
         filter_counts = 500
@@ -51,13 +50,32 @@ class TestResults(unittest.TestCase):
 
 
     def test_transform_counts_to_log(self):
-        log_test, pd = self.results.transform_counts_to_log()
+        counts = self.results.count_by_windows()
+        log_test, pd = self.results.transform_counts_to_log(counts)
 #         print(log_test.tolist())
-        self.assertEqual(log_test[0], 5.493061443340548)
-        self.assertEqual(log_test[6], 4.189654742026425)
+        self.assertEqual( round( log_test[0][0], 2),  round( 5.493061443340548, 2 ) )
+        self.assertEqual( round( log_test[6][0], 2),  round( 4.189654742026425, 2 ) )
+
+    def test_build_model(self):
+        counts = self.results.count_by_windows()
+        log_test, pd = self.results.transform_counts_to_log(counts)
+        model = self.results.build_gmm_model(log_test, pd,self.n_components, self.covariance_type) 
+        print("....\n")
+        print(model)
+        # self.assertEqual(model.iloc[0]['v_gmm'],  0)
+        # self.assertEqual(model.iloc[1]['v_gmm'],  0)
+        # self.assertEqual(model.iloc[2]['v_gmm'],  1)
+        # self.assertEqual(model.iloc[3]['v_gmm'],  1)
+        # self.assertEqual(model.iloc[4]['v_gmm'],  1)
+        # self.assertEqual(model.iloc[5]['v_gmm'],  0)
+        # self.assertEqual(model.iloc[6]['v_gmm'],  0)
+        #TODO: Finish ths test
 
     def test_stitch_gmm_haplotypes(self):
-        hap_pd = self.results.stitch_gmm_haplotypes(self.n_components,self.covariance_type, self.stitch_number)
+        counts = self.results.count_by_windows()
+        log_test, pd = self.results.transform_counts_to_log(counts)
+        model = self.results.build_gmm_model(log_test, pd,self.n_components, self.covariance_type) 
+        hap_pd = self.results.stitch_gmm_haplotypes(model, self.stitch_number)
         # print(hap_pd)
         
         self.assertEqual(hap_pd.iloc[0]['mean'], 48.60)

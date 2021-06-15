@@ -2,7 +2,7 @@ import argparse
 from IBSpy import IBSpyResults, IBSpyPlots
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
-
+import numpy as np
 def parse_arguments():
     parser = argparse.ArgumentParser()
 
@@ -27,9 +27,8 @@ def main():
 
     # count variations by windows from IBS_results
     IBS_results = IBSpyResults(args.IBSpy_counts, args.window_size, args.filter_counts)
-    IBS_results = IBS_results.stitch_gmm_haplotypes(args.n_components, args.covariance_type, args.stitch_number)
+    IBS_results = IBS_results.run_analysis(args.n_components, args.covariance_type, args.stitch_number)
     IBS_results.to_csv(args.output, index=False,  sep='\t', compression="gzip")
-
 
     plots =  IBSpyPlots(IBS_results, args.window_size, args.filter_counts, args.reference, args.query)
     with PdfPages(args.plot_output) as pdf:
