@@ -10,15 +10,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
-      run:|
+      run: |
         sudo apt install gcc-10 g++-10 cmake
     - name: Compiling IBScpp
-      run:|
+      run: |
         mkdir -p IBScpp/build 
         cd IBScpp/build
         cmake -DCMAKE_BUILD_TYPE=Release ../ 
         make
         cd ../..
-    -name: Running integration tests
-      run:|
+    - name: Running integration tests
+      run: |
         tests/integration_cpp.sh
