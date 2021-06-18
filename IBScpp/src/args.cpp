@@ -9,10 +9,10 @@ struct args_st deal_args(int argc, char* argv[]){
     try
 	{
 		options.add_options()
-			("k,kmers_db", "kmers_with_strand path(required)", cxxopts::value<string>())
+			("d,database", "kmers_with_strand path(required)", cxxopts::value<string>())
 			("r,reference", "reference file path(required)", cxxopts::value<string>())
 			("p,threads","threads(default=1)",cxxopts::value<uint32_t>()->default_value("1"))
-			("s,kmer_size","kmer size(default=31)",cxxopts::value<uint32_t>()->default_value("31"))
+			("k,kmer_size","kmer size(default=31)",cxxopts::value<uint32_t>()->default_value("31"))
             ("w,window_size","window size(default=1000)",cxxopts::value<uint64_t>()->default_value("1000"))
 			("h,help", "print help")
 			;
@@ -23,7 +23,7 @@ struct args_st deal_args(int argc, char* argv[]){
 			exit(0);
 		}
         //check required parametrs
-		vector<string> required_parametrs({"kmers_db",  "reference"});
+		vector<string> required_parametrs({"database",  "reference"});
 		for(size_t i=0; i<required_parametrs.size(); i++) {
 			if(result.count(required_parametrs[i]) == 0) {
 				cerr <<"ERROR: " <<required_parametrs[i] << " is a required parameter" << endl;
@@ -32,7 +32,7 @@ struct args_st deal_args(int argc, char* argv[]){
 			}
 		}
 		// Load parameters
-		string kmers_database(result["kmers_db"].as<string>());
+		string kmers_database(result["database"].as<string>());
 		string reference_path(result["reference"].as<string>());
 		uint32_t threads(result["threads"].as<uint32_t>());
 		uint32_t kmer_size(result["kmer_size"].as<uint32_t>());
