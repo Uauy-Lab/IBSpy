@@ -33,15 +33,10 @@ jobs:
         ./configure --enable-python-binding
         make -j 4
         sudo  make install
-        #cd swig/python
-        #python setup.py build
-        #python setup.py install 
-        #cd ../../..
         cd ..
         python -m pip install --upgrade pip
         python -m pip install flake8 cython pysam biopython pyfaidx
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        #export PYTHONPATH=$PYTHONPATH:/opt/hostedtoolcache/Python/3.8.6/x64/lib/python3.8/site-packages
         echo $PYTHONPATH
         env
     - name: Lint with flake8
@@ -53,3 +48,6 @@ jobs:
     - name: Test with pytest
       run: |
         python setup.py test
+        python setup.py develop
+        tests/integration_python.sh
+

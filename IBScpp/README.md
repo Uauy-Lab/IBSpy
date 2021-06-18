@@ -2,7 +2,9 @@ This is the C / C ++ version of IBSpy, the original repository: https://github.c
 
 ## How to install
 
-requirement : Installing IBSCPP requires your GCC version to support C ++ 17 features.
+requirements : 
+  * Installing IBScpp requires your GCC version to support C ++ 17 features.
+
 
 The installation process is very simple, go to the project directory and execute the following command.
 
