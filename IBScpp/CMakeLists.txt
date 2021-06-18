@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.13)
+project(IBScpp)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/KMC/kmc_api/)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/include/)
+find_package(Threads)
+
+set(CMAKE_CXX_FLAGS   "-pthread")  
+set(CMAKE_C_FLAGS   "-pthread")  
+add_executable(IBScpp  src/kmer_general.cpp src/args.cpp  src/IBScpp.cpp src/reference.cpp src/kmerdb.cpp src/kmer_thread.cpp )
