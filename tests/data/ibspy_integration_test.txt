@@ -1,0 +1,39 @@
+./tests/data/test4B.jagger.fa
+seqname	start	end	total_kmers	observed_kmers	variations	kmer_distance
+chr4B__jag	0	3000	2970	2970	0	0
+chr4B__jag	2969	5200	2201	2201	0	0
+./tests/data/test4B.arinalrfor.fa
+seqname	start	end	total_kmers	observed_kmers	variations	kmer_distance
+chr4B__ari	0	3000	2970	2939	1	1
+chr4B__ari	2969	5200	2201	2170	1	1
+./tests/data/test4B.julius.fa
+seqname	start	end	total_kmers	observed_kmers	variations	kmer_distance
+chr4B__jul	0	3000	2970	2970	0	0
+chr4B__jul	2969	5200	2201	2201	0	0
+./tests/data/test4B.lancer.fa
+seqname	start	end	total_kmers	observed_kmers	variations	kmer_distance
+chr4B__lac	0	2639	2609	2609	0	0
+./tests/data/test4B.landmark.fa
+seqname	start	end	total_kmers	observed_kmers	variations	kmer_distance
+chr4B__ldm	0	3000	2970	2970	0	0
+chr4B__ldm	2969	5200	2201	2201	0	0
+./tests/data/test4B.mace.fa
+seqname	start	end	total_kmers	observed_kmers	variations	kmer_distance
+chr4B__mac	0	3000	2970	2970	0	0
+chr4B__mac	2969	5200	2201	2201	0	0
+./tests/data/test4B.norin61.fa
+seqname	start	end	total_kmers	observed_kmers	variations	kmer_distance
+chr4B__nor	0	3000	2970	2970	0	0
+chr4B__nor	2969	5200	2201	2201	0	0
+./tests/data/test4B.spelta.fa
+seqname	start	end	total_kmers	observed_kmers	variations	kmer_distance
+chr4B__tsp	0	3000	2970	2970	0	0
+chr4B__tsp	2969	5200	2201	2201	0	0
+./tests/data/test4B.stanley.fa
+seqname	start	end	total_kmers	observed_kmers	variations	kmer_distance
+chr4B__sta	0	3000	2970	2879	2	31
+chr4B__sta	2969	5202	2203	2176	1	2
+./tests/data/test4B.sy_mattis.fa
+seqname	start	end	total_kmers	observed_kmers	variations	kmer_distance
+chr4B__sym	0	3000	2970	2970	0	0
+chr4B__sym	2969	5200	2201	2201	0	0
