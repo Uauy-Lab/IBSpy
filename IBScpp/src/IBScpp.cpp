@@ -71,17 +71,18 @@ int main(int argc, char* argv[]){
     pthread_t * tids=(pthread_t *)calloc(threads,sizeof(pthread_t));
     for(size_t i = 0; i < threads; ++i)
     {
-        (td+i)->jobcount = job_count[i];
-        (td+i)->reference =reference_file_path ;
-        (td+i)->joboffset = job_offset[i];
+        td[i].jobcount = job_count[i];
+        td[i].reference =reference_file_path ;
+        td[i].joboffset = job_offset[i];
         // vector<chromosome_inf> &tmp_chr_inf = chr_inf;
-        (td+i)->chr_inf = &chr_inf;
+        td[i].chr_inf = &chr_inf;
         // vector<window_info> &tmp_tasks = tasks;
-        (td+i)->tasks = &tasks;
-        (td+i)->kmers = kmers;
-        // (td+i)->ref = ref;
+        td[i].tasks = &tasks;
+        td[i].kmers = kmers;
+        // td[i]->ref = ref;
         //参数依次是：创建的线程id，线程参数，调用的函数，传入的函数参数
-        int ret = pthread_create(tids+i, NULL, thread_func,(void *)(td+i));
+        //The parameters are: created thread id, thread parameters, function called, function parameters passed in
+        int ret = pthread_create(tids+i, NULL, thread_func,(void *)&td[i]);
         if (ret != 0)
         {
             cerr << "pthread_create error: error_code=" << ret << endl;

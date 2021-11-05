@@ -10,11 +10,12 @@ output="tests/ibspy_out.txt"
 for l in $lines; do
 	ref="$data_path/test4B.$l.fa"
 	echo $ref
-	./IBScpp/build/IBScpp -d $kmer_db -r $ref -k 31 -w 3000 
+	./IBScpp/build/IBScpp -d $kmer_db -r $ref -k 31 -w 3000 -p 2
 done > $output
 
 def_ret=`diff $output $expected_output`
-echo $def_ret
-echo ${#def_ret}
+
+echo "Differences: $def_ret"
+echo "Code: ${#def_ret}"
 exit ${#def_ret}
 
