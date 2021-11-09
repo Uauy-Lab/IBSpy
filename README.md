@@ -11,6 +11,14 @@ Then, run the following command to setup the path for it.
 ```sh
 source KMC/py_kmc_api/set_path.sh 
 ```
+
+To build the mker database for kmc and the tests run this comand:
+
+```sh
+kmc -k31 -r  -fm data/test4B.jagger.fa data/test4B.jagger.kmc_k31 tmp
+```
+
+
 ## Installyng IBSpy
 
 There easiest way to install IBSpy is to use pip3. 
