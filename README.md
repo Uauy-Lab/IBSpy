@@ -5,6 +5,12 @@
 
 Python library to identify Identical By State regions
 
+If you want to use the [KMC](https://github.com/refresh-bio/KMC) binder, install the KMC and compile the python instructions.
+
+Then, run the following command to setup the path for it.  
+```sh
+source KMC/py_kmc_api/set_path.sh 
+```
 ## Installyng IBSpy
 
 There easiest way to install IBSpy is to use pip3. 
@@ -30,6 +36,15 @@ IBSpy requires to have a kmer database from the sequencing files. Currently two 
 
   1. Jellyfish: Follow the instructions in its [website](https://github.com/gmarcais/Jellyfish/blob/master/doc/Readme.md)
   2. kmerGWAS: Has an adhoc file format that contains only the kmers in a binary representation, sorted. This option is faster than the jellyfish version, but creating the kmer table is less straight forward. The manual is [here](https://github.com/voichek/kmersGWAS/blob/master/manual.pdf).
+
+## Runn unit tests
+
+To makes sure that your changes havent broken the core IBSpy, run the unit tests:
+
+```sh
+python3 setup.py test
+```
+
 
 ## Running IBSPy
 
