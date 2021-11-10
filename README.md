@@ -9,7 +9,8 @@ If you want to use the [KMC](https://github.com/refresh-bio/KMC) binder, install
 
 Then, run the following command to setup the path for it.  
 ```sh
-source KMC/py_kmc_api/set_path.sh 
+cd KMC/py_kmc_api
+source set_path.sh 
 ```
 
 To build the mker database for kmc and the tests run this comand:
