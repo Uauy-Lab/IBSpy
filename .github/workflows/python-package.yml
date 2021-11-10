@@ -13,6 +13,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    
     strategy:
       matrix:
         python-version: [ '3.7', '3.8', '3.9']
@@ -50,10 +51,9 @@ jobs:
         cd py_kmc_api
         #source set_path.sh
         cd ../..
-        #export PYTHONPATH=$PYTHONPATH:/opt/hostedtoolcache/Python/3.8.6/x64/lib/python3.8/site-packages
         echo $PWD
         #echo "::set-env name=PYTHONPATH::$PWD/KMC-3.1.1/bin"
-        echo "$PWD/KMC-3.1.1/bin" >> $PYTHONPATH
+        #echo "$PWD/KMC-3.1.1/bin" >> $PYTHONPATH
         ls -lah $PWD/KMC-3.1.1/bin
         echo $PYTHONPATH
         #env
@@ -65,4 +65,8 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
+        CURRENT_DIR=$PWD
+        cd KMC-3.1.1/py_kmc_api
+        source set_path.sh
+        cd ../../
         python setup.py test
