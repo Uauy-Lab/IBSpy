@@ -45,14 +45,15 @@ jobs:
         wget https://github.com/refresh-bio/KMC/archive/refs/tags/v3.1.1.tar.gz
         tar -xzf v3.1.1.tar.gz
         cd KMC-3.1.1
+        make
         make py_kmc_api
         cd py_kmc_api
         source set_path.sh
         cd ../..
         #export PYTHONPATH=$PYTHONPATH:/opt/hostedtoolcache/Python/3.8.6/x64/lib/python3.8/site-packages
-        echo $$PWD
+        echo $PWD
         ls -lah $PWD/KMC-3.1.1/bin
-        #echo $PYTHONPATH
+        echo $PYTHONPATH
         #env
     - name: Lint with flake8
       run: |
