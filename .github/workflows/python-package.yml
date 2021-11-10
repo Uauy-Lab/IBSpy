@@ -48,10 +48,11 @@ jobs:
         make
         make py_kmc_api
         cd py_kmc_api
-        source set_path.sh
+        #source set_path.sh
         cd ../..
         #export PYTHONPATH=$PYTHONPATH:/opt/hostedtoolcache/Python/3.8.6/x64/lib/python3.8/site-packages
         echo $PWD
+        echo "::set-env name=PYTHONPATH::$PWD/KMC-3.1.1/bin"
         ls -lah $PWD/KMC-3.1.1/bin
         echo $PYTHONPATH
         #env
