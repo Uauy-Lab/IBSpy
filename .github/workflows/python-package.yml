@@ -45,7 +45,7 @@ jobs:
         wget https://github.com/refresh-bio/KMC/archive/refs/tags/v3.1.1.tar.gz
         tar -xzf v3.1.1.tar.gz
         cd KMC-3.1.1
-        make
+        #make
         make py_kmc_api
         cd py_kmc_api
         #source set_path.sh
