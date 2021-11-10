@@ -52,7 +52,8 @@ jobs:
         cd ../..
         #export PYTHONPATH=$PYTHONPATH:/opt/hostedtoolcache/Python/3.8.6/x64/lib/python3.8/site-packages
         echo $PWD
-        echo "::set-env name=PYTHONPATH::$PWD/KMC-3.1.1/bin"
+        #echo "::set-env name=PYTHONPATH::$PWD/KMC-3.1.1/bin"
+        echo "$PWD/KMC-3.1.1/bin" >> $PYTHONPATH
         ls -lah $PWD/KMC-3.1.1/bin
         echo $PYTHONPATH
         #env
