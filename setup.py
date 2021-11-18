@@ -21,8 +21,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="IBSpy", # Replace with your own username
-    version="0.3.0",
+    name="IBSpy",
+    version="0.3.1",
     author="Ricardo H. Ramirez-Gonzalez",
     author_email="ricardo.ramirez-gonzalez@jic.ac.uk",
     description="A package to detect IBS regions",
