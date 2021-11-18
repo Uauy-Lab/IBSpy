@@ -5,13 +5,7 @@
 
 Python library to identify Identical By State regions
 
-If you want to use the [KMC](https://github.com/refresh-bio/KMC) binder, install the KMC and compile the python instructions.
 
-Then, run the following command to setup the path for it.  
-```sh
-cd KMC/py_kmc_api
-source set_path.sh 
-```
 
 To build the mker database for kmc and the tests run this comand:
 
@@ -37,6 +31,17 @@ python3 setup.py develop
 ```
 
 Then you should have the  IBSpy command available. 
+
+
+### KMC3 
+
+If you want to use the [KMC](https://github.com/refresh-bio/KMC) binder, install the KMC and compile the python instructions.
+
+Then, run the following command to setup the path for it.  
+```sh
+cd KMC/py_kmc_api
+source set_path.sh 
+```
 
 
 ## Preparing the databases
@@ -77,8 +82,8 @@ optional arguments:
   -z, --compress        When an ouput file is present, it is compressed as .gz
   -o OUTPUT, --output OUTPUT
                         Output file. If missing, the ouptut is sent to stdout
-  -f {kmerGWAS,jellyfish}, --database_format {kmerGWAS,jellyfish}
-                        Database format (kmerGWAS, jellyfish)
+  -f {kmerGWAS,kmerGWAS_mmap,jellyfish,kmc3}, --database_format {kmerGWAS,kmerGWAS_mmap,jellyfish,kmc3}
+                        Database format 
 ```
 
 To generate the table with the number of observed kmers and variants run the following command, using the kmer database from kmerGWAS use the following command:
@@ -87,6 +92,8 @@ To generate the table with the number of observed kmers and variants run the fol
 ```sh
  IBSpy --output "kmer_windows_LineXXX.tsv.gz" -z --database kmers_with_strand  --reference arinaLrFor.fa --window_size 50000 --compress --database_format kmerGWAS
 ```
+For KMC3, the database is the name used while creating the database, not the filename. 
+
 
 ## Running IBSplot
 

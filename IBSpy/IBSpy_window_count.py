@@ -1,7 +1,7 @@
 import argparse
 import gzip
 from sys import stdout
-from IBSpy import KmerGWASDBBuilder, KmerGWASDB, FastaChunkReader, JellyfishSDB, JellyfishBuilder 
+from IBSpy import KmerGWASDB, JellyfishSDB, KMC3DB
 
 
 def print_line(out, line, compress):
@@ -30,6 +30,8 @@ def open_db(args):
 		kmerdb = KmerGWASDB(args.kmer_size, mmap=True)
 	if(args.database_format=="jellyfish"):
 		kmerdb = JellyfishSDB(args.kmer_size)
+	if(args.database_format=="kmc3"):
+		kmerdb = KMC3DB(args.kmer_size)
 	kmerdb.load(args.database)
 	return kmerdb
 
@@ -68,7 +70,7 @@ def parse_arguments():
 		help="When an ouput file is present, it is compressed as .gz")
 	parser.add_argument("-o", "--output", default=None, 
 		help="Output file. If missing, the ouptut is sent to stdout")
-	parser.add_argument("-f", "--database_format", default="kmerGWAS", choices=["kmerGWAS", "kmerGWAS_mmap","jellyfish"],
+	parser.add_argument("-f", "--database_format", default="kmerGWAS", choices=["kmerGWAS", "kmerGWAS_mmap","jellyfish", "kmc3"],
 		help="Database format")
 	args = parser.parse_args()
 	return args
