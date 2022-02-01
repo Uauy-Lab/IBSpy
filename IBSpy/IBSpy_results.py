@@ -1,31 +1,47 @@
+from locale import normalize
 import pandas as pd
 import numpy as np
 from sklearn.mixture import GaussianMixture
 
 class IBSpyResults:
     # class variables go here
-    def __init__(self, filename, window_size, filter_counts):
-
+    def __init__(self, filename, window_size, filter_counts, score="variations", normalize=False):
         self.db = pd.read_csv(filename, delimiter='\t')
+
         self.window_size = window_size
         self.filter_counts = filter_counts
+        self.score = score
+        self.normalize = normalize
+        self.db['normalized'] = self.db[self.score] / self.db['total_kmers']
 
     def count_by_windows(self):
-        windSize = self.window_size
-        db_DF = self.db[['seqname','start','end','variations']]
+        window_size = self.window_size
+        db_DF = self.db[['seqname','start','end',self.score, 'normalized']]
         # get the longest chromosome
         chrLen = db_DF['end'].max()
         # windows to iterate
         w_pos = 0
         db_byChr = pd.DataFrame()
+       
+        # while w_pos <= chrLen:
+        #     db_DF_ByWind = db_DF[(db_DF['start'] >= w_pos) & (db_DF['start'] < w_pos + windSize)]
+        #     db_DF_ByWind = db_DF_ByWind.loc[:, ('seqname','start' ,self.score, "normalized")]
+        #     db_DF_ByWind['window'] = w_pos + windSize
+        #     w_pos += windSize
+        #     db_byChr = db_byChr.append(db_DF_ByWind)
         while w_pos <= chrLen:
-            db_DF_ByWind = db_DF[(db_DF['start'] >= w_pos) & (db_DF['start'] < w_pos + windSize)]
-            db_DF_ByWind = db_DF_ByWind.loc[:, ('seqname','start','variations')]
-            db_DF_ByWind['window'] = w_pos + windSize
-            w_pos += windSize
-            db_byChr = db_byChr.append(db_DF_ByWind)
-
-        db_grouped = db_byChr.groupby(['seqname','window'])['variations']
+            by_windows_df = db_DF[(db_DF['end'] > w_pos) & (db_DF['end'] <= w_pos + window_size)]
+            by_windows_df = by_windows_df.drop(['start','end'], axis=1)
+            by_windows_df['start'] = w_pos + 1
+            by_windows_df['end'] = w_pos + window_size
+            w_pos += window_size
+            db_byChr = db_byChr.append(by_windows_df)  
+       
+        if self.normalize: 
+            db_grouped = db_byChr.groupby(['seqname','start','end'])['normalized']
+        else:
+            db_grouped = db_byChr.groupby(['seqname','start','end'])[self.score]
+        
 
         # calculate statistics by chromosome, windows, and variations
         out_db              = db_grouped.sum().reset_index()
@@ -39,12 +55,12 @@ class IBSpyResults:
         by_windows_db = counts 
         #by_windows_db = self.count_by_windows()
         if self.filter_counts is not None:
-            applied_filter = by_windows_db[by_windows_db['variations'] <= self.filter_counts]
+            applied_filter = by_windows_db[by_windows_db[self.score] <= self.filter_counts]
         else:
             applied_filter = by_windows_db
-        varDF = pd.DataFrame(applied_filter[['seqname','window','variations']])
+        varDF = pd.DataFrame(applied_filter[['seqname','start','end',self.score]])
         varDF.reset_index(drop=True, inplace=True)
-        varArray = varDF['variations'].to_numpy()
+        varArray = varDF[self.score].to_numpy()
         log_varArray = np.log(varArray, where=varArray>0)
         log_varArray = log_varArray.reshape((len(log_varArray),1))
         return log_varArray, varDF
@@ -63,7 +79,7 @@ class IBSpyResults:
         value_group = []
         for key, group in gmmIBS_DF:
             key_group.append(key)
-            value_group.append(group['variations'].median())
+            value_group.append(group[self.score].median())
         dic_grupby = dict(zip(key_group, value_group))
         IBS_group = min(dic_grupby, key=dic_grupby.get)
         varDF['v_gmm'] = np.where(varDF['v_gmm'] == IBS_group, 1, 0)
@@ -93,11 +109,11 @@ class IBSpyResults:
         # put back filtered data with haploblocks
         hapCntFile = self.count_by_windows()
         model = pd.merge(hapCntFile, model, 
-            left_on=['seqname','window'], 
-            right_on=['seqname','window'],
+            left_on=['seqname','start','end'], 
+            right_on=['seqname','start','end'],
             how='left')
         model.loc[:,'v_gmm':'vh_block'] = np.where(model.loc[:, 'v_gmm':'vh_block'] == 1, 1, 0)
-        model.rename(columns={'seqname_x':'seqname', 'variations_x':'variations'}, inplace=True)
+        model.rename(columns={'seqname_x':'seqname', 'variations_x':self.score}, inplace=True)
         model = model.drop(['variations_y'], axis=1)
         return model
     
