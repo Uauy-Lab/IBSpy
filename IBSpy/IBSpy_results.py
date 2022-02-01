@@ -35,7 +35,7 @@ class IBSpyResults:
             by_windows_df['start'] = w_pos + 1
             by_windows_df['end'] = w_pos + window_size
             w_pos += window_size
-            db_byChr = db_byChr.append(by_windows_df)  
+            db_byChr = pd.concat([db_byChr,by_windows_df], axis=0)  
        
         if self.normalize: 
             db_grouped = db_byChr.groupby(['seqname','start','end'])['normalized']
