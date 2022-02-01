@@ -51,9 +51,7 @@ class KmerDB(ABC):
         stats.total_kmers = len(kmers)
         last_present = True
         gap_size = 0
-        i = 0
-        for k in kmers: 
-            i += 1
+        for i, k in enumerate(kmers): 
             present = k in self 
             if not present:
                 gap_size += 1
@@ -62,7 +60,6 @@ class KmerDB(ABC):
                 stats.add_variation(gap_size, self.kmer_size)
                 gap_size = 0;
             last_present = present
-        
         stats.add_variation(gap_size, self.kmer_size)
         return stats
 
