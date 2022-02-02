@@ -21,7 +21,8 @@ class TestResultSet(unittest.TestCase):
     
     def test_values_matrix(self):
         ibspy_results = IBSpyResultsSet(filename=self.samples_metadata)
-        matrix = ibspy_results = ibspy_results.values_matrix
+        ibspy_results.values_matrix
+        matrix = ibspy_results.values_matrix
         print(matrix)
 
 if __name__ == '__main__':

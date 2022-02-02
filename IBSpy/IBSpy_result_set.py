@@ -21,10 +21,10 @@ class IBSpyResultsSet:
         self.stat:string = stat
         self.references = self.samples_df["reference"].unique()
         self.samples = self.samples_df["query"].unique()
+        self._values_matrix  = None
 
     def values_matrix_for_reference(self, reference:string):
         samples = self.samples_df[self.samples_df['reference'] == reference]
-        print(samples)
         values_matrix = pd.DataFrame()
         for index, row in samples.iterrows():
             path=row['path'] + "/" + row['file']
@@ -39,6 +39,8 @@ class IBSpyResultsSet:
 
     @property
     def values_matrix(self):
+        if self._values_matrix is not None:
+            return self._values_matrix
         dfs = []
         for ref in self.references:
             df = self.values_matrix_for_reference(ref)
