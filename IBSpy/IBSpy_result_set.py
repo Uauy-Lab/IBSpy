@@ -44,5 +44,18 @@ class IBSpyResultsSet:
         return self._values_matrix
 
     
+    def values_matrix_seqname_iterator(self):
+        mat = self.values_matrix
+        seqnames = mat['seqname'].unique()
+        for seq in seqnames:
+            yield mat[mat['seqname'] == seq]
+
     def values_matrix_iterator(self):
-        mat = self._values_matrix
+        for seq in self.values_matrix_seqname_iterator():
+            # total_windows = len(seq) / self.options.affinity_blocks
+            for x in range(0, len(seq) ,self.options.affinity_blocks):
+                print(x)
+                yield seq.iloc[x:x+self.options.affinity_blocks]
+
+
+

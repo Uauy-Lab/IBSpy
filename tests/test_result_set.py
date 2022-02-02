@@ -6,7 +6,7 @@ import unittest
 import pandas
 import pandas.testing as pdt
 import shutil
-from IBSpy import IBSpyOptions, IBSpyResultsSet
+from IBSpy import IBSpy_results, IBSpyOptions, IBSpyResultsSet
 
 
 
@@ -43,6 +43,20 @@ class TestResultSet(unittest.TestCase):
         matrix.to_csv(self.combine_resut_out, sep='\t', index=False )
         matrix = pandas.read_csv(self.combine_resut_out, delimiter='\t')
         pdt.assert_series_equal(matrix["seqname"], expected["seqname"], check_names=False)
+
+    def test_values_matrix_chromosome_iterator(self):
+        ibspy_results = IBSpyResultsSet(options=self.options)
+        for chr_map in ibspy_results.values_matrix_seqname_iterator():
+            print(chr_map)
+            print("----")
+
+    def test_values_matrix_iterator(self):
+        ibspy_results = IBSpyResultsSet(options=self.options)
+        for block in ibspy_results.values_matrix_iterator():
+            print(block)
+            print("----")
+
+    
 
 if __name__ == '__main__':
     unittest.main()
