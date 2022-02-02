@@ -1,3 +1,4 @@
+from asyncio.log import logger
 from fileinput import filename
 import logging
 import os
@@ -16,7 +17,10 @@ class TestResultSet(unittest.TestCase):
         self.samples_metadata="./tests/data/affinity/samples_metadata.tsv"
         self.combine_resut="./tests/data/affinity/chr1A_variations_5000w.tsv"
         self.combine_resut_out="./tests/data/affinity/out/chr1A_variations_5000w.tsv"
-        shutil.rmtree("./tests/data/affinity/out")
+        try:
+            shutil.rmtree("./tests/data/affinity/out")
+        except OSError as error:
+            pass
         os.mkdir("./tests/data/affinity/out")
 
     def test_load_data(self):
