@@ -7,7 +7,10 @@ import numpy as np
 import logging
 import operator
 import unittest
-from IBSpy import IBSpyResults 
+
+from pandas import options
+from IBSpy import IBSpyResults
+from IBSpy.IBSpy_options import IBSpyOptions 
 
 class TestResults(unittest.TestCase):
     logger = logging.getLogger("test")
@@ -20,8 +23,17 @@ class TestResults(unittest.TestCase):
         self.stitch_number = 3
         self.n_components = 3
         self.covariance_type = 'full'
-        self.results = IBSpyResults(db, windows, filter_counts)
-        self.results_norm = IBSpyResults(db, windows, filter_counts, score="observed_kmers", normalize=True)
+        opts1 = IBSpyOptions()
+        opts1.normalize = False
+        opts1.score = 'variations'
+        opts1.window_size = windows
+        self.results = IBSpyResults(db, opts1)
+        opts = IBSpyOptions()
+        opts.score = "observed_kmers"
+        opts.normalize = True
+        opts.filter_counts = filter_counts
+        opts.window_size = windows
+        self.results_norm = IBSpyResults(db, opts)
         # print(self.results.count_by_windows())
 
     def test_windows(self):
@@ -89,15 +101,15 @@ class TestResults(unittest.TestCase):
         self.assertEqual( round( log_test[4][0], 2),  round(4.867534450455582, 2))
         self.assertEqual( round( log_test[5][0], 2),  round(4.465908118654584, 2 ) )
 
-    def test_build_model(self):
-        counts = self.results.count_by_windows()
-        log_test, pd = self.results.transform_counts_to_log(counts)
-        model = self.results.build_gmm_model(log_test, pd,self.n_components, self.covariance_type) 
-        # print("....\n")
-        # print(model)
-        # self.assertEqual(model.iloc[0]['v_gmm'],  0)
-        # self.assertEqual(model.iloc[1]['v_gmm'],  0)
-        # self.assertEqual(model.iloc[2]['v_gmm'],  1)
+    # def test_build_model(self):
+    #     counts = self.results.count_by_windows()
+    #     log_test, pd = self.results.transform_counts_to_log(counts)
+    #     model = self.results.build_gmm_model(log_test, pd,self.n_components, self.covariance_type) 
+    #     # print("....\n")
+    #     # print(model)
+    #     # self.assertEqual(model.iloc[0]['v_gmm'],  0)
+    #     # self.assertEqual(model.iloc[1]['v_gmm'],  0)
+    #     # self.assertEqual(model.iloc[2]['v_gmm'],  1)
         # self.assertEqual(model.iloc[3]['v_gmm'],  1)
         # self.assertEqual(model.iloc[4]['v_gmm'],  1)
         # self.assertEqual(model.iloc[5]['v_gmm'],  0)

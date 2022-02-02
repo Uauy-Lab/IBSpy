@@ -3,15 +3,17 @@ import pandas as pd
 import numpy as np
 from sklearn.mixture import GaussianMixture
 
+from IBSpy.IBSpy_options import IBSpyOptions
+
 class IBSpyResults:
     # class variables go here
-    def __init__(self, filename, window_size, filter_counts = None, score="variations", normalize=False):
+    def __init__(self, filename, options:IBSpyOptions):
         self.db = pd.read_csv(filename, delimiter='\t')
 
-        self.window_size = window_size
-        self.filter_counts = filter_counts
-        self.score = score
-        self.normalize = normalize
+        self.window_size = options.window_size
+        self.filter_counts = options.filter_counts
+        self.score = options.score
+        self.normalize = options.normalize
         self.db['normalized'] = self.db[self.score] / self.db['total_kmers']
 
     def count_by_windows(self) -> pd.DataFrame:
