@@ -5,7 +5,7 @@ from sklearn.mixture import GaussianMixture
 
 class IBSpyResults:
     # class variables go here
-    def __init__(self, filename, window_size, filter_counts, score="variations", normalize=False):
+    def __init__(self, filename, window_size, filter_counts = None, score="variations", normalize=False):
         self.db = pd.read_csv(filename, delimiter='\t')
 
         self.window_size = window_size
@@ -14,7 +14,7 @@ class IBSpyResults:
         self.normalize = normalize
         self.db['normalized'] = self.db[self.score] / self.db['total_kmers']
 
-    def count_by_windows(self):
+    def count_by_windows(self) -> pd.DataFrame:
         window_size = self.window_size
         db_DF = self.db[['seqname','start','end',self.score, 'normalized']]
         # get the longest chromosome
@@ -23,12 +23,6 @@ class IBSpyResults:
         w_pos = 0
         db_byChr = pd.DataFrame()
        
-        # while w_pos <= chrLen:
-        #     db_DF_ByWind = db_DF[(db_DF['start'] >= w_pos) & (db_DF['start'] < w_pos + windSize)]
-        #     db_DF_ByWind = db_DF_ByWind.loc[:, ('seqname','start' ,self.score, "normalized")]
-        #     db_DF_ByWind['window'] = w_pos + windSize
-        #     w_pos += windSize
-        #     db_byChr = db_byChr.append(db_DF_ByWind)
         while w_pos <= chrLen:
             by_windows_df = db_DF[(db_DF['end'] > w_pos) & (db_DF['end'] <= w_pos + window_size)]
             by_windows_df = by_windows_df.drop(['start','end'], axis=1)
