@@ -54,7 +54,6 @@ class IBSpyResultsSet:
         for seq in self.values_matrix_seqname_iterator():
             # total_windows = len(seq) / self.options.affinity_blocks
             for x in range(0, len(seq) ,self.options.affinity_blocks):
-                print(x)
                 yield seq.iloc[x:x+self.options.affinity_blocks]
 
 

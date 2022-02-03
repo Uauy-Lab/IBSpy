@@ -46,15 +46,19 @@ class TestResultSet(unittest.TestCase):
 
     def test_values_matrix_chromosome_iterator(self):
         ibspy_results = IBSpyResultsSet(options=self.options)
-        for chr_map in ibspy_results.values_matrix_seqname_iterator():
-            print(chr_map)
-            print("----")
+        expected_seqname = ['chr1A', 'chr1A_WhJag']
+        expected_len = [109,109]
+        for i, chr_map in enumerate(ibspy_results.values_matrix_seqname_iterator()):
+            chromosomes = chr_map['seqname'].unique()
+            self.assertEqual(chromosomes[0], expected_seqname[i])
+            self.assertAlmostEqual(len(chr_map), expected_len[i])
 
     def test_values_matrix_iterator(self):
         ibspy_results = IBSpyResultsSet(options=self.options)
-        for block in ibspy_results.values_matrix_iterator():
-            print(block)
-            print("----")
+        sizes = [20, 20, 20, 20, 20, 9, 20, 20, 20, 20, 20, 9]
+        for i, block in enumerate(ibspy_results.values_matrix_iterator()):
+            print(str(len(block)) + ",")
+            self.assertAlmostEqual(len(block), expected_len[i])
 
     
 
