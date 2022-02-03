@@ -1,7 +1,9 @@
 import setuptools
-from distutils.core import setup, Extension
+# from distutils.core import setup, Extension
 from Cython.Build import cythonize
 import unittest
+
+from setuptools import Extension
 
 def unit_tests():
     test_loader = unittest.TestLoader()
@@ -22,7 +24,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="IBSpy",
-    version="0.3.1",
+    version="0.4.0-dev",
     author="Ricardo H. Ramirez-Gonzalez",
     author_email="ricardo.ramirez-gonzalez@jic.ac.uk",
     description="A package to detect IBS regions",
