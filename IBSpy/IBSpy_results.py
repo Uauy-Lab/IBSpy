@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.mixture import GaussianMixture
 
-from IBSpy.IBSpy_options import IBSpyOptions
+from .IBSpy_options import IBSpyOptions
 
 class IBSpyResults:
     # class variables go here

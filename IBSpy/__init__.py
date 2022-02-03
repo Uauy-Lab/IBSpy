@@ -7,6 +7,7 @@ from .IBSpy_results import IBSpyResults
 from .IBSpy_plot import IBSpyPlots
 from .IBSpy_result_set import IBSpyResultsSet
 from .IBSpy_options import IBSpyOptions
+from .IBSpy_values_matrix import IBSpyValuesMatrix
 import argparse
 
 def main(): 
