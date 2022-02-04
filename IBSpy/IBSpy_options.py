@@ -16,8 +16,9 @@ class IBSpyOptions:
         self.window_size:int = 50000
         self.stat:string = 'mean'
         self.affinity_blocks:int = 20
-        self.out_folder = "./out/"
-        self.cache_tables = True
+        self.out_folder:string = "./out/"
+        self.cache_tables:bool = True
+        self.chromosome_mapping:string = None
         try:
             os.mkdir(self.out_folder)
         except OSError as error:

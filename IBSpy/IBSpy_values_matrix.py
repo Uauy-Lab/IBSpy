@@ -13,7 +13,7 @@ class IBSpyValuesMatrix:
         self.samples = self.samples_df["query"].unique()
         self._values_matrix  = None
 
-    def values_matrix_for_reference(self, reference:string):
+    def _values_matrix_for_reference(self, reference:string):
         samples = self.samples_df[self.samples_df['reference'] == reference]
         values_matrix = pd.DataFrame()
         for index, row in samples.iterrows():
@@ -29,10 +29,25 @@ class IBSpyValuesMatrix:
     def _build_dataset(self):
         dfs = []
         for ref in self.references:
-            df = self.values_matrix_for_reference(ref)
+            df = self._values_matrix_for_reference(ref)
             dfs.append(df)
-        return pd.concat(dfs, join="inner")
+        
+        return self.rename_sequnames( pd.concat(dfs, join="inner") )
+
+    def mapping_seqnames(self):
+        map_df = pd.read_csv(self.options.chromosome_mapping, delimiter='\t')
+        ret = {}
+        for index, row in map_df.iterrows():
+            ret[row['original']] = row['mapping']
+        return ret
     
+    def rename_sequnames(self, df):
+        if self.options.chromosome_mapping is None:
+            return df
+        mapping = self.mapping_seqnames()
+        df['seqname'] = df['seqname'].apply(lambda x: mapping[x]) 
+        return df
+
     @property
     def values_matrix(self):
         if self._values_matrix is not None:

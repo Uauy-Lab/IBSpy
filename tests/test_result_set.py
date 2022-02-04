@@ -17,7 +17,10 @@ class TestResultSet(unittest.TestCase):
     def setUp(self):
         self.samples_metadata="./tests/data/affinity/samples_metadata.tsv"
         self.combine_resut="./tests/data/affinity/chr1A_variations_5000w.tsv"
+        self.combine_resut_renamed="./tests/data/affinity/chr1A_variations_5000w_renamed.tsv"
         self.combine_resut_out="./tests/data/affinity/out/chr1A_variations_5000w.tsv"
+        self.combine_resut_renamed_out="./tests/data/affinity/out/chr1A_variations_5000w_renamed.tsv"
+        self.mapping_path = "./tests/data/affinity/chi_jag_mapping.tsv"
         self.options = IBSpy.IBSpyOptions()
         self.options.metadata = self.samples_metadata
 
@@ -42,6 +45,15 @@ class TestResultSet(unittest.TestCase):
         matrix = ibspy_results.values_matrix
         matrix.to_csv(self.combine_resut_out, sep='\t', index=False )
         matrix = pandas.read_csv(self.combine_resut_out, delimiter='\t')
+        pdt.assert_series_equal(matrix["seqname"], expected["seqname"], check_names=False)
+    
+    def test_values_matrix_rename(self):
+        expected = pandas.read_csv(self.combine_resut_renamed, delimiter='\t')
+        self.options.chromosome_mapping = self.mapping_path
+        ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
+        matrix = ibspy_results.values_matrix
+        matrix.to_csv(self.combine_resut_renamed_out, sep='\t', index=False )
+        matrix = pandas.read_csv(self.combine_resut_renamed_out, delimiter='\t')
         pdt.assert_series_equal(matrix["seqname"], expected["seqname"], check_names=False)
 
     def test_values_matrix_chromosome_iterator(self):
