@@ -4,9 +4,14 @@ verify_ssl = true
 name       = "pypi"
 
 [packages]
-cython    = "*"
-pyfaidx     = "*"
-biopython = "*"
+cython     = "*"
+pyfaidx    = "*"
+biopython  = "*"
+sklearn    = "*"
+numpy      = "*"
+pandas     = "*"
+matplotlib = "*"
+pyranges   = "*"
 
 
 [dev-packages]

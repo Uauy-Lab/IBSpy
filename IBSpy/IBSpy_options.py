@@ -27,7 +27,7 @@ class IBSpyOptions:
         
 
     @property
-    def file_prefix(self):
+    def file_prefix(self) -> string:
         arr = [str(self.window_size), "ws",
             str(self.score), "score",
             str(self.stat), "stat",
