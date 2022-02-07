@@ -52,11 +52,11 @@ class IBSpyValuesMatrix:
         return df
 
     @property
-    def values_matrix(self):
+    def values_matrix(self) -> PyRanges:
         if self._values_matrix is not None:
             return self._values_matrix
         self._values_matrix = self._build_dataset()
-        self._values_matrix = PyRanges(self._values_matrix)
+        self._values_matrix = PyRanges(self._values_matrix, int64=True)
         return self._values_matrix
 
     @property
