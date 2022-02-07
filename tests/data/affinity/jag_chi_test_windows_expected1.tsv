@@ -1,0 +1,13 @@
+assembly	reference	Chromosome	Start	End	block_no	Strand
+chinese	jagger	chr1A__chi	194000	200000	chr1A__chi:100001-200000	+
+chinese	jagger	chr1A__chi	194000	227000	chr1A__chi:150001-250000	+
+chinese	jagger	chr1A__chi	200001	227000	chr1A__chi:200001-300000	+
+jagger	chinese	chr1A__chi	194000	203000	chr1A__jag:100001-200000	+
+jagger	chinese	chr1A__chi	194000	227000	chr1A__jag:150001-250000	+
+jagger	chinese	chr1A__chi	203001	227000	chr1A__jag:200001-300000	+
+chinese	jagger	chr1A__jag	191000	197000	chr1A__chi:100001-200000	+
+chinese	jagger	chr1A__jag	191000	224000	chr1A__chi:150001-250000	+
+chinese	jagger	chr1A__jag	197001	224000	chr1A__chi:200001-300000	+
+jagger	chinese	chr1A__jag	191000	200000	chr1A__jag:100001-200000	+
+jagger	chinese	chr1A__jag	191000	224000	chr1A__jag:150001-250000	+
+jagger	chinese	chr1A__jag	200001	224000	chr1A__jag:200001-300000	+
