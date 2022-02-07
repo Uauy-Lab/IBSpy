@@ -43,7 +43,7 @@ class TestResultSet(unittest.TestCase):
         expected = pandas.read_csv(self.combine_resut, delimiter='\t')
         ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
         matrix = ibspy_results.values_matrix
-        matrix.to_csv(self.combine_resut_out, sep='\t', index=False )
+        matrix.to_csv(self.combine_resut_out, sep='\t')
         matrix = pandas.read_csv(self.combine_resut_out, delimiter='\t')
         pdt.assert_series_equal(matrix["Chromosome"], expected["Chromosome"], check_names=False)
     
@@ -52,7 +52,7 @@ class TestResultSet(unittest.TestCase):
         self.options.chromosome_mapping = self.mapping_path
         ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
         matrix = ibspy_results.values_matrix
-        matrix.to_csv(self.combine_resut_renamed_out, sep='\t', index=False )
+        matrix.to_csv(self.combine_resut_renamed_out, sep='\t')
         matrix = pandas.read_csv(self.combine_resut_renamed_out, delimiter='\t')
         pdt.assert_series_equal(matrix["Chromosome"], expected["Chromosome"], check_names=False)
 
@@ -60,9 +60,8 @@ class TestResultSet(unittest.TestCase):
         ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
         expected_seqname = ['chr1A', 'chr1A_WhJag']
         expected_len = [109,109]
-        for i, chr_map in enumerate(ibspy_results.values_matrix_seqname_iterator()):
-            chromosomes = chr_map['Chromosome'].unique()
-            self.assertEqual(chromosomes[0], expected_seqname[i])
+        for i, (chr_map, chr )  in enumerate(ibspy_results.values_matrix_seqname_iterator()):
+            self.assertEqual(chr, expected_seqname[i])
             self.assertAlmostEqual(len(chr_map), expected_len[i])
 
     def test_values_matrix_iterator(self):
