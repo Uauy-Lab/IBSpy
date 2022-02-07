@@ -22,7 +22,8 @@ class IBSpyValuesMatrix:
             ibr = IBSpyResults(path, self.options)
             df: pd.DataFrame = ibr.count_by_windows()
             values_matrix[sample_name] = df[self.options.stat]
-        names = df[['seqname','start','end']]
+        df.rename(columns = {'seqname':'Chromosome', 'chromosome':'Chromosome', 'start':'Start', 'end':"End", 'orientation':"Strand"}, inplace = True)
+        names = df[['Chromosome','Start','End']]
         values_matrix = pd.concat([names,values_matrix], axis=1)
         return values_matrix
 
@@ -45,7 +46,7 @@ class IBSpyValuesMatrix:
         if self.options.chromosome_mapping is None:
             return df
         mapping = self.mapping_seqnames()
-        df['seqname'] = df['seqname'].apply(lambda x: mapping[x]) 
+        df['Chromosome'] = df['Chromosome'].apply(lambda x: mapping[x]) 
         return df
 
     @property
@@ -57,9 +58,9 @@ class IBSpyValuesMatrix:
     
     def seqname_iterator(self):
         mat = self.values_matrix
-        seqnames = mat['seqname'].unique()
+        seqnames = mat['Chromosome'].unique()
         for seq in seqnames:
-            yield mat[mat['seqname'] == seq]
+            yield mat[mat['Chromosome'] == seq]
 
     def matrix_iterator(self):
         for seq in self.seqname_iterator():
