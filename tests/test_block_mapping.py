@@ -1,6 +1,6 @@
 from operator import delitem
 import unittest
-
+import os
 import pandas as pd
 import pandas.testing as pdt
 import IBSpy
@@ -8,6 +8,12 @@ import IBSpy
 
 class TestBlockMapping(unittest.TestCase):
 	def setUp(self) -> None:
+		self.out_folder="./tests/data/affinity/out/"
+		try:
+			os.mkdir(self.out_folder)
+		except OSError as error:
+			pass
+
 		self.mapping_file = "./tests/data/affinity/jag_chi_test_windows.tsv"
 		self.mapping_file_expected_1 = "./tests/data/affinity/jag_chi_test_windows_expected1.tsv"
 		self.mapping_file_expected_2 = "./tests/data/affinity/jag_chi_test_windows_expected2.tsv"

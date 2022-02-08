@@ -2,6 +2,8 @@ from locale import normalize
 import string
 import pandas as pd
 from typing import List
+from pyranges import PyRanges
+from multiprocessing import Pool
 
 from .BlockMapping import BlockMapping
 from .IBSpy_options import IBSpyOptions
@@ -47,11 +49,21 @@ class IBSpyResultsSet:
     def to_csv(self,  *args, **kwargs):
         self.values_matrix.to_csv( *args, **kwargs)
             
-    def mapped_window(self, chromosome, start, end, assembly = None):
+    def mapped_window(self, chromosome, start, end, assembly = None) -> PyRanges:
         if self.block_mapping is None:
             return self.values_matrix.values_matrix[chromosome, start:end]
-
         targets = self.block_mapping.all_regions_for(chromosome, start, end, assembly=assembly)
         return self.values_matrix.values_matrix.intersect(targets)
+
+    def mapped_window_iterator(self, chromosome: None, function: len):
+        chromosome_lengths = self.values_matrix.chromosome_lengths
+        if chromosome is not None:
+            chromosome_lengths = {chromosome : chromosome_lengths[chromosome]}
+        for chromosome, length in chromosome_lengths.items():
+            with Pool(self.options.pool_size) as p:
+                res = p.imap(function, range(0, length , self.options.affinity_window_size))
+                print(res)
+         
+
     
     

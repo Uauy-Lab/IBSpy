@@ -15,6 +15,11 @@ class TestResultSet(unittest.TestCase):
     logger.setLevel(logging.DEBUG)
 
     def setUp(self):
+        self.out_folder="./tests/data/affinity/out/"
+        try:
+            os.mkdir(self.out_folder)
+        except OSError as error:
+            pass
         self.samples_metadata="./tests/data/affinity/samples_metadata.tsv"
         self.combine_resut="./tests/data/affinity/chr1A_variations_5000w.tsv"
         self.combine_resut_renamed="./tests/data/affinity/chr1A_variations_5000w_renamed.tsv"
@@ -97,6 +102,13 @@ class TestResultSet(unittest.TestCase):
         mapped_window = ibspy_results.mapped_window("chr1A__chi",  100001, 300000, assembly="chinese")
         mapped_window.to_csv(self.mapped_window_result2_out, sep="\t")
         self.compare_dfs(self.mapped_window_result2, self.mapped_window_result2_out, extras=["Agron", "ability", "WATDE0010", "WATDE0020"])
+
+    def test_window_iterator(self):
+        self.options.chromosome_mapping = self.mapping_path
+        self.options.block_mapping = self.block_mapping_file
+        ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
+
+        
 
 
 if __name__ == '__main__':
