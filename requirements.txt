@@ -6,3 +6,5 @@ sklearn
 numpy
 pandas
 matplotlib
+multiprocess
+dill

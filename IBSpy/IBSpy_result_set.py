@@ -3,11 +3,13 @@ import string
 import pandas as pd
 from typing import List
 from pyranges import PyRanges
-from multiprocessing import Pool
+from multiprocess import Pool
 
 from .BlockMapping import BlockMapping
 from .IBSpy_options import IBSpyOptions
 from .IBSpy_values_matrix import IBSpyValuesMatrix
+import warnings
+
 class IBSpyResultsSet:
     def __init__(self, options: IBSpyOptions):
         
@@ -55,15 +57,26 @@ class IBSpyResultsSet:
         targets = self.block_mapping.all_regions_for(chromosome, start, end, assembly=assembly)
         return self.values_matrix.values_matrix.intersect(targets)
 
-    def mapped_window_iterator(self, chromosome: None, function: len):
+    def _function_window_wrapper(self, start, function, chromosome, assembly=None ):
+        window = self.mapped_window(chromosome, start, start + self.options.affinity_window_size, assembly=assembly)
+        return function(window)
+
+    def map_window_iterator(self, chromosome= None, function= None):
+        if function is None:
+            function = lambda x: x
+        
         chromosome_lengths = self.values_matrix.chromosome_lengths
         if chromosome is not None:
             chromosome_lengths = {chromosome : chromosome_lengths[chromosome]}
+
+        ret = list()
         for chromosome, length in chromosome_lengths.items():
+            assembly = None #TODO: have the hash of chromosomes to assembly
             with Pool(self.options.pool_size) as p:
-                res = p.imap(function, range(0, length , self.options.affinity_window_size))
-                print(res)
-         
+                wrapped_function = lambda x: self._function_window_wrapper(x, function, chromosome, assembly = assembly)
+                res = p.imap(wrapped_function, range(0, length , self.options.affinity_window_size),self.options.chunks_in_pool)
+                ret.extend(res)
+        return ret 
 
     
     

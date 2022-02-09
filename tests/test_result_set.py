@@ -7,7 +7,7 @@ import pandas as pd
 import pandas.testing as pdt
 import shutil
 import IBSpy
-
+from pyranges import PyRanges
 
 
 class TestResultSet(unittest.TestCase):
@@ -33,6 +33,8 @@ class TestResultSet(unittest.TestCase):
         self.mapped_window_result2 = "./tests/data/affinity/mapped_window_2.tsv"
         self.mapped_window_result1_out = "./tests/data/affinity/out/mapped_window_1.tsv"
         self.mapped_window_result2_out = "./tests/data/affinity/out/mapped_window_2.tsv"
+        self.windows_for_affy = "./tests/data/affinity/windows"
+        self.windows_for_affy_out = "./tests/data/affinity/out/windows"
 
         try:
             shutil.rmtree("./tests/data/affinity/out")
@@ -103,13 +105,17 @@ class TestResultSet(unittest.TestCase):
         mapped_window.to_csv(self.mapped_window_result2_out, sep="\t")
         self.compare_dfs(self.mapped_window_result2, self.mapped_window_result2_out, extras=["Agron", "ability", "WATDE0010", "WATDE0020"])
 
-    def test_window_iterator(self):
+    def test_mapped_window_iterator(self):
         self.options.chromosome_mapping = self.mapping_path
         self.options.block_mapping = self.block_mapping_file
         ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
-
-        
-
+        ret = ibspy_results.map_window_iterator()
+        for i, window  in enumerate(ret):
+            expeced_path = self.windows_for_affy+"/"+str(i)+".tsv"
+            result_path = self.windows_for_affy_out +str(i)+".tsv"        
+            window.to_csv(result_path, sep="\t")
+            self.compare_dfs(result_path, expeced_path, extras=["Agron", "ability", "WATDE0010", "WATDE0020"])
+ 
 
 if __name__ == '__main__':
     unittest.main()

@@ -2,6 +2,7 @@ import os
 import string
 
 from numpy import number
+import pandas as pd
 
 
 class IBSpyOptions:
@@ -22,6 +23,9 @@ class IBSpyOptions:
         self.chromosome_mapping:string = None
         self.block_mapping:string = None
         self.pool_size: int = 1
+        self.chunks_in_pool = 100
+        self._mapping_seqnames = None
+        
         try:
             os.mkdir(self.out_folder)
         except OSError as error:
@@ -40,3 +44,15 @@ class IBSpyOptions:
         if self.normalize:
             arr.append("normalize")
         return "_".join(arr)
+
+    @property
+    def mapping_seqnames(self):
+        if self._mapping_seqnames is not None:
+            return self._mapping_seqnames
+        self._mapping_seqnames = {}
+        if self.chromosome_mapping is None:
+            return self._mapping_seqnames
+        map_df = pd.read_csv(self.chromosome_mapping, delimiter='\t')
+        for index, row in map_df.iterrows():
+            self._mapping_seqnames[row['original']] = row['mapping']
+        return self._mapping_seqnames
