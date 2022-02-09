@@ -37,13 +37,6 @@ class IBSpyValuesMatrix:
         
         return self.rename_sequnames( pd.concat(dfs, join="inner") )
 
-    # def mapping_seqnames(self):
-    #     map_df = pd.read_csv(self.options.chromosome_mapping, delimiter='\t')
-    #     ret = {}
-    #     for index, row in map_df.iterrows():
-    #         ret[row['original']] = row['mapping']
-    #     return ret
-    
     def rename_sequnames(self, df):
         if self.options.chromosome_mapping is None:
             return df
