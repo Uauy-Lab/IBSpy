@@ -4,11 +4,13 @@ import unittest
 import pandas as pd
 from pyranges import PyRanges
 from sklearn.preprocessing import StandardScaler
-from IBSpy.window_affinity_propagation import single_affinity_run, cluster_by_haplotype
+from IBSpy.window_affinity_propagation import select_best_cluster, single_affinity_run, cluster_by_haplotype
 import numpy as np
 import pandas.testing as pdt
 
-def clustering_to_df(predicted, varieties):
+def clustering_to_df(runs):
+	predicted = map(lambda r: r.predicted, runs )
+	varieties = runs[0].varieties
 	df = pd.DataFrame(predicted).T
 	df.insert(loc = 0,
           column = 'variety',
@@ -42,38 +44,49 @@ class TestAffinityPropagation(unittest.TestCase):
 	def test_cluster_by_haplotype_short(self):
 		df = pd.read_csv(self.test_prefix + "/0.tsv", delimiter="\t")
 		gr = PyRanges(df)
-		predicted, scores, used_dampings, random_states, varieties = cluster_by_haplotype(gr, seed=42, iterations=10, dampings=[0.6, 0.7])
+		runs = cluster_by_haplotype(gr, seed=42, iterations=10, dampings=[0.6, 0.7], max_missing=10)
 		expected_predicted=[0,0,1,1]
 		expected_predicted2=[0,0,0,0]
-		for i, p in enumerate(predicted):
+		for i, p in enumerate(runs):
 			ep = expected_predicted
 			if i == 3:
 				ep = expected_predicted2
-			np.testing.assert_array_almost_equal(ep, p)
-		for s in scores:
-			self.assertTrue(math.isnan(s))
+			np.testing.assert_array_almost_equal(ep, p.predicted )
+			self.assertTrue(math.isnan(p.score))
+		
 		# df2 = pd.DataFrame(predicted)
 		# print(df2) 	
+
+	def run_single_hap_run(self, input, predicted_expected, tmp_out):
+		df = pd.read_csv(input, delimiter="\t")
+		# print(df)
+		gr = PyRanges(df)
+		runs = cluster_by_haplotype(gr, seed=42, iterations=50, dampings=[0.5, 0.6, 0.7, 0.8, 0.9], max_missing=5)
+		df = clustering_to_df(runs)
+		# df.to_csv(predicted_expected, sep="\t", index=False)
+		df.to_csv(tmp_out, sep="\t", index=False)
+		expected=pd.read_csv(predicted_expected, delimiter="\t")
+		df = pd.read_csv(tmp_out,delimiter="\t")
+		pdt.assert_frame_equal(expected, df)
+		return select_best_cluster(runs)
+		
 	
 	def test_cluster_by_haplotype_long(self):
+		best =  self.run_single_hap_run(self.good_region, self.good_predicted_expected,"./tests/data/affinity/out/predicted_good.tsv" )
+		self.assertAlmostEqual(best.score, 0.9061312647192928)
+		self.assertAlmostEqual(best.damping, 0.7)
+		self.assertAlmostEqual(best.random_state, 2906402158)
+		self.assertAlmostEqual(best.mutual_info_score, 1.0)
+		self.assertAlmostEqual(best.number_of_runs, 5)
+		self.assertAlmostEqual(best.stdev, 0.0)
+		best =  self.run_single_hap_run(self.bad_region, self.bad_predicted_expected,"./tests/data/affinity/out/predicted_bad.tsv" )
+		self.assertAlmostEqual(best.score, 0.2153727591312509)
+		self.assertAlmostEqual(best.damping, 0.7)
+		self.assertAlmostEqual(best.random_state, 2906402158)
+		self.assertAlmostEqual(best.mutual_info_score, 1.0)
+		self.assertAlmostEqual(best.number_of_runs, 5)
+		self.assertAlmostEqual(best.stdev, 1.2161883888976234e-16)
 		
-		df = pd.read_csv(self.good_region, delimiter="\t")
-		gr = PyRanges(df)
-		predicted, scores, used_dampings, random_states, varieties = cluster_by_haplotype(gr, seed=42, iterations=3, dampings=[0.5, 0.6, 0.7, 0.8, 0.9])
-		df = clustering_to_df(predicted, varieties)
-		df.to_csv("./tests/data/affinity/out/predicted_good.tsv", sep="\t", index=False)
-		expected=pd.read_csv(self.good_predicted_expected, delimiter="\t")
-		df = pd.read_csv("./tests/data/affinity/out/predicted_good.tsv",delimiter="\t")
-		pdt.assert_frame_equal(expected, df)
-		
-		df = pd.read_csv(self.bad_region, delimiter="\t")
-		gr = PyRanges(df)
-		predicted, scores, used_dampings, random_states, varieties = cluster_by_haplotype(gr, seed=42, iterations=3, dampings=[0.5, 0.6, 0.7, 0.8, 0.9])
-		df = clustering_to_df(predicted, varieties)
-		df.to_csv("./tests/data/affinity/out/predicted_bad.tsv", sep="\t", index=False)
-		expected=pd.read_csv(self.bad_predicted_expected, delimiter="\t")
-		df = pd.read_csv("./tests/data/affinity/out/predicted_bad.tsv",delimiter="\t")
-		pdt.assert_frame_equal(expected, df)
 
 if __name__ == '__main__':
     unittest.main()
