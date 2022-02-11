@@ -39,6 +39,7 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     test_suite='setup.unit_tests',
+    # test_suite='tests',
     #ext_modules=[module1]
     ext_modules = cythonize(
         [module1],

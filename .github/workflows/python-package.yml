@@ -69,4 +69,6 @@ jobs:
         cd KMC-3.1.1/py_kmc_api
         source set_path.sh
         cd ../../
-        python setup.py test
+        #python setup.py test
+        python setup.py develop
+        python -m unittest discover tests "test_*.py"

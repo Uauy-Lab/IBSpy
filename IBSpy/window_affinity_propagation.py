@@ -40,6 +40,8 @@ def select_best_cluster(affinity_runs ):
 		p = run_1.predicted
 		scores =  list()
 		for j, run_2, in enumerate(affinity_runs):
+			if j == i:
+				next
 			info_score = metrics.adjusted_mutual_info_score(p, run_2.predicted)
 			scores.append(info_score)
 		mean_score = statistics.mean(scores)
