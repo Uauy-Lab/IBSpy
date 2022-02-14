@@ -22,8 +22,10 @@ class TestAffinityPropagation(unittest.TestCase):
 		self.test_prefix="./tests/data/affinity/windows"
 		self.good_region="./tests/data/affinity/good_region_test.tsv"
 		self.bad_region="./tests/data/affinity/bad_region_test.tsv" 
+		self.unconverged_region="./tests/data/affinity/unconverged_region_test.tsv" 
 		self.good_predicted_expected="./tests/data/affinity/predicted_good.tsv"
 		self.bad_predicted_expected="./tests/data/affinity/predicted_bad.tsv" 
+		self.unconverged_predicted_expected="./tests/data/affinity/unconverged_bad.tsv" 
 		self.out_folder="./tests/data/affinity/out/"
 		try:
 			os.mkdir(self.out_folder)
@@ -59,11 +61,11 @@ class TestAffinityPropagation(unittest.TestCase):
 
 	def run_single_hap_run(self, input, predicted_expected, tmp_out):
 		df = pd.read_csv(input, delimiter="\t")
-		# print(df)
+		print(df)
 		gr = PyRanges(df)
 		runs = cluster_by_haplotype(gr, seed=42, iterations=50, dampings=[0.5, 0.6, 0.7, 0.8, 0.9], max_missing=5)
 		df = clustering_to_df(runs)
-		# df.to_csv(predicted_expected, sep="\t", index=False)
+		df.to_csv(predicted_expected, sep="\t", index=False)
 		df.to_csv(tmp_out, sep="\t", index=False)
 		expected=pd.read_csv(predicted_expected, delimiter="\t")
 		df = pd.read_csv(tmp_out,delimiter="\t")
@@ -72,6 +74,20 @@ class TestAffinityPropagation(unittest.TestCase):
 		
 	
 	def test_cluster_by_haplotype_long(self):
+		best =  self.run_single_hap_run(self.unconverged_region, self.unconverged_predicted_expected,"./tests/data/affinity/out/predicted_unconverged.tsv" )
+		self.assertAlmostEqual(best.score, 0.9891135390808048)
+		self.assertAlmostEqual(best.damping, 0.8)
+		self.assertAlmostEqual(best.random_state, 2536146026)
+		self.assertAlmostEqual(best.mutual_info_score, 1.0)
+		self.assertAlmostEqual(best.number_of_runs, 5)
+		self.assertAlmostEqual(best.stdev, 0.0)
+		# print("....")
+		# print(best.score)
+		# print(best.damping)
+		# print(best.random_state)
+		# print(best.mutual_info_score)
+		# print(best.number_of_runs)
+		# print(best.stdev)
 		best =  self.run_single_hap_run(self.good_region, self.good_predicted_expected,"./tests/data/affinity/out/predicted_good.tsv" )
 		self.assertAlmostEqual(best.score, 0.9061312647192928)
 		self.assertAlmostEqual(best.damping, 0.7)
