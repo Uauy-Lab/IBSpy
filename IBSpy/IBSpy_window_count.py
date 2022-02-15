@@ -37,10 +37,10 @@ def open_db(args):
 
 
 def window_count(args):
-	window_size = 1000
-	kmers_path  = "./tests/data/test4B.jagger.kmerGWAS_k31"
-	reference  = "./tests/data/test4B.stanley.fa"
-	kmer_size   = 31
+	# window_size = 1000
+	# kmers_path  = "./tests/data/test4B.jagger.kmerGWAS_k31"
+	# reference  = "./tests/data/test4B.stanley.fa"
+	# kmer_size   = 31
 	kmerdb = open_db(args)
 	windows = kmerdb.kmers_in_windows(args.reference, window_size=args.window_size)
 	printed = False
