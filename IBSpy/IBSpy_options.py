@@ -23,7 +23,7 @@ class IBSpyOptions:
         self.chromosome_mapping:string = None
         self.block_mapping:string = None
         self.pool_size: int = 1
-        # self.chunks_in_pool = 100
+        self.chunks_in_pool = 100
         self._mapping_seqnames = None
         try:
             os.mkdir(self.out_folder)
@@ -61,7 +61,7 @@ class IBSpyOptions:
 def parse_IBSpyOptions_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("-w", "--window_size", default=50000,
-		help="window size to analyze", type=int)
+		help="Window size to analyze", type=int)
     parser.add_argument("-n", "--normalize", default=False, action="store_true", 
         help="If present, the values are nomalised in a range from 0 to 1")
     parser.add_argument("-f", "--filter_counts", type=number, default=None,
@@ -76,7 +76,8 @@ def parse_IBSpyOptions_arguments():
         help="Column with the score to use from the output of IBSpy_window_count")
     parser.add_argument("-T", "--stat",default="mean" , 
         help="to calculate on the grouped windows [mean, median, variance or std]")
-    
-
-
-    pass
+    parser.add_argument("-a", "--affinity_blocks", default=20, type=int, 
+        help="Number of windows windows to group [deprectiated]")
+    parser.add_argument("-A", "--affinity_window_size", default=1000000, type=int, 
+        help="Size of the groups to merge for the affinity propagatin, in basepairs")
+    parser.add_argument("-o", "output_folder")
