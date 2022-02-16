@@ -26,8 +26,12 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        #sudo apt update
-        #sudo apt install jellyfish wget
+        
+        python -m pip install --upgrade pip
+        python -m pip install flake8 cython pysam biopython pyfaidx
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        python setup.py develop
+
         wget https://github.com/gmarcais/Jellyfish/releases/download/v2.3.0/jellyfish-2.3.0.tar.gz
         tar -xzf jellyfish-2.3.0.tar.gz
         cd jellyfish-2.3.0 
@@ -38,10 +42,6 @@ jobs:
         python setup.py build
         python setup.py install 
         cd ../../..
-        #cd ..
-        python -m pip install --upgrade pip
-        python -m pip install flake8 cython pysam biopython pyfaidx
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         
         wget https://github.com/refresh-bio/KMC/archive/refs/tags/v3.1.1.tar.gz
         tar -xzf v3.1.1.tar.gz
@@ -70,5 +70,5 @@ jobs:
         source set_path.sh
         cd ../../
         #python setup.py test
-        python setup.py develop
+        
         python -m unittest discover tests "test_*.py"
