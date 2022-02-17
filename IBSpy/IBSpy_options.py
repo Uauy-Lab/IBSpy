@@ -19,11 +19,11 @@ class IBSpyOptions:
         self.affinity_blocks:int = 20
         self.affinity_window_size:int = 1000000
         self.out_folder:string = "./out/"
-        self.cache_tables:bool = True
+        self.no_cache_tables:bool = False
         self.chromosome_mapping:string = None
         self.block_mapping:string = None
         self.pool_size: int = 1
-        self.chunks_in_pool = 100
+        self.chunks_in_pool = 1
         self._mapping_seqnames = None
         try:
             os.mkdir(self.out_folder)
@@ -31,6 +31,9 @@ class IBSpyOptions:
             pass
         self.metadata_filename = os.path.basename(self.metadata)
         
+    @property
+    def cache_tables(self) -> bool:
+        return not self.no_cache_tables
 
     @property
     def file_prefix(self) -> string:
@@ -80,4 +83,16 @@ def parse_IBSpyOptions_arguments():
         help="Number of windows windows to group [deprectiated]")
     parser.add_argument("-A", "--affinity_window_size", default=1000000, type=int, 
         help="Size of the groups to merge for the affinity propagatin, in basepairs")
-    parser.add_argument("-o", "output_folder")
+    parser.add_argument("-o", "output_folder", default="./out",
+        help="Folder with the outputs.")
+    parser.add_argument("-c","--no_cache_tables", default=True, action="store_true",
+        help="If enable, don't cache any of the tables")
+    parser.add_argument("-M", "chromosome_mapping", default=None, 
+        help="Tab separated file to show rename chromosomes when reading tables. The columns should be [original, mapping]")
+    parser.add_argument("-p", "--pool_size", default=1, type=int, 
+        help="Number of threads to use")
+    parser.add_argument("-C", "--chunks_in_pool", default=1, type=int, 
+        help="Number of chunks to process per pool ")
+    
+    
+    
