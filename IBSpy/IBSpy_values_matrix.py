@@ -29,15 +29,14 @@ class IBSpyValuesMatrix:
         values_matrix = pd.concat([names,values_matrix], axis=1)
         return values_matrix
 
-    def _build_dataset(self):
+    def _build_dataset(self) -> pd.DataFrame:
         dfs = []
         for ref in self.references:
             df = self._values_matrix_for_reference(ref)
             dfs.append(df)
-        
         return self.rename_sequnames( pd.concat(dfs, join="inner") )
 
-    def rename_sequnames(self, df):
+    def rename_sequnames(self, df) -> pd.DataFrame:
         if self.options.chromosome_mapping is None:
             return df
         mapping = self.options.mapping_seqnames
@@ -75,5 +74,11 @@ class IBSpyValuesMatrix:
 
     def to_csv(self,  *args, **kwargs):
         self.values_matrix.to_csv( *args, **kwargs)
+
+    def save(self):
+        prefix = self.options.output_folder
+        file = self.options.file_prefix
+        path = f"{prefix}/{file}.csv.gz"
+        self.values_matrix.to_csv(path,sep="\t")
 
     
