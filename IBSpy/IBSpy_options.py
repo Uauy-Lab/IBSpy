@@ -20,27 +20,11 @@ class IBSpyOptions:
         self.stat:string = 'mean'
         self.affinity_blocks:int = 20
         self.affinity_window_size:int = 1000000
-<<<<<<< HEAD
-        self.out_folder:string = "./out/"
-=======
         self._out_folder:string = "./out/"
->>>>>>> 81e100f75b506228a9c951b14666a9570aa08048
         self.no_cache_tables:bool = False
         self.chromosome_mapping:string = None
         self.block_mapping:string = None
         self.pool_size: int = 1
-<<<<<<< HEAD
-        self.chunks_in_pool = 1
-        self._mapping_seqnames = None
-        try:
-            os.mkdir(self.out_folder)
-        except OSError as error:
-            pass
-        self.metadata_filename = os.path.basename(self.metadata)
-        
-    @property
-    def cache_tables(self) -> bool:
-=======
         self.chunks_in_pool: int = 100
         self._mapping_seqnames: dict = None
     
@@ -82,7 +66,6 @@ class IBSpyOptions:
             
     @property
     def cache_tables(self):
->>>>>>> 81e100f75b506228a9c951b14666a9570aa08048
         return not self.no_cache_tables
 
     @property
@@ -135,21 +118,6 @@ def parse_IBSpyOptions_arguments():
         help="Number of windows windows to group [deprectiated]")
     parser.add_argument("-A", "--affinity_window_size", default=1000000, type=int, 
         help="Size of the groups to merge for the affinity propagatin, in basepairs")
-<<<<<<< HEAD
-    parser.add_argument("-o", "output_folder", default="./out",
-        help="Folder with the outputs.")
-    parser.add_argument("-c","--no_cache_tables", default=True, action="store_true",
-        help="If enable, don't cache any of the tables")
-    parser.add_argument("-M", "chromosome_mapping", default=None, 
-        help="Tab separated file to show rename chromosomes when reading tables. The columns should be [original, mapping]")
-    parser.add_argument("-p", "--pool_size", default=1, type=int, 
-        help="Number of threads to use")
-    parser.add_argument("-C", "--chunks_in_pool", default=1, type=int, 
-        help="Number of chunks to process per pool ")
-    
-    
-    
-=======
     parser.add_argument("-o", "--output_folder", default="./out/", 
         help="Folder with the output, including the cached files")
     parser.add_argument("-C", "--no_cache_tables", default=False, action="store_true", 
@@ -171,4 +139,3 @@ def get_options() -> IBSpyOptions:
     ret = parse_IBSpyOptions_arguments()
     return ret
 
->>>>>>> 81e100f75b506228a9c951b14666a9570aa08048
