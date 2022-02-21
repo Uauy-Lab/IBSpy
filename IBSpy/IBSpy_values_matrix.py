@@ -1,4 +1,6 @@
+import os
 import string
+import sys
 import pandas as pd
 from pyranges import PyRanges
  
@@ -47,7 +49,12 @@ class IBSpyValuesMatrix:
     def values_matrix(self) -> PyRanges:
         if self._values_matrix is not None:
             return self._values_matrix
-        self._values_matrix = self._build_dataset()
+        if os.path.isfile(self.path):
+            print(f"Loading {self.path}", file=sys.stderr)
+            self._values_matrix = pd.read_csv(self.path, sep="\t")
+        else:
+            print("Building matrix", file=sys.stderr)
+            self._values_matrix = self._build_dataset()
         self._values_matrix = PyRanges(self._values_matrix, int64=True)
         return self._values_matrix
 
@@ -76,9 +83,12 @@ class IBSpyValuesMatrix:
         self.values_matrix.to_csv( *args, **kwargs)
 
     def save(self):
+        self.values_matrix.to_csv(self.path,sep="\t")
+
+    @property
+    def path(self):
         prefix = self.options.output_folder
         file = self.options.file_prefix
-        path = f"{prefix}/{file}.csv.gz"
-        self.values_matrix.to_csv(path,sep="\t")
+        return f"{prefix}/{file}.csv.gz"
 
     
