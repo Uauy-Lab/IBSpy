@@ -8,3 +8,4 @@ pandas
 matplotlib
 multiprocess
 dill
+tables

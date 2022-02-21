@@ -1,4 +1,6 @@
 import argparse
+from ast import arguments
+import configparser
 import os
 import string
 
@@ -18,11 +20,16 @@ class IBSpyOptions:
         self.stat:string = 'mean'
         self.affinity_blocks:int = 20
         self.affinity_window_size:int = 1000000
+<<<<<<< HEAD
         self.out_folder:string = "./out/"
+=======
+        self._out_folder:string = "./out/"
+>>>>>>> 81e100f75b506228a9c951b14666a9570aa08048
         self.no_cache_tables:bool = False
         self.chromosome_mapping:string = None
         self.block_mapping:string = None
         self.pool_size: int = 1
+<<<<<<< HEAD
         self.chunks_in_pool = 1
         self._mapping_seqnames = None
         try:
@@ -33,15 +40,59 @@ class IBSpyOptions:
         
     @property
     def cache_tables(self) -> bool:
+=======
+        self.chunks_in_pool: int = 100
+        self._mapping_seqnames: dict = None
+    
+    @property
+    def metadata_filename(self):
+        os.path.basename(self.metadata)
+
+    @property
+    def output_folder(self):
+        if not os.path.isdir(self._out_folder): 
+            os.mkdir(self._out_folder)
+        return self._out_folder
+    
+    @output_folder.setter
+    def output_folder(self, value):
+        self._out_folder = value
+        
+    @property
+    def preferences(self):
+        return vars(self)
+    
+    @preferences.setter
+    def preferences(self, value):
+        ints = ["window_size", "affinity_blocks", "affinity_window_size", "pool_size", "chunks_in_pool"]
+        bools = ["normalize", "cache_tables"]
+        floats = ["filter_counts"]
+        config = configparser.ConfigParser()
+        config.read(value)
+        for key in config['DEFAULT']:
+            if key in ints:
+                value = config["DEFAULT"].getint(key)
+            elif key in bools:
+                value = config["DEFAULT"].getboolean(key)
+            elif key in floats:
+                value = config["DEFAULT"].getfloat(key)
+            else:
+                value = config['DEFAULT'][key]
+            setattr(self, key, value)
+            
+    @property
+    def cache_tables(self):
+>>>>>>> 81e100f75b506228a9c951b14666a9570aa08048
         return not self.no_cache_tables
 
     @property
     def file_prefix(self) -> string:
-        arr = [str(self.window_size), "ws",
+        arr = ["matrix",
+            str(self.window_size), "ws",
             str(self.score), "score",
             str(self.stat), "stat",
-            str(self.window_size), "ws"]
-        if self.filter is not None:
+            ]
+        if self.filter_counts is not None:
             arr.append(str(self.filter_counts), "filter")
         if self.normalize:
             arr.append("normalize")
@@ -62,6 +113,7 @@ class IBSpyOptions:
 
 
 def parse_IBSpyOptions_arguments():
+    ret = IBSpyOptions()
     parser = argparse.ArgumentParser()
     parser.add_argument("-w", "--window_size", default=50000,
 		help="Window size to analyze", type=int)
@@ -83,6 +135,7 @@ def parse_IBSpyOptions_arguments():
         help="Number of windows windows to group [deprectiated]")
     parser.add_argument("-A", "--affinity_window_size", default=1000000, type=int, 
         help="Size of the groups to merge for the affinity propagatin, in basepairs")
+<<<<<<< HEAD
     parser.add_argument("-o", "output_folder", default="./out",
         help="Folder with the outputs.")
     parser.add_argument("-c","--no_cache_tables", default=True, action="store_true",
@@ -96,3 +149,26 @@ def parse_IBSpyOptions_arguments():
     
     
     
+=======
+    parser.add_argument("-o", "--output_folder", default="./out/", 
+        help="Folder with the output, including the cached files")
+    parser.add_argument("-C", "--no_cache_tables", default=False, action="store_true", 
+        help="By default, the intermediate tables are stored. This flag dissables the cache ")
+    parser.add_argument("-c", "--chromosome_mapping", default=None, 
+        help="Path to tab separated file to rename the chromosome names. Columns are [original, mapping]")
+    parser.add_argument("-B", "--block_mapping", default=None,
+        help="Path with the file containing the coordinate mapping across pangenome")
+    parser.add_argument("-p", "--pool_size", default=1, type=int, 
+        help="Number of threads to use")
+    parser.add_argument("-P", "--chunks_in_pool", default=1, type=int, 
+        help="Number of workers per pool. ")
+    parser.add_argument("-F", "--preferences", default=None, 
+        help="Preferences file ")
+    parser.parse_args(namespace=ret)
+    return ret
+
+def get_options() -> IBSpyOptions:
+    ret = parse_IBSpyOptions_arguments()
+    return ret
+
+>>>>>>> 81e100f75b506228a9c951b14666a9570aa08048
