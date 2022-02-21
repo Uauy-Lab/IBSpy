@@ -24,7 +24,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="IBSpy",
-    version="0.4.0-pre0",
+    version="0.4.0-rc1",
     author="Ricardo H. Ramirez-Gonzalez",
     author_email="ricardo.ramirez-gonzalez@jic.ac.uk",
     description="A package to detect IBS regions",
@@ -49,6 +49,7 @@ setuptools.setup(
             'IBSpy_wcount=IBSpy.IBSpy_window_count:main',
             'IBSpy=IBSpy:main',
             'IBSplot=IBSpy.IBSpy_plot_window_results:main'
+            'IBSpy_matrix=IBSpy.build_score_matrix:main'
         ],
     }
 )
