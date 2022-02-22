@@ -1,9 +1,10 @@
 import argparse
 from ast import arguments
 import configparser
+import logging
 import os
 import string
-
+import psutil
 from numpy import number
 import pandas as pd
 
@@ -26,7 +27,10 @@ class IBSpyOptions:
         self.block_mapping:string = None
         self.pool_size: int = 1
         self.chunks_in_pool: int = 100
+        self.log_level =  logging.INFO
         self._mapping_seqnames: dict = None
+        self._logger: logging.Logger = None
+
     
     @property
     def metadata_filename(self):
@@ -93,7 +97,20 @@ class IBSpyOptions:
             self._mapping_seqnames[row['original']] = row['mapping']
         return self._mapping_seqnames
 
+    @property
+    def logger(self) -> logging.Logger:
+        if self._logger is not None:
+            return self._logger
+        logging.basicConfig(filename=f'{self.output_folder}/{self.file_prefix}.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+        self._logger = logging.getLogger("IBSpy")
+        self._logger.setLevel(self.log_level)
+        return self._logger
 
+    def log(self, text) -> None:
+        self.logger.info(text)
+        gb_mem = psutil.Process().memory_info().rss / (1024 * 1024 * 1024)
+        gb_mem = round(gb_mem, 3)
+        self.logger.debug(f"Mem: {gb_mem} GB")
 
 def parse_IBSpyOptions_arguments():
     ret = IBSpyOptions()

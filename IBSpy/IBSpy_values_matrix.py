@@ -23,6 +23,7 @@ class IBSpyValuesMatrix:
         for index, row in samples.iterrows():
             path=row['path'] + "/" + row['file']
             sample_name = row['query']
+            self.options.log(f"Reading {reference} {sample_name} : {path}")
             ibr = IBSpyResults(path, self.options)
             df: pd.DataFrame = ibr.count_by_windows()
             values_matrix[sample_name] = df[self.options.stat]
@@ -50,10 +51,10 @@ class IBSpyValuesMatrix:
         if self._values_matrix is not None:
             return self._values_matrix
         if os.path.isfile(self.path):
-            print(f"Loading {self.path}", file=sys.stderr)
+            self.options.log(f"Loading {self.path}")
             self._values_matrix = pd.read_csv(self.path, sep="\t")
         else:
-            print("Building matrix", file=sys.stderr)
+            self.options.log("Building matrix")
             self._values_matrix = self._build_dataset()
         self._values_matrix = PyRanges(self._values_matrix, int64=True)
         return self._values_matrix

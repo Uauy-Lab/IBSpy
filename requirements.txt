@@ -9,3 +9,4 @@ matplotlib
 multiprocess
 dill
 tables
+psutil

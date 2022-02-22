@@ -2,6 +2,7 @@ from asyncio.log import logger
 from fileinput import filename
 import logging
 import os
+from re import A
 import unittest
 import pandas as pd
 import pandas.testing as pdt
@@ -49,7 +50,8 @@ class TestResultSet(unittest.TestCase):
         pdt.assert_series_equal(mapped["Start"], expected["Start"], check_names=False)
         pdt.assert_series_equal(mapped["End"], expected["End"], check_names=False)
         for e in extras:
-            pdt.assert_series_equal(mapped[e], expected[e], check_names=False)
+            pdt.assert_series_equal(mapped[e], expected[e], check_names=False, check_dtype=False)
+
 
 
     def test_load_data(self):

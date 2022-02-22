@@ -15,6 +15,7 @@ pyranges     = "*"
 multiprocess = "^"
 dill         = "*"
 tables       = "*"
+psutil       = "*"
 
 [dev-packages]
 
