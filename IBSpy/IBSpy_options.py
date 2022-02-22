@@ -25,8 +25,8 @@ class IBSpyOptions:
         self.no_cache_tables:bool = False
         self.chromosome_mapping:string = None
         self.block_mapping:string = None
-        self.pool_size: int = 1
-        self.chunks_in_pool: int = 100
+        self.pool_size: int = 4
+        self.chunks_in_pool: int = 1
         self.log_level =  logging.INFO
         self._mapping_seqnames: dict = None
         self._logger: logging.Logger = None
@@ -67,6 +67,20 @@ class IBSpyOptions:
             else:
                 value = config['DEFAULT'][key]
             setattr(self, key, value)
+
+
+    @property
+    def cache_folder(self):
+        cache_folder =  f'{self.output_folder}/{self.cache_file_prefix}'
+        if not os.path.isdir(cache_folder): 
+            os.mkdir(cache_folder)
+        return cache_folder
+
+    def folder_for_reference(self, reference: string):
+        out_f = f'{self.cache_folder}/{reference}'
+        if not os.path.isdir(out_f): 
+            os.mkdir(out_f)
+        return out_f
             
     @property
     def cache_tables(self):
@@ -83,6 +97,13 @@ class IBSpyOptions:
             arr.append(str(self.filter_counts), "filter")
         if self.normalize:
             arr.append("normalize")
+        return "_".join(arr)
+
+    @property
+    def cache_file_prefix(self) -> string:
+        arr = ["combined",
+            str(self.window_size), "ws",
+            ]
         return "_".join(arr)
 
     @property

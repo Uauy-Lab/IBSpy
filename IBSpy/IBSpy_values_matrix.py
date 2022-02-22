@@ -3,6 +3,7 @@ import string
 import sys
 import pandas as pd
 from pyranges import PyRanges
+from multiprocess import Pool
  
 from .IBSpy_options import IBSpyOptions
 from .IBSpy_results import IBSpyResults
@@ -17,19 +18,44 @@ class IBSpyValuesMatrix:
         self._values_matrix  = None
         self._chromosome_lengths = None
 
+    def _summarize_single_line(self, i:int, samples: pd.DataFrame):
+        row = samples.iloc[i]
+        reference= row['reference']
+        sample_name = row['query']
+        path_ref=f'{self.options.folder_for_reference(reference=reference)}'
+        out_path=f"{path_ref}/{sample_name}.pkl.gz"
+        if os.path.exists(out_path):
+            self.options.log(f" File already exits: {out_path}")
+            return i
+        path=row['path'] + "/" + row['file']
+        self.options.log(f" Reading {reference} {sample_name} : {path}")
+        ibr = IBSpyResults(path, self.options)
+        df: pd.DataFrame = ibr.count_by_windows()
+        df.rename(columns = {'seqname':'Chromosome', 'chromosome':'Chromosome', 'start':'Start', 'end':"End", 'orientation':"Strand"}, inplace = True)
+        df.to_pickle(out_path, compression={'method': 'gzip', 'compresslevel': 9} )
+        return i        
+
     def _values_matrix_for_reference(self, reference:string):
-        samples = self.samples_df[self.samples_df['reference'] == reference]
+        samples = self.samples_df[self.samples_df['reference'] == reference]  
+        path_ref=f'{self.options.folder_for_reference(reference=reference)}'      
+        path_matrix=f'{path_ref}/merged.pickle.gz'
+        if os.path.isfile(path_matrix):
+            return pd.read_pickle(path_matrix)
+        nrows = samples.shape[0]
+        with Pool(self.options.pool_size) as p:
+            wrapped_function = lambda x: self._summarize_single_line(x, samples)
+            p.map(wrapped_function,range(0, nrows),self.options.chunks_in_pool )
+
         values_matrix = pd.DataFrame()
         for index, row in samples.iterrows():
-            path=row['path'] + "/" + row['file']
             sample_name = row['query']
-            self.options.log(f"Reading {reference} {sample_name} : {path}")
-            ibr = IBSpyResults(path, self.options)
-            df: pd.DataFrame = ibr.count_by_windows()
+            self.options.log(f" Reading {path_ref}/{sample_name}.pkl.gz")
+            df = pd.read_pickle(f"{path_ref}/{sample_name}.pkl.gz")
             values_matrix[sample_name] = df[self.options.stat]
-        df.rename(columns = {'seqname':'Chromosome', 'chromosome':'Chromosome', 'start':'Start', 'end':"End", 'orientation':"Strand"}, inplace = True)
+        
         names = df[['Chromosome','Start','End']]
         values_matrix = pd.concat([names,values_matrix], axis=1)
+        values_matrix.to_pickle(path_matrix, compression={'method': 'gzip', 'compresslevel': 9} )
         return values_matrix
 
     def _build_dataset(self) -> pd.DataFrame:
@@ -91,5 +117,11 @@ class IBSpyValuesMatrix:
         prefix = self.options.output_folder
         file = self.options.file_prefix
         return f"{prefix}/{file}.csv.gz"
+    
+    @property
+    def cache_path(self):
+        prefix = self.options.cache_folder
+        file = self.options.file_prefix
+        return f"{prefix}/{file}.pickle.gz"
 
     
