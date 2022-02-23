@@ -15,8 +15,8 @@ class IBSpyOptions:
         self.normalize:bool  = False
         self.filter_counts:float or number = None
         self.metadata:string = "metadata.tsv"
-        self.samples:list=None 
-        self.references:list=None 
+        self._samples:list=None 
+        self._references:list=None 
         self.score:string="variations"
         self.stat:string = 'mean'
         self.affinity_blocks:int = 20
@@ -31,7 +31,22 @@ class IBSpyOptions:
         self._mapping_seqnames: dict = None
         self._logger: logging.Logger = None
 
+    @property
+    def samples(self):
+        return self._samples
     
+    @samples.setter
+    def samples(self, value):
+        self._samples = parse_str_to_list(value)
+
+    @property
+    def references(self):
+        return self._references
+
+    @references.setter
+    def references(self, value):
+        self._references = parse_str_to_list(value)
+
     @property
     def metadata_filename(self):
         os.path.basename(self.metadata)
@@ -177,3 +192,19 @@ def get_options() -> IBSpyOptions:
     ret = parse_IBSpyOptions_arguments()
     return ret
 
+def parse_str_to_list(value):
+    print(type(value))
+    if type(value) is list:
+        return value
+    if os.path.isfile(value):
+        return file_to_list(value)
+    if type(value) is str:
+        return value.split(",")
+    raise TypeError(f"Invalid sample {str(value)}")
+
+def file_to_list(value):
+    ret = []
+    with open(value, 'r') as file:
+        for line in file:
+            ret.append(line.strip())
+    return ret
