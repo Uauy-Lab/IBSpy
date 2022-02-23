@@ -13,10 +13,31 @@ class IBSpyValuesMatrix:
         self.options: IBSpyOptions = result_set.options
         self.result_set = result_set
         self.samples_df = pd.read_csv(self.options.metadata, delimiter='\t')
+        self._samples = None
+        self._references = None
         self.references = self.samples_df["reference"].unique()
         self.samples = self.samples_df["query"].unique()
         self._values_matrix  = None
         self._chromosome_lengths = None
+
+
+    @property
+    def references(self):
+        return self._references
+    @references.setter
+    def references(self, value):
+        if self.options.references is not None:
+            value = filter(lambda r: r in self.options.references, value)
+        self._references = value
+        
+    @property
+    def samples(self):
+        return self._samples
+    @samples.setter
+    def samples(self, value):
+        if self.options.samples is not None:
+            value = filter(lambda r: r in self.options.samples, value)
+        self._samples = value
 
     def _summarize_single_line(self, i:int, samples: pd.DataFrame):
         row = samples.iloc[i]
