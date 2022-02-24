@@ -68,12 +68,13 @@ class IBSpyValuesMatrix:
             p.map(wrapped_function,range(0, nrows),self.options.chunks_in_pool )
 
         values_matrix = pd.DataFrame()
+        prep = {}
         for index, row in samples.iterrows():
             sample_name = row['query']
             self.options.log(f" Reading {path_ref}/{sample_name}.pkl.gz")
             df = pd.read_pickle(f"{path_ref}/{sample_name}.pkl.gz")
-            values_matrix[sample_name] = df[self.options.stat]
-        
+            prep[sample_name] = df[self.options.stat] 
+        values_matrix = pd.DataFrame(prep)
         names = df[['Chromosome','Start','End']]
         values_matrix = pd.concat([names,values_matrix], axis=1)
         values_matrix.to_pickle(path_matrix, compression={'method': 'gzip', 'compresslevel': 9} )
