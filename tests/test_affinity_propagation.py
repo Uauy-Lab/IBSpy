@@ -36,7 +36,7 @@ class TestAffinityPropagation(unittest.TestCase):
 		df = pd.read_csv(self.test_prefix + "/0.tsv", delimiter="\t")
 		gr = PyRanges(df)
 		t_df = gr.as_df().set_index(['Chromosome', 'Start', 'End']).T
-		x = StandardScaler(with_mean=True).fit_transform(t_df)
+		x = StandardScaler(with_mean=True).fit_transform(t_df) #TODO: Fix feature warnings
 		predicted, score = single_affinity_run(x)
 		expected_predicted=[0,0,1,1]
 		# expected_score = math.nan
@@ -91,7 +91,7 @@ class TestAffinityPropagation(unittest.TestCase):
 		self.assertAlmostEqual(best.number_of_runs, 5)
 		self.assertAlmostEqual(best.stdev, 1.2161883888976234e-16)
 		
-
+		print(best.as_df())
 		# best =  self.run_single_hap_run(self.unconverged_region, self.unconverged_predicted_expected,"./tests/data/affinity/out/predicted_unconverged.tsv" )
 		# print("....")
 		# print(best.score)

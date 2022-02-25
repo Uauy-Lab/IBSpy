@@ -2,7 +2,6 @@ from asyncio.log import logger
 from fileinput import filename
 import logging
 import os
-from re import A
 import unittest
 import pandas as pd
 import pandas.testing as pdt
@@ -55,7 +54,6 @@ class TestResultSet(unittest.TestCase):
 
 
     def test_load_data(self):
-        
         ibspy_results = IBSpy.IBSpyResultsSet(options= self.options)
         self.assertEqual(len(ibspy_results.samples_df.index), 8)
         self.options.references = ["chinese"]
@@ -112,12 +110,36 @@ class TestResultSet(unittest.TestCase):
         self.options.block_mapping = self.block_mapping_file
         ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
         ret = ibspy_results.map_window_iterator()
-        for i, window  in enumerate(ret):
+        regions = [
+            ['chr1A__chi', 0, 1000000],
+            ['chr1A__chi', 1000000, 2000000],
+            ['chr1A__chi', 2000000, 3000000],
+            ['chr1A__chi', 3000000, 4000000],
+            ['chr1A__chi', 4000000, 5000000],
+            ['chr1A__chi', 5000000, 6000000],
+            ['chr1A__jag', 0, 1000000],
+            ['chr1A__jag', 1000000, 2000000],
+            ['chr1A__jag', 2000000, 3000000],
+            ['chr1A__jag', 3000000, 4000000],
+            ['chr1A__jag', 4000000, 5000000],
+            ['chr1A__jag', 5000000, 6000000]]
+        for i,( window, chromosome, start, end)  in enumerate(ret):
             expeced_path = self.windows_for_affy+"/"+str(i)+".tsv"
-            result_path = self.windows_for_affy_out +str(i)+".tsv"        
+            result_path = self.windows_for_affy_out +str(i)+".tsv"    
+            self.assertEqual(regions[i][0], chromosome )
+            self.assertEqual(regions[i][1], start )
+            self.assertEqual(regions[i][2], end )
             window.to_csv(result_path, sep="\t")
             self.compare_dfs(result_path, expeced_path, extras=["Agron", "ability", "WATDE0010", "WATDE0020"])
  
+    def test_run_affinity_propagation(self):
+        self.options.chromosome_mapping = self.mapping_path
+        self.options.block_mapping = self.block_mapping_file
+        ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
+        ret = ibspy_results.run_affinity_propagation()
+ 
+
+        self.assertEqual(1, 1)
 
 if __name__ == '__main__':
     unittest.main()

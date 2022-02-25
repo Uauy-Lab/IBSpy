@@ -5,6 +5,8 @@ from typing import List
 from pyranges import PyRanges
 from multiprocess import Pool
 
+from IBSpy.window_affinity_propagation import cluster_by_haplotype, select_best_cluster
+
 from .BlockMapping import BlockMapping
 from .IBSpy_options import IBSpyOptions
 from .IBSpy_values_matrix import IBSpyValuesMatrix
@@ -58,8 +60,9 @@ class IBSpyResultsSet:
         return self.values_matrix.values_matrix.intersect(targets)
 
     def _function_window_wrapper(self, start, function, chromosome, assembly=None ):
-        window = self.mapped_window(chromosome, start, start + self.options.affinity_window_size, assembly=assembly)
-        return function(window)
+        end = start + self.options.affinity_window_size
+        window = self.mapped_window(chromosome, start, end, assembly=assembly)
+        return function(window), chromosome, start, end 
 
     def map_window_iterator(self, chromosome= None, function= None):
         if function is None:
@@ -77,6 +80,28 @@ class IBSpyResultsSet:
                 res = p.imap(wrapped_function, range(0, length , self.options.affinity_window_size),self.options.chunks_in_pool)
                 ret.extend(res)
         return ret 
+
+    def run_affinity_propagation(self):
+        max_missing = self.options.max_missing
+        dampings = self.options.dampings
+        iterations = self.options.iterations
+        seed = self.options.seed
+        
+        def run_single_run(gr ):
+            runs = cluster_by_haplotype(gr, seed=seed, iterations=iterations, dampings=dampings, max_missing=max_missing)
+            best = select_best_cluster(runs)
+            return  best 
+
+        ret = list()
+        for best, chromosome, start, end in self.map_window_iterator(function= run_single_run):
+            if best is not None:
+                best.chromosome = chromosome
+                best.start = start 
+                best.end = end
+                ret.append(best)
+         
+
+    
 
     
     

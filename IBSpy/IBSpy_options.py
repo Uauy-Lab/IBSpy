@@ -30,6 +30,18 @@ class IBSpyOptions:
         self.log_level =  logging.INFO
         self._mapping_seqnames: dict = None
         self._logger: logging.Logger = None
+        self.dampings=[0.5, 0.6, 0.7, 0.8, 0.9]
+        self.max_missing=5
+        self.iterations=100
+        self._seed = 42
+
+    @property
+    def seed(self):
+        return self._seed 
+
+    @seed.setter
+    def seed(self, value):
+        self.seed = value
 
     @property
     def samples(self):

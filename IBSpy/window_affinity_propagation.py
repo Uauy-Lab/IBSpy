@@ -2,6 +2,7 @@ from cmath import nan
 import math
 import statistics
 import sys
+from numpy import NaN
 import pandas as pd
 import warnings
 from sklearn.cluster import AffinityPropagation
@@ -21,16 +22,24 @@ class AffinityRunResults:
 		self.mutual_info_score = 0
 		self.number_of_runs = 0
 		self.stdev = 0
+		self.chromosome = None
+		self.start = None
+		self.end = None
 
 	@property
 	def failed(self):
 		return math.isnan(self.score)
 
 	def as_df(self):
-		df = pd.DataFrame(self.predicted).T
-		df.insert(loc = 0,
-          column = 'variety',
-          value = self.varieties)
+
+		df = pd.DataFrame({
+			'Chromosome': self.chromosome,
+			'Start': self.start, 
+			'End': self.end, 
+			'variety': self.varieties, 
+			'group':self.predicted},
+			)
+		print(df)
 		return df
 
 def select_best_cluster(affinity_runs ):
@@ -47,7 +56,10 @@ def select_best_cluster(affinity_runs ):
 		mean_score = statistics.mean(scores)
 		run_1.mutual_info_score = mean_score
 		run_1.number_of_runs    = len(affinity_runs)
-		run_1.stdev = statistics.stdev(scores)
+		if(len(scores) > 2):
+			run_1.stdev = statistics.stdev(scores)
+		else:
+			run_1.stdev = NaN
 		if mean_score > best_score:
 			best_score   = mean_score
 			best_cluster = run_1
