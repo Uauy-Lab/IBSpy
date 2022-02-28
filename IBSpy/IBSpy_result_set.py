@@ -99,7 +99,7 @@ class IBSpyResultsSet:
                 best.start = start 
                 best.end = end
                 ret.append(best)
-         
+        return ret
 
     
 

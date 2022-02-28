@@ -37,9 +37,15 @@ class AffinityRunResults:
 			'Start': self.start, 
 			'End': self.end, 
 			'variety': self.varieties, 
-			'group':self.predicted},
+			'group':self.predicted,
+			'mutual_info_score':self.mutual_info_score,
+			'sc_score':self.score,
+			'number_of_runs':self.number_of_runs,
+			'damping':self.damping
+			}
+
 			)
-		print(df)
+		# print(df)
 		return df
 
 def select_best_cluster(affinity_runs ):

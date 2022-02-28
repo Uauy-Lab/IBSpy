@@ -9,6 +9,6 @@ def main():
 	for k, v in prefs.items():
 		print(f"{k}:\t{v}", file=sys.stderr)
 	ibspy_results = IBSpy.IBSpyResultsSet(options= options)
-	ibspy_results.values_matrix.save()
+	#ibspy_results.values_matrix.save()
 if __name__ == '__main__':
 	main()
