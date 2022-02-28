@@ -91,7 +91,7 @@ class IBSpyValuesMatrix:
         if self.options.chromosome_mapping is None:
             return df
         mapping = self.options.mapping_seqnames
-        df['Chromosome'] = df['Chromosome'].apply(lambda x: mapping[x]) 
+        df['Chromosome'] = df['Chromosome'].apply(lambda x: mapping.get(x, x)) 
         return df
 
     @property
