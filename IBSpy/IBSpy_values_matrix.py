@@ -1,9 +1,12 @@
 import os
 import string
 import sys
+from numpy import int64
 import pandas as pd
+import psutil
 from pyranges import PyRanges
 from multiprocess import Pool
+
  
 from .IBSpy_options import IBSpyOptions
 from .IBSpy_results import IBSpyResults
@@ -59,7 +62,7 @@ class IBSpyValuesMatrix:
     def _values_matrix_for_reference(self, reference:string):
         samples = self.samples_df[self.samples_df['reference'] == reference]  
         path_ref=f'{self.options.folder_for_reference(reference=reference)}'      
-        path_matrix=f'{path_ref}/merged.pickle.gz'
+        path_matrix=f'{path_ref}/{self.options.file_prefix}.merged.pickle.gz'
         if os.path.isfile(path_matrix):
             return pd.read_pickle(path_matrix)
         nrows = samples.shape[0]
@@ -85,6 +88,9 @@ class IBSpyValuesMatrix:
         for ref in self.references:
             df = self._values_matrix_for_reference(ref)
             dfs.append(df)
+        mem_usage = psutil.Process().memory_info().rss / (1024 * 1024 * 1024)
+        self.options.log(f"Merging single values for matrix {mem_usage} Gb")
+
         return self.rename_sequnames( pd.concat(dfs, join="inner") )
 
     def rename_sequnames(self, df) -> pd.DataFrame:
@@ -104,6 +110,7 @@ class IBSpyValuesMatrix:
         else:
             self.options.log("Building matrix")
             self._values_matrix = self._build_dataset()
+        self.options.log("Converting to PyRanges")
         self._values_matrix = PyRanges(self._values_matrix, int64=True)
         return self._values_matrix
 
