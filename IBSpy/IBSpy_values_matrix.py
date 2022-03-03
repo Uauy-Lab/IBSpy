@@ -46,13 +46,14 @@ class IBSpyValuesMatrix:
         row = samples.iloc[i]
         reference= row['reference']
         sample_name = row['query']
+        score = self.options.score
         path_ref=f'{self.options.folder_for_reference(reference=reference)}'
-        out_path=f"{path_ref}/{sample_name}.pkl.gz"
+        out_path=f"{path_ref}/{sample_name}.{score}.pkl.gz"
         if os.path.exists(out_path):
             self.options.log(f" File already exits: {out_path}")
             return i
         path=row['path'] + "/" + row['file']
-        self.options.log(f" Reading {reference} {sample_name} : {path}")
+        self.options.log(f" Reading {reference} {sample_name}: {path}")
         ibr = IBSpyResults(path, self.options)
         df: pd.DataFrame = ibr.count_by_windows()
         df.rename(columns = {'seqname':'Chromosome', 'chromosome':'Chromosome', 'start':'Start', 'end':"End", 'orientation':"Strand"}, inplace = True)
@@ -60,6 +61,7 @@ class IBSpyValuesMatrix:
         return i        
 
     def _values_matrix_for_reference(self, reference:string):
+        score = self.options.score
         samples = self.samples_df[self.samples_df['reference'] == reference]  
         path_ref=f'{self.options.folder_for_reference(reference=reference)}'      
         path_matrix=f'{path_ref}/{self.options.file_prefix}.merged.pickle.gz'
@@ -74,8 +76,8 @@ class IBSpyValuesMatrix:
         prep = {}
         for index, row in samples.iterrows():
             sample_name = row['query']
-            self.options.log(f" Reading {path_ref}/{sample_name}.pkl.gz")
-            df = pd.read_pickle(f"{path_ref}/{sample_name}.pkl.gz")
+            self.options.log(f" Reading {path_ref}/{sample_name}.{score}.pkl.gz")
+            df = pd.read_pickle(f"{path_ref}/{sample_name}.{score}.pkl.gz")
             prep[sample_name] = df[self.options.stat] 
         values_matrix = pd.DataFrame(prep)
         names = df[['Chromosome','Start','End']]
