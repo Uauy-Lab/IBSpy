@@ -1,11 +1,13 @@
+import gc
 from locale import normalize
+import os
 import string
 import pandas as pd
 from typing import List
 from pyranges import PyRanges
 from multiprocess import Pool
 
-from IBSpy.window_affinity_propagation import cluster_by_haplotype, select_best_cluster
+from IBSpy.window_affinity_propagation import AffinityRunResults, cluster_by_haplotype, select_best_cluster
 
 from .BlockMapping import BlockMapping
 from .IBSpy_options import IBSpyOptions
@@ -61,6 +63,7 @@ class IBSpyResultsSet:
 
     def _function_window_wrapper(self, start, function, chromosome, assembly=None ):
         end = start + self.options.affinity_window_size
+        self.options.log(f"Running: {chromosome}:{start}-{end}")
         window = self.mapped_window(chromosome, start, end, assembly=assembly)
         return function(window), chromosome, start, end 
 
@@ -81,25 +84,45 @@ class IBSpyResultsSet:
                 ret.extend(res)
         return ret 
 
-    def run_affinity_propagation(self):
+    
+    def path_affinity(self,chr=None):
+        prefix = self.options.output_folder
+        file = self.options.file_prefix
+        if chr is not None:
+            chr = f".{chr}."
+        else:
+            chr = ""
+        return f"{prefix}/{file}{chr}.affinity.csv.gz"
+
+    def run_affinity_propagation(self) -> pd.DataFrame :
+        self.options.log("Preparing affinity propagation")
         max_missing = self.options.max_missing
         dampings = self.options.dampings
         iterations = self.options.iterations
         seed = self.options.seed
-        
+        self.options.log(f"Searching for {self.path_affinity}")
+        if os.path.isfile(self.path_affinity()): 
+            return pd.read_csv(self.path_affinity(),sep="\t")
+        self.options.log("Not found, building")
         def run_single_run(gr ):
             runs = cluster_by_haplotype(gr, seed=seed, iterations=iterations, dampings=dampings, max_missing=max_missing)
             best = select_best_cluster(runs)
             return  best 
 
         ret = list()
-        for best, chromosome, start, end in self.map_window_iterator(function= run_single_run):
-            if best is not None:
-                best.chromosome = chromosome
-                best.start = start 
-                best.end = end
-                ret.append(best)
-        return ret
+        chromosomes = self.values_matrix.values_matrix.chromosomes
+        for chr in chromosomes:
+            gc.collect()
+            for best, chromosome, start, end in self.map_window_iterator(function= run_single_run, chromosome=chr):
+                
+                if best is not None:
+                    best.chromosome = chromosome
+                    best.start = start 
+                    best.end = end
+                    ret.append(best.as_df()) 
+            df = pd.concat(ret)
+            df.to_csv(self.path_affinity(chr=f"{chr}"), sep="\t",index=False)
+        return df
 
     
 

@@ -23,7 +23,12 @@ class BlockMapping:
 
 
 	def mapping_for_range(self, chromosome, start, end, assembly = None):
+		# print(f"{chromosome}:{start}-{end}")
 		gr = self.mapping[chromosome, start:end]
+		# print(assembly)
+		# print(gr)
+		if len(gr) == 0:
+			return gr
 		if assembly is not None:
 			gr = gr[gr.assembly==assembly]
 		blocks_nos = gr.block_no.unique()
@@ -32,6 +37,8 @@ class BlockMapping:
 	def all_regions_for(self, chromosome, start, end, assembly = None):
 		region = pr.PyRanges(chromosomes=chromosome, starts=[start], ends=[end], strands=["+"], int64=self.int64)
 		mapping = self.mapping_for_range(chromosome, start, end, assembly=assembly)
+		if len(mapping) == 0:
+			return region
 		mapping = mapping[mapping.Chromosome != chromosome ]
 		mapping = pr.concat([region, mapping])
 		merged = mapping.merge()

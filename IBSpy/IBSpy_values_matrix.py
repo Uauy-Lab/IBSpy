@@ -65,6 +65,7 @@ class IBSpyValuesMatrix:
         samples = self.samples_df[self.samples_df['reference'] == reference]  
         path_ref=f'{self.options.folder_for_reference(reference=reference)}'      
         path_matrix=f'{path_ref}/{self.options.file_prefix}.merged.pickle.gz'
+        self.options.log(f"Searching {path_matrix}")
         if os.path.isfile(path_matrix):
             return pd.read_pickle(path_matrix)
         nrows = samples.shape[0]
