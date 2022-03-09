@@ -6,7 +6,7 @@ import pandas as pd
 from typing import List
 from pyranges import PyRanges
 from multiprocess import Pool
-
+import pysam
 from IBSpy.window_affinity_propagation import AffinityRunResults, cluster_by_haplotype, select_best_cluster
 
 from .BlockMapping import BlockMapping
@@ -78,6 +78,21 @@ class IBSpyResultsSet:
         ret = list()
         for chromosome, length in chromosome_lengths.items():
             assembly = None #TODO: have the hash of chromosomes to assembly
+            with Pool(self.options.pool_size) as p:
+                wrapped_function = lambda x: self._function_window_wrapper(x, function, chromosome, assembly = assembly)
+                res = p.imap(wrapped_function, range(0, length , self.options.affinity_window_size),self.options.chunks_in_pool)
+                ret.extend(res)
+        return ret 
+
+    
+    def map_window_iterator_tabix(self, chromosome= None, function= None):
+        if function is None:
+            function = lambda x: x
+        tabixes: dict[str, pysam.TabixFile] = self.values_matrix.merged_values
+        ret = list()
+        for assembly, tabix in tabixes.items():
+            chromosomes = tabix.contigs
+
             with Pool(self.options.pool_size) as p:
                 wrapped_function = lambda x: self._function_window_wrapper(x, function, chromosome, assembly = assembly)
                 res = p.imap(wrapped_function, range(0, length , self.options.affinity_window_size),self.options.chunks_in_pool)

@@ -4,6 +4,7 @@ import sys
 from numpy import int64
 import pandas as pd
 import psutil
+import pysam
 from pyranges import PyRanges
 from multiprocess import Pool
 
@@ -22,6 +23,7 @@ class IBSpyValuesMatrix:
         self.samples = self.samples_df["query"].unique()
         self._values_matrix  = None
         self._chromosome_lengths = None
+        self._tabix = None 
 
 
     @property
@@ -60,20 +62,15 @@ class IBSpyValuesMatrix:
         df.to_pickle(out_path, compression={'method': 'gzip', 'compresslevel': 9} )
         return i        
 
-    def _values_matrix_for_reference(self, reference:string):
-        score = self.options.score
+    def _run_summirize_lines(self, reference:string) -> None:
         samples = self.samples_df[self.samples_df['reference'] == reference]  
-        path_ref=f'{self.options.folder_for_reference(reference=reference)}'      
-        path_matrix=f'{path_ref}/{self.options.file_prefix}.merged.pickle.gz'
-        self.options.log(f"Searching {path_matrix}")
-        if os.path.isfile(path_matrix):
-            return pd.read_pickle(path_matrix)
         nrows = samples.shape[0]
         with Pool(self.options.pool_size) as p:
             wrapped_function = lambda x: self._summarize_single_line(x, samples)
             p.map(wrapped_function,range(0, nrows),self.options.chunks_in_pool )
 
-        values_matrix = pd.DataFrame()
+    def _merge_values_matrix(self, samples:pd.DataFrame , path_ref: string) -> pd.DataFrame:
+        score = self.options.score
         prep = {}
         for index, row in samples.iterrows():
             sample_name = row['query']
@@ -83,8 +80,63 @@ class IBSpyValuesMatrix:
         values_matrix = pd.DataFrame(prep)
         names = df[['Chromosome','Start','End']]
         values_matrix = pd.concat([names,values_matrix], axis=1)
+        return values_matrix
+
+    def _values_matrix_for_reference(self, reference:string) -> pd.DataFrame:
+        samples = self.samples_df[self.samples_df['reference'] == reference]  
+        path_ref=f'{self.options.folder_for_reference(reference=reference)}'      
+        path_matrix=f'{path_ref}/{self.options.file_prefix}.merged.pickle.gz'
+        self.options.log(f"Searching {path_matrix}")
+        if os.path.isfile(path_matrix):
+            return pd.read_pickle(path_matrix)
+        self._run_summirize_lines(reference=reference)
+        values_matrix = self._merge_values_matrix(samples, path_ref)
         values_matrix.to_pickle(path_matrix, compression={'method': 'gzip', 'compresslevel': 9} )
         return values_matrix
+
+    def _read_single_line(self, i:int, samples: pd.DataFrame):
+        row = samples.iloc[i]
+        reference= row['reference']
+        sample_name = row['query']
+        score = self.options.score
+        path_ref=f'{self.options.folder_for_reference(reference=reference)}'
+        out_path=f"{path_ref}/{sample_name}.{score}.pkl.gz"
+        df = pd.read_pickle(f"{path_ref}/{sample_name}.{score}.pkl.gz")
+        df["sample"] = sample_name
+        return df   
+
+    def _merge_values_long(self, samples: pd.DataFrame, reference:string) -> pd.DataFrame:
+        path_ref   = f'{self.options.folder_for_reference(reference=reference)}' 
+        path_df    = f'{path_ref}/{self.options.file_prefix}.merged.tsv'
+        path_tabix = f'{path_df}.gz'
+        if os.path.isfile(path_tabix):
+            return pysam.TabixFile(filename=path_tabix,index=f"{path_tabix}.csi" )
+        self._run_summirize_lines(reference=reference)
+        samples = self.samples_df[self.samples_df['reference'] == reference]  
+        nrows = samples.shape[0]
+        with Pool(self.options.pool_size) as p:
+            wrapped_function = lambda x: self._read_single_line(x, samples)
+            dfs = p.map(wrapped_function,range(0, nrows),self.options.chunks_in_pool )
+        
+        df = pd.concat(dfs)
+        df.sort_values(by=["Chromosome", "Start","End"], inplace=True)
+        df.to_csv(path_df,sep="\t",index=False )
+        pysam.tabix_index(path_df,seq_col=0, start_col=1, end_col=2, line_skip=1,csi=True)
+        return pysam.TabixFile(filename=path_tabix, index=f"{path_tabix}.csi" )
+
+    @property
+    def merged_values(self):
+        references = self.references
+        if self._tabix  is not None:
+            return self._tabix
+            
+        ret = {}
+        for ref in references:
+            samples = self.samples_df[self.samples_df['reference'] == ref]
+            ret[ref] = self._merge_values_long(samples=samples, reference=ref)
+        self._tabix = ret
+        return ret     
+
 
     def _build_dataset(self) -> pd.DataFrame:
         dfs = []

@@ -16,6 +16,7 @@ multiprocess = "^"
 dill         = "*"
 tables       = "*"
 psutil       = "*"
+pysam        = "*"
 
 [dev-packages]
 

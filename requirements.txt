@@ -10,3 +10,4 @@ multiprocess
 dill
 tables
 psutil
+pysam

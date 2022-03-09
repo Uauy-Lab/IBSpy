@@ -35,6 +35,19 @@ class TestResultSet(unittest.TestCase):
         self.mapped_window_result2_out = "./tests/data/affinity/out/mapped_window_2.tsv"
         self.windows_for_affy = "./tests/data/affinity/windows"
         self.windows_for_affy_out = "./tests/data/affinity/out/windows"
+        self.regions = [
+            ['chr1A__chi', 0, 1000000],
+            ['chr1A__chi', 1000000, 2000000],
+            ['chr1A__chi', 2000000, 3000000],
+            ['chr1A__chi', 3000000, 4000000],
+            ['chr1A__chi', 4000000, 5000000],
+            ['chr1A__chi', 5000000, 6000000],
+            ['chr1A__jag', 0, 1000000],
+            ['chr1A__jag', 1000000, 2000000],
+            ['chr1A__jag', 2000000, 3000000],
+            ['chr1A__jag', 3000000, 4000000],
+            ['chr1A__jag', 4000000, 5000000],
+            ['chr1A__jag', 5000000, 6000000]]
 
         try:
             shutil.rmtree("./tests/data/affinity/out")
@@ -110,19 +123,7 @@ class TestResultSet(unittest.TestCase):
         self.options.block_mapping = self.block_mapping_file
         ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
         ret = ibspy_results.map_window_iterator()
-        regions = [
-            ['chr1A__chi', 0, 1000000],
-            ['chr1A__chi', 1000000, 2000000],
-            ['chr1A__chi', 2000000, 3000000],
-            ['chr1A__chi', 3000000, 4000000],
-            ['chr1A__chi', 4000000, 5000000],
-            ['chr1A__chi', 5000000, 6000000],
-            ['chr1A__jag', 0, 1000000],
-            ['chr1A__jag', 1000000, 2000000],
-            ['chr1A__jag', 2000000, 3000000],
-            ['chr1A__jag', 3000000, 4000000],
-            ['chr1A__jag', 4000000, 5000000],
-            ['chr1A__jag', 5000000, 6000000]]
+        regions = self.regions
         for i,( window, chromosome, start, end)  in enumerate(ret):
             expeced_path = self.windows_for_affy+"/"+str(i)+".tsv"
             result_path = self.windows_for_affy_out +str(i)+".tsv"    
@@ -140,6 +141,11 @@ class TestResultSet(unittest.TestCase):
  
 
         self.assertEqual(1, 1)
+
+    def test_merge_values(self):
+        ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
+        tabixes = ibspy_results.values_matrix.merged_values
+        print(tabixes)
 
 if __name__ == '__main__':
     unittest.main()

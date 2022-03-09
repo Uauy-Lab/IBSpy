@@ -27,7 +27,7 @@ class TestResults(unittest.TestCase):
         opts1.normalize = False
         opts1.score = 'variations'
         opts1.window_size = windows
-        self.results = IBSpyResults(db, opts1)
+        self.results: IBSpyResults = IBSpyResults(db, opts1)
         opts = IBSpyOptions()
         opts.score = "observed_kmers"
         opts.normalize = True
@@ -131,8 +131,6 @@ class TestResults(unittest.TestCase):
         self.assertEqual(hap_pd.iloc[3]['mean'], 27.666667)
         self.assertEqual(hap_pd.iloc[4]['mean'], 32.500000)
         self.assertEqual(hap_pd.iloc[5]['mean'], 29.000000)
-      
-
 
 if __name__ == '__main__':
     unittest.main()
