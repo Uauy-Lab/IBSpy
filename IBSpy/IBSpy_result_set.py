@@ -61,10 +61,29 @@ class IBSpyResultsSet:
         targets = self.block_mapping.all_regions_for(chromosome, start, end, assembly=assembly)
         return self.values_matrix.values_matrix.intersect(targets)
 
+    def mapped_window_tabix(self, chromosome, start, end, assembly = None) -> PyRanges:
+        if self.block_mapping is None:
+            ret = self.values_matrix.values_for_region(chromosome, start, end)
+        else: 
+            targets = self.block_mapping.all_regions_for(chromosome, start, end, assembly=assembly)
+            ret = list()
+            for index, row in targets.as_df().iterrows():
+                # print(index)
+                # print(row)
+                tmp =  self.values_matrix.values_for_region(row["Chromosome"], row["Start"], row["End"])
+                ret.append(tmp)
+        return pd.concat(ret).drop_duplicates()
+
     def _function_window_wrapper(self, start, function, chromosome, assembly=None ):
         end = start + self.options.affinity_window_size
         self.options.log(f"Running: {chromosome}:{start}-{end}")
         window = self.mapped_window(chromosome, start, end, assembly=assembly)
+        return function(window), chromosome, start, end 
+
+    def _function_window_wrapper_tabix(self, start, function, chromosome, assembly=None ):
+        end = start + self.options.affinity_window_size
+        self.options.log(f"Running: {chromosome}:{start}-{end}")
+        window = self.mapped_window_tabix(chromosome, start, end, assembly=assembly)
         return function(window), chromosome, start, end 
 
     def map_window_iterator(self, chromosome= None, function= None):
@@ -92,9 +111,12 @@ class IBSpyResultsSet:
         ret = list()
         for assembly, tabix in tabixes.items():
             chromosomes = tabix.contigs
-
+            if chromosome not in chromosomes:
+                next
+            
+            length = self.options.chromosome_length(assembly, chromosome)
             with Pool(self.options.pool_size) as p:
-                wrapped_function = lambda x: self._function_window_wrapper(x, function, chromosome, assembly = assembly)
+                wrapped_function = lambda x: self._function_window_wrapper_tabix(x, function, chromosome, assembly = assembly)
                 res = p.imap(wrapped_function, range(0, length , self.options.affinity_window_size),self.options.chunks_in_pool)
                 ret.extend(res)
         return ret 
@@ -127,6 +149,7 @@ class IBSpyResultsSet:
         ret = list()
         chromosomes = self.values_matrix.values_matrix.chromosomes
         for chr in chromosomes:
+            print(f"Affi for {chr}")
             gc.collect()
             for best, chromosome, start, end in self.map_window_iterator(function= run_single_run, chromosome=chr):
                 

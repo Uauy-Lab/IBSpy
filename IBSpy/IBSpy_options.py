@@ -24,6 +24,7 @@ class IBSpyOptions:
         self._out_folder:string = "./out/"
         self.no_cache_tables:bool = False
         self.chromosome_mapping:string = None
+        self._chromosomes:pd.DataFrame = None
         self.block_mapping:string = None
         self.pool_size: int = 4
         self.chunks_in_pool: int = 1
@@ -34,6 +35,22 @@ class IBSpyOptions:
         self.max_missing=5
         self.iterations=100
         self._seed = 42
+        self._chromosome_lengths = None
+
+
+    @property
+    def chromosomes(self):
+        return self._chromosomes
+
+    @chromosomes.setter
+    def chromosomes(self, value):
+        self._chromosomes = pd.read_csv(value, sep="\t")
+
+    def chromosome_length(self, assembly, chromosome):
+        #TODO: Validate or find a way to get this from the rest of the metadata. 
+        df = self._chromosomes
+        return df[df["assembly"] == assembly &  df["chr"] == chromosome ]["end"][0]
+
 
     @property
     def seed(self):
@@ -145,6 +162,12 @@ class IBSpyOptions:
             self._mapping_seqnames[row['original']] = row['mapping']
         return self._mapping_seqnames
 
+    def chromosome_lengths(self):
+        if self._chromosome_lengths is not None:
+            return self._chromosome_lengths
+        self._chromosome_lengths = {}
+        
+
     @property
     def logger(self) -> logging.Logger:
         if self._logger is not None:
@@ -178,7 +201,7 @@ def parse_IBSpyOptions_arguments():
     parser.add_argument("-S", "--score", default="variations", 
         help="Column with the score to use from the output of IBSpy_window_count")
     parser.add_argument("-T", "--stat",default="mean" , 
-        help="to calculate on the grouped windows [mean, median, variance or std]")
+        help="To calculate on the grouped windows [mean, median, variance or std]")
     parser.add_argument("-a", "--affinity_blocks", default=20, type=int, 
         help="Number of windows windows to group [deprectiated]")
     parser.add_argument("-A", "--affinity_window_size", default=1000000, type=int, 
@@ -197,6 +220,8 @@ def parse_IBSpyOptions_arguments():
         help="Number of workers per pool. ")
     parser.add_argument("-F", "--preferences", default=None, 
         help="Preferences file ")
+    parser.add_argument("-l", "--chromosomes", default=None, 
+        help="Tab separated file with the following columns [assembly, chr, start, end]. The chromsosome lenght is used to determine the last position when using the tabix tables")
     parser.parse_args(namespace=ret)
     return ret
 
@@ -205,7 +230,6 @@ def get_options() -> IBSpyOptions:
     return ret
 
 def parse_str_to_list(value):
-    print(type(value))
     if type(value) is list:
         return value
     if os.path.isfile(value):

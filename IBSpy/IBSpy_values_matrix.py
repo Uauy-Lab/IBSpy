@@ -1,6 +1,8 @@
 import os
 import string
 import sys
+import threading
+from typing import Dict
 from numpy import int64
 import pandas as pd
 import psutil
@@ -15,6 +17,7 @@ from .IBSpy_results import IBSpyResults
 class IBSpyValuesMatrix:
     def __init__(self, result_set) -> None:
         self.options: IBSpyOptions = result_set.options
+        self._locks : Dict[str, threading.Lock]  = {}
         self.result_set = result_set
         self.samples_df = pd.read_csv(self.options.metadata, delimiter='\t')
         self._samples = None
@@ -24,6 +27,7 @@ class IBSpyValuesMatrix:
         self._values_matrix  = None
         self._chromosome_lengths = None
         self._tabix = None 
+        
 
 
     @property
@@ -34,6 +38,8 @@ class IBSpyValuesMatrix:
         if self.options.references is not None:
             value = filter(lambda r: r in self.options.references, value)
         self._references = value
+        for ref in self._references:
+            self._locks[ref] = threading.Lock()
         
     @property
     def samples(self):
@@ -105,7 +111,7 @@ class IBSpyValuesMatrix:
         df["sample"] = sample_name
         return df   
 
-    def _merge_values_long(self, samples: pd.DataFrame, reference:string) -> pd.DataFrame:
+    def _merge_values_long(self, samples: pd.DataFrame, reference:string) -> pysam.TabixFile:
         path_ref   = f'{self.options.folder_for_reference(reference=reference)}' 
         path_df    = f'{path_ref}/{self.options.file_prefix}.merged.tsv'
         path_tabix = f'{path_df}.gz'
@@ -119,13 +125,14 @@ class IBSpyValuesMatrix:
             dfs = p.map(wrapped_function,range(0, nrows),self.options.chunks_in_pool )
         
         df = pd.concat(dfs)
+        df = self.rename_seqnames(df)
         df.sort_values(by=["Chromosome", "Start","End"], inplace=True)
         df.to_csv(path_df,sep="\t",index=False )
         pysam.tabix_index(path_df,seq_col=0, start_col=1, end_col=2, line_skip=1,csi=True)
         return pysam.TabixFile(filename=path_tabix, index=f"{path_tabix}.csi" )
 
     @property
-    def merged_values(self):
+    def merged_values(self) -> dict[str, pysam.TabixFile]:
         references = self.references
         if self._tabix  is not None:
             return self._tabix
@@ -135,8 +142,30 @@ class IBSpyValuesMatrix:
             samples = self.samples_df[self.samples_df['reference'] == ref]
             ret[ref] = self._merge_values_long(samples=samples, reference=ref)
         self._tabix = ret
-        return ret     
+        return ret
 
+    def acquire(self, assembly):
+        self._locks[assembly].acquire()
+
+    def release(self, assembly):
+        self._locks[assembly].release()     
+
+    def values_for_region(self, chromosome, start, end):
+        
+        colnames = ["Chromosome",	"Start",	"End",	self.options.score,	"mean",	"median",	"variance",	"std",	"sample"]
+        for assembly in self.merged_values.keys():
+            tabix = self.merged_values[assembly]
+            if chromosome not in tabix.contigs:
+                continue
+            # print(f'{chromosome} is in {assembly}')
+            # print(tabix.contigs)
+            self.acquire(assembly)
+            regions = pd.DataFrame(tabix.fetch(reference=chromosome, start=start, end=end, parser=pysam.asTuple()), columns=colnames)
+            self.release(assembly)
+        
+        if self.options.samples is not None:
+            regions = regions[regions["sample"] in self.options.samples ]
+        return regions
 
     def _build_dataset(self) -> pd.DataFrame:
         dfs = []
@@ -146,13 +175,16 @@ class IBSpyValuesMatrix:
         mem_usage = psutil.Process().memory_info().rss / (1024 * 1024 * 1024)
         self.options.log(f"Merging single values for matrix {mem_usage} Gb")
 
-        return self.rename_sequnames( pd.concat(dfs, join="inner") )
+        return self.rename_seqnames( pd.concat(dfs, join="inner") )
 
-    def rename_sequnames(self, df) -> pd.DataFrame:
+    def rename_seqnames(self, df) -> pd.DataFrame:
         if self.options.chromosome_mapping is None:
             return df
         mapping = self.options.mapping_seqnames
+        # print(df)
         df['Chromosome'] = df['Chromosome'].apply(lambda x: mapping.get(x, x)) 
+        # print("...")
+        # print(df)
         return df
 
     @property
