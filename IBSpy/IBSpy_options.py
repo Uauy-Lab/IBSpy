@@ -49,7 +49,14 @@ class IBSpyOptions:
     def chromosome_length(self, assembly, chromosome) -> int:
         #TODO: Validate or find a way to get this from the rest of the metadata. 
         df = self._chromosomes
-        return df[df["assembly"] == assembly &  df["chr"] == chromosome ]["end"][0]
+        try:
+            ret = df[ (df["assembly"] == assembly) &  (df["chr"] == chromosome) ]["end"][0]
+        except:
+            ret = None 
+        if ret is None:
+            raise f"Unable to find length for {assembly}, {chromosome}"
+
+        return ret 
 
 
     @property
@@ -179,7 +186,7 @@ class IBSpyOptions:
 
     def log(self, text) -> None:
         self.logger.info(text)
-        print(text)
+        # print(text)
         gb_mem = psutil.Process().memory_info().rss / (1024 * 1024 * 1024)
         gb_mem = round(gb_mem, 3)
         self.logger.debug(f"Mem: {gb_mem} GB")

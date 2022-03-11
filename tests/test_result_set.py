@@ -18,7 +18,7 @@ class TestResultSet(unittest.TestCase):
         self.out_folder="./tests/data/affinity/out/"
         try:
             shutil.rmtree(self.out_folder)
-            shutil.rmtree("./out/")
+            # shutil.rmtree("./out/")
         except OSError as error:
             pass
 
@@ -158,8 +158,9 @@ class TestResultSet(unittest.TestCase):
 
         result_test = ibspy_results.mapped_window_tabix("chr1A__chi", 1, 5450000, assembly="chinese")
         print(result_test)
+        print(result_test.dtypes)
        # for i,( window, chromosome, start, end)  in enumerate(self.regions):
-        #    f
+           
 
 if __name__ == '__main__':
     unittest.main()

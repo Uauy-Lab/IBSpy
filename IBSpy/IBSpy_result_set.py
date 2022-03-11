@@ -62,17 +62,36 @@ class IBSpyResultsSet:
         return self.values_matrix.values_matrix.intersect(targets)
 
     def mapped_window_tabix(self, chromosome, start, end, assembly = None) -> PyRanges:
+        ret = []
         if self.block_mapping is None:
-            ret = self.values_matrix.values_for_region(chromosome, start, end)
+            ret.append(self.values_matrix.values_for_region(chromosome, start, end))
         else: 
             targets = self.block_mapping.all_regions_for(chromosome, start, end, assembly=assembly)
-            ret = list()
+            
+            # print("[mapped_window_tabix] searching for mapped")
             for index, row in targets.as_df().iterrows():
-                # print(index)
-                # print(row)
                 tmp =  self.values_matrix.values_for_region(row["Chromosome"], row["Start"], row["End"])
-                ret.append(tmp)
-        return pd.concat(ret).drop_duplicates()
+                if tmp is not None:
+                    ret.append(tmp)
+                    # print("++++++++++")
+                    # print(tmp)
+        ret = pd.concat(ret, ignore_index=True, axis=0, join="outer")
+        if ret is not None:
+        #     ret[['Start']] = ret[['Start']].apply(pd.to_numeric) 
+        #     ret[['End']] = ret[['End']].apply(pd.to_numeric) 
+        #     ret[[self.options.score]] = ret[[self.options.score]].apply(pd.to_numeric) 
+        #     ret[['mean']] = ret[['mean']].apply(pd.to_numeric) 
+        #     ret[['median']] = ret[['median']].apply(pd.to_numeric) 
+            ret[['variance']] = ret[['variance']].apply(pd.to_numeric) 
+            ret[['std']] = ret[['std']].apply(pd.to_numeric) 
+            ret['sample'] = ret['sample'].astype('string') 
+            ret['Chromosome'] = ret['Chromosome'].astype('string') 
+            ret=ret.convert_dtypes()
+
+        # print("~~~~~~")
+        # print(ret.dtypes)
+        # print(ret)
+        return ret
 
     def _function_window_wrapper(self, start, function, chromosome, assembly=None ):
         end = start + self.options.affinity_window_size
@@ -82,9 +101,16 @@ class IBSpyResultsSet:
 
     def _function_window_wrapper_tabix(self, start, function, chromosome, assembly=None ):
         end = start + self.options.affinity_window_size
-        self.options.log(f"Running: {chromosome}:{start}-{end}")
+        self.options.log(f"[_function_window_wrapper_tabix] Running: {chromosome}:{start}-{end}")
         window = self.mapped_window_tabix(chromosome, start, end, assembly=assembly)
-        return function(window), chromosome, start, end 
+        print(f"[_function_window_wrapper_tabix]About to run region: {chromosome}:{start}-{end}")
+        print(window)
+        m=window.pivot(index=["Chromosome", "Start", "End"], columns="sample", values="variations")
+        m.reset_index(inplace=True)
+        m.rename_axis(None, axis=1, inplace=True)
+        m.columns
+        print(m)
+        return function(m), chromosome, start, end 
 
     def map_window_iterator(self, chromosome= None, function= None):
         if function is None:
@@ -113,11 +139,15 @@ class IBSpyResultsSet:
             chromosomes = tabix.contigs
             if chromosome not in chromosomes:
                 next
-            
+            print(f"[map_window_iterator_tabix]About to get length for chromosome {chromosome}, {assembly}")
             length = self.options.chromosome_length(assembly, chromosome)
+            print(f"Lenght {length}")
+            print(f"Window {self.options.affinity_window_size}")
             with Pool(self.options.pool_size) as p:
                 wrapped_function = lambda x: self._function_window_wrapper_tabix(x, function, chromosome, assembly = assembly)
                 res = p.imap(wrapped_function, range(0, length , self.options.affinity_window_size),self.options.chunks_in_pool)
+                print("About to merge")
+                #print(list(res))
                 ret.extend(res)
         return ret 
 
@@ -149,15 +179,17 @@ class IBSpyResultsSet:
         ret = list()
         chromosomes = self.values_matrix.values_matrix.chromosomes
         for chr in chromosomes:
-            print(f"Affi for {chr}")
+            self.options.log(f"Affi for {chr}")
             gc.collect()
-            for best, chromosome, start, end in self.map_window_iterator(function= run_single_run, chromosome=chr):
-                
+            for best, chromosome, start, end in self.map_window_iterator_tabix(function= run_single_run, chromosome=chr):
                 if best is not None:
                     best.chromosome = chromosome
                     best.start = start 
                     best.end = end
-                    ret.append(best.as_df()) 
+                    print("[run_affinity_propagation] Best:")
+                    print(best)
+                    print(best.dtypes)
+                    ret.append(best) 
             if(len(ret)) > 0:
                 df = pd.concat(ret)
                 df.to_csv(self.path_affinity(chr=f"{chr}"), sep="\t",index=False)

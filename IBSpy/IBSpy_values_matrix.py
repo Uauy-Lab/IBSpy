@@ -136,7 +136,6 @@ class IBSpyValuesMatrix:
         references = self.references
         if self._tabix  is not None:
             return self._tabix
-            
         ret = {}
         for ref in references:
             samples = self.samples_df[self.samples_df['reference'] == ref]
@@ -151,21 +150,33 @@ class IBSpyValuesMatrix:
         self._locks[assembly].release()     
 
     def values_for_region(self, chromosome, start, end):
-        
         colnames = ["Chromosome",	"Start",	"End",	self.options.score,	"mean",	"median",	"variance",	"std",	"sample"]
         for assembly in self.merged_values.keys():
             tabix = self.merged_values[assembly]
             if chromosome not in tabix.contigs:
                 continue
-            # print(f'{chromosome} is in {assembly}')
-            # print(tabix.contigs)
+            # print(f'[values_for_region]{chromosome}:{start}-{end} is in {assembly}')
+           # print(tabix.contigs)
             self.acquire(assembly)
             regions = pd.DataFrame(tabix.fetch(reference=chromosome, start=start, end=end, parser=pysam.asTuple()), columns=colnames)
             self.release(assembly)
-        
-        if self.options.samples is not None:
-            regions = regions[regions["sample"] in self.options.samples ]
-        return regions
+            if regions is not None:
+                regions[['Start']] = regions[['Start']].apply(pd.to_numeric) 
+                regions[['End']] = regions[['End']].apply(pd.to_numeric) 
+                regions[[self.options.score]] = regions[[self.options.score]].apply(pd.to_numeric) 
+                regions[['mean']] = regions[['mean']].apply(pd.to_numeric) 
+                regions[['median']] = regions[['median']].apply(pd.to_numeric) 
+                regions[['variance']] = regions[['variance']].apply(pd.to_numeric) 
+                regions[['std']] = regions[['std']].apply(pd.to_numeric) 
+                # regions[['sample']] = regions[['sample']].apply(str) 
+                #regions[['Chromosome']] = regions[['Chromosome']].apply(str) 
+                regions=regions.convert_dtypes()
+            # print(regions.dtypes)
+            # print("[values_for_region]")
+            # print(regions)
+            # print("_____________")
+            return regions
+        raise f"Chromsome not found: {chromosome}"
 
     def _build_dataset(self) -> pd.DataFrame:
         dfs = []
