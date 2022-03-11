@@ -144,7 +144,7 @@ class TestResultSet(unittest.TestCase):
         self.options.chromosome_mapping = self.mapping_path
         self.options.block_mapping = self.block_mapping_file
         ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
-        # ret = ibspy_results.run_affinity_propagation()
+        ret = ibspy_results.run_affinity_propagation()
         self.assertEqual(1, 1)
 
     def test_merge_values(self):

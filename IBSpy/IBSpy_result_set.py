@@ -158,8 +158,11 @@ class IBSpyResultsSet:
                     best.start = start 
                     best.end = end
                     ret.append(best.as_df()) 
-            df = pd.concat(ret)
-            df.to_csv(self.path_affinity(chr=f"{chr}"), sep="\t",index=False)
+            if(len(ret)) > 0:
+                df = pd.concat(ret)
+                df.to_csv(self.path_affinity(chr=f"{chr}"), sep="\t",index=False)
+            else:
+                self.options.log(f"Unable to run affinity prpagation for {chromosome}")
         return df
 
     
