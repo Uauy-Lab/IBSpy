@@ -84,7 +84,10 @@ def single_affinity_run(x, random_state=42, damping=0.5):
 def cluster_by_haplotype (gr, dampings=[0.5,0.6,0.7,0.8,0.9], iterations=100, seed=42, max_missing=5, min_iterations=5):
 	with warnings.catch_warnings():
 		warnings.filterwarnings("ignore", category=ConvergenceWarning)
-		t_df = gr.as_df().set_index(['Chromosome', 'Start', 'End']).T
+
+		if not isinstance(gr, pd.DataFrame):
+			gr = gr.as_df()
+		t_df = gr.set_index(['Chromosome', 'Start', 'End']).T
 		# print(t_df.columns)
 		varieties = t_df.index
 		x = StandardScaler(with_mean=True).fit_transform(t_df)

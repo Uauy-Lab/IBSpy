@@ -2,13 +2,14 @@ import gc
 from locale import normalize
 import os
 import string
+from numpy import dtype
 import pandas as pd
 from typing import List
 from pyranges import PyRanges
 from multiprocess import Pool
 import pysam
 from IBSpy.window_affinity_propagation import AffinityRunResults, cluster_by_haplotype, select_best_cluster
-
+import dill
 from .BlockMapping import BlockMapping
 from .IBSpy_options import IBSpyOptions
 from .IBSpy_values_matrix import IBSpyValuesMatrix
@@ -103,13 +104,14 @@ class IBSpyResultsSet:
         end = start + self.options.affinity_window_size
         self.options.log(f"[_function_window_wrapper_tabix] Running: {chromosome}:{start}-{end}")
         window = self.mapped_window_tabix(chromosome, start, end, assembly=assembly)
-        print(f"[_function_window_wrapper_tabix]About to run region: {chromosome}:{start}-{end}")
-        print(window)
+        # print(f"[_function_window_wrapper_tabix]About to run region: {chromosome}:{start}-{end}")
+        # print(window)
+        window = window.drop_duplicates(keep="last")
         m=window.pivot(index=["Chromosome", "Start", "End"], columns="sample", values="variations")
         m.reset_index(inplace=True)
         m.rename_axis(None, axis=1, inplace=True)
         m.columns
-        print(m)
+        # print(m)
         return function(m), chromosome, start, end 
 
     def map_window_iterator(self, chromosome= None, function= None):
@@ -138,17 +140,25 @@ class IBSpyResultsSet:
         for assembly, tabix in tabixes.items():
             chromosomes = tabix.contigs
             if chromosome not in chromosomes:
-                next
-            print(f"[map_window_iterator_tabix]About to get length for chromosome {chromosome}, {assembly}")
+                continue
+            # print(chromosomes)
+            # print(f"[map_window_iterator_tabix]About to get length for chromosome {chromosome}, {assembly}")
             length = self.options.chromosome_length(assembly, chromosome)
-            print(f"Lenght {length}")
-            print(f"Window {self.options.affinity_window_size}")
+            # print(f"Lenght {length}")
+            # print(f"Window {self.options.affinity_window_size}")
+            # print(type(chromosome))
+            # print(type(assembly))
+            # print(f"chunks in pool: {self.options.chunks_in_pool}")
+            
             with Pool(self.options.pool_size) as p:
                 wrapped_function = lambda x: self._function_window_wrapper_tabix(x, function, chromosome, assembly = assembly)
                 res = p.imap(wrapped_function, range(0, length , self.options.affinity_window_size),self.options.chunks_in_pool)
+                #res = map(wrapped_function,  range(0, length , self.options.affinity_window_size))
                 print("About to merge")
+                newlist = [x for x in res]
                 #print(list(res))
-                ret.extend(res)
+                ret.extend(newlist)
+        #print(ret)
         return ret 
 
     
@@ -175,7 +185,7 @@ class IBSpyResultsSet:
             runs = cluster_by_haplotype(gr, seed=seed, iterations=iterations, dampings=dampings, max_missing=max_missing)
             best = select_best_cluster(runs)
             return  best 
-
+            #return gr
         ret = list()
         chromosomes = self.values_matrix.values_matrix.chromosomes
         for chr in chromosomes:
@@ -187,9 +197,9 @@ class IBSpyResultsSet:
                     best.start = start 
                     best.end = end
                     print("[run_affinity_propagation] Best:")
-                    print(best)
-                    print(best.dtypes)
-                    ret.append(best) 
+                    print(best.as_df())
+                   # print(best.dtypes)
+                    ret.append(best.as_df()) 
             if(len(ret)) > 0:
                 df = pd.concat(ret)
                 df.to_csv(self.path_affinity(chr=f"{chr}"), sep="\t",index=False)

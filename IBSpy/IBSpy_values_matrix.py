@@ -134,13 +134,13 @@ class IBSpyValuesMatrix:
     @property
     def merged_values(self) -> dict[str, pysam.TabixFile]:
         references = self.references
-        if self._tabix  is not None:
-            return self._tabix
+        # if self._tabix  is not None:
+        #     return self._tabix
         ret = {}
         for ref in references:
             samples = self.samples_df[self.samples_df['reference'] == ref]
             ret[ref] = self._merge_values_long(samples=samples, reference=ref)
-        self._tabix = ret
+        # self._tabix = ret
         return ret
 
     def acquire(self, assembly):

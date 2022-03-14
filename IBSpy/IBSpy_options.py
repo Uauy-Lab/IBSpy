@@ -50,13 +50,14 @@ class IBSpyOptions:
         #TODO: Validate or find a way to get this from the rest of the metadata. 
         df = self._chromosomes
         try:
-            ret = df[ (df["assembly"] == assembly) &  (df["chr"] == chromosome) ]["end"][0]
-        except:
+            ret = df[ (df["assembly"] == assembly) &  (df["chr"] == chromosome) ]["end"].array[0]
+        except Exception as e:
             ret = None 
         if ret is None:
-            raise f"Unable to find length for {assembly}, {chromosome}"
+            print(df)
+            raise Exception(f"Unable to find length for {assembly}, {chromosome}")
 
-        return ret 
+        return ret
 
 
     @property
