@@ -1,14 +1,19 @@
+from audioop import bias
 from cmath import nan
 import math
 import statistics
 import sys
-from numpy import NaN
+from numpy import NaN, ndarray
 import pandas as pd
+import numpy as np
 import warnings
 from sklearn.cluster import AffinityPropagation
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.preprocessing import StandardScaler
 from sklearn import metrics
+import scipy.stats as stats
+from scipy.stats import kurtosis
+from scipy.stats import skew
 import random
 
 
@@ -25,6 +30,8 @@ class AffinityRunResults:
 		self.chromosome = None
 		self.start = None
 		self.end = None
+		self.descriptive_stats = {}
+		self.norm_descriptive_stats = {}
 
 	@property
 	def failed(self):
@@ -41,7 +48,17 @@ class AffinityRunResults:
 			'mutual_info_score':self.mutual_info_score,
 			'sc_score':self.score,
 			'number_of_runs':self.number_of_runs,
-			'damping':self.damping
+			'damping':self.damping,
+			'median': self.descriptive_stats["median"],
+			'mean': self.descriptive_stats["mean"],
+			'stdev': self.descriptive_stats["stdev"],
+			'skew': self.descriptive_stats["skew"],
+			'kurt': self.descriptive_stats["kurt"],
+			'median_scaled': self.norm_descriptive_stats["median"],
+			'mean_scaled': self.norm_descriptive_stats["mean"],
+			'stdev_scaled': self.norm_descriptive_stats["stdev"],
+			'skew_scaled': self.norm_descriptive_stats["skew"],
+			'kurt_scaled': self.norm_descriptive_stats["kurt"]
 			}
 
 			)
@@ -81,16 +98,39 @@ def single_affinity_run(x, random_state=42, damping=0.5):
 		sc_score = math.nan
 	return (predicted, sc_score)
 
-def cluster_by_haplotype (gr, dampings=[0.5,0.6,0.7,0.8,0.9], iterations=100, seed=42, max_missing=5, min_iterations=5):
+def descriptive_stats(gr: pd.DataFrame):
+	ret = {}
+	melted  = gr.melt(id_vars=["Chromosome", "Start", "End"])
+	ret['stdev'] = statistics.stdev(melted['value'])
+	ret['median'] = statistics.median(melted['value'])
+	ret['mean'] = statistics.mean(melted['value'])
+	ret['skew'] = skew(melted['value'])
+	ret['kurt'] = kurtosis(melted['value'], bias=True)
+	#print(ret)
+	return ret 
+
+
+def descriptive_stats_normalized(x: ndarray):
+	ret = {}
+	flat = x.flatten()
+	ret['stdev'] = statistics.stdev(flat)
+	ret['median'] = statistics.median(flat)
+	ret['mean'] = statistics.mean(flat)
+	ret['skew'] = skew(flat)
+	ret['kurt'] = kurtosis(flat, bias = True)
+	return ret 
+
+
+def cluster_by_haplotype (gr, dampings=[0.5,0.6,0.7,0.8,0.9], iterations=1000, seed=42, max_missing=5, min_iterations=10):
 	with warnings.catch_warnings():
 		warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 		if not isinstance(gr, pd.DataFrame):
 			gr = gr.as_df()
 		t_df = gr.set_index(['Chromosome', 'Start', 'End']).T
-		# print(t_df.columns)
 		varieties = t_df.index
-		x = StandardScaler(with_mean=True).fit_transform(t_df)
+		x:ndarray = StandardScaler(with_mean=True).fit_transform(t_df)
+
 		runs = list()
 		best_dmp_score = 0
 		best_dmp = dampings[0]
@@ -105,10 +145,15 @@ def cluster_by_haplotype (gr, dampings=[0.5,0.6,0.7,0.8,0.9], iterations=100, se
 				runs = tmp_runs
 				best_dmp_score = tmp_score
 		best_cluster = select_best_cluster(runs)
+
 		if best_cluster is not None and  best_cluster.stdev > 0.001:
 			tmp_runs = multiple_affinity_run(iterations - len(runs), max_missing, min_iterations, varieties, x, best_dmp )
 			runs.extend(tmp_runs)
-				
+		desc_stats = descriptive_stats(gr)
+		desc_stats_norm = descriptive_stats_normalized(x)
+		for run in runs:
+			run.descriptive_stats = desc_stats
+			run.norm_descriptive_stats = desc_stats_norm
 	return runs
 
 def multiple_affinity_run(iterations, max_missing, min_iterations, varieties, x, dmp):

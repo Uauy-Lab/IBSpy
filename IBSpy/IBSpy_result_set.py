@@ -77,17 +77,17 @@ class IBSpyResultsSet:
                     # print("++++++++++")
                     # print(tmp)
         ret = pd.concat(ret, ignore_index=True, axis=0, join="outer")
-        if ret is not None:
-        #     ret[['Start']] = ret[['Start']].apply(pd.to_numeric) 
-        #     ret[['End']] = ret[['End']].apply(pd.to_numeric) 
-        #     ret[[self.options.score]] = ret[[self.options.score]].apply(pd.to_numeric) 
-        #     ret[['mean']] = ret[['mean']].apply(pd.to_numeric) 
-        #     ret[['median']] = ret[['median']].apply(pd.to_numeric) 
-            ret[['variance']] = ret[['variance']].apply(pd.to_numeric) 
-            ret[['std']] = ret[['std']].apply(pd.to_numeric) 
-            ret['sample'] = ret['sample'].astype('string') 
-            ret['Chromosome'] = ret['Chromosome'].astype('string') 
-            ret=ret.convert_dtypes()
+        # if ret is not None:
+        # #     ret[['Start']] = ret[['Start']].apply(pd.to_numeric) 
+        # #     ret[['End']] = ret[['End']].apply(pd.to_numeric) 
+        # #     ret[[self.options.score]] = ret[[self.options.score]].apply(pd.to_numeric) 
+        # #     ret[['mean']] = ret[['mean']].apply(pd.to_numeric) 
+        # #     ret[['median']] = ret[['median']].apply(pd.to_numeric) 
+        #     ret[['variance']] = ret[['variance']].apply(pd.to_numeric) 
+        #     ret[['std']] = ret[['std']].apply(pd.to_numeric) 
+        #     ret['sample'] = ret['sample'].astype('string') 
+        #     ret['Chromosome'] = ret['Chromosome'].astype('string') 
+        #     ret=ret.convert_dtypes()
 
         # print("~~~~~~")
         # print(ret.dtypes)
@@ -136,13 +136,14 @@ class IBSpyResultsSet:
         if function is None:
             function = lambda x: x
         tabixes: dict[str, pysam.TabixFile] = self.values_matrix.merged_values
+        #print(tabixes)
         ret = list()
         for assembly, tabix in tabixes.items():
             chromosomes = tabix.contigs
             if chromosome not in chromosomes:
                 continue
             # print(chromosomes)
-            # print(f"[map_window_iterator_tabix]About to get length for chromosome {chromosome}, {assembly}")
+            self.options.log(f"[map_window_iterator_tabix]About to get length for chromosome {chromosome}, {assembly}")
             length = self.options.chromosome_length(assembly, chromosome)
             # print(f"Lenght {length}")
             # print(f"Window {self.options.affinity_window_size}")
@@ -177,17 +178,19 @@ class IBSpyResultsSet:
         dampings = self.options.dampings
         iterations = self.options.iterations
         seed = self.options.seed
-        self.options.log(f"Searching for {self.path_affinity}")
-        if os.path.isfile(self.path_affinity()): 
-            return pd.read_csv(self.path_affinity(),sep="\t")
-        self.options.log("Not found, building")
+        # # self.options.log(f"Searching for {self.path_affinity(chr=chr)}")
+        # # if os.path.isfile(self.path_affinity(chr=f"{chr}")): 
+        # #     return pd.read_csv(self.path_affinity(chr=f"{chr}"),sep="\t")
+        # self.options.log("Not found, building")
         def run_single_run(gr ):
             runs = cluster_by_haplotype(gr, seed=seed, iterations=iterations, dampings=dampings, max_missing=max_missing)
             best = select_best_cluster(runs)
             return  best 
             #return gr
         ret = list()
-        chromosomes = self.values_matrix.values_matrix.chromosomes
+        #chromosomes = self.values_matrix.values_matrix.chromosomes
+        df = None
+        chromosomes = self.options.chromosomes["chr"]
         for chr in chromosomes:
             self.options.log(f"Affi for {chr}")
             gc.collect()
@@ -196,15 +199,17 @@ class IBSpyResultsSet:
                     best.chromosome = chromosome
                     best.start = start 
                     best.end = end
-                    print("[run_affinity_propagation] Best:")
-                    print(best.as_df())
+                    #print("[run_affinity_propagation] Best:")
+                    #print(best.as_df())
                    # print(best.dtypes)
                     ret.append(best.as_df()) 
+                else:
+                    self.options.log(f"[run_affinity_propagation] failed to run {chromosome}:{start}-{end}")
             if(len(ret)) > 0:
                 df = pd.concat(ret)
                 df.to_csv(self.path_affinity(chr=f"{chr}"), sep="\t",index=False)
             else:
-                self.options.log(f"Unable to run affinity prpagation for {chromosome}")
+                self.options.log(f"Unable to run affinity prpagation for {chr}")
         return df
 
     

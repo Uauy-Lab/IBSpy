@@ -36,7 +36,7 @@ class IBSpyValuesMatrix:
     @references.setter
     def references(self, value):
         if self.options.references is not None:
-            value = filter(lambda r: r in self.options.references, value)
+            value = [x for x in filter(lambda r: r in self.options.references, value)]
         self._references = value
         for ref in self._references:
             self._locks[ref] = threading.Lock()
@@ -134,11 +134,15 @@ class IBSpyValuesMatrix:
     @property
     def merged_values(self) -> dict[str, pysam.TabixFile]:
         references = self.references
+        # print(f"[merged_valie]")
+        # print(references)
         # if self._tabix  is not None:
         #     return self._tabix
         ret = {}
         for ref in references:
+           # print(ref)
             samples = self.samples_df[self.samples_df['reference'] == ref]
+            
             ret[ref] = self._merge_values_long(samples=samples, reference=ref)
         # self._tabix = ret
         return ret
