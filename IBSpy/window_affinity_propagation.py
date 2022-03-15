@@ -32,10 +32,16 @@ class AffinityRunResults:
 		self.end = None
 		self.descriptive_stats = {}
 		self.norm_descriptive_stats = {}
+		self.samples = 0
+		self.windows = 0
 
 	@property
 	def failed(self):
 		return math.isnan(self.score)
+
+	@property
+	def n(self):
+		return self.samples * self.windows
 
 	def as_df(self):
 
@@ -49,6 +55,9 @@ class AffinityRunResults:
 			'sc_score':self.score,
 			'number_of_runs':self.number_of_runs,
 			'damping':self.damping,
+			'n_windows': self.windows,
+			'n_samples': self.samples,
+			'n': self.n, 
 			'median': self.descriptive_stats["median"],
 			'mean': self.descriptive_stats["mean"],
 			'stdev': self.descriptive_stats["stdev"],
@@ -127,6 +136,8 @@ def cluster_by_haplotype (gr, dampings=[0.5,0.6,0.7,0.8,0.9], iterations=1000, s
 
 		if not isinstance(gr, pd.DataFrame):
 			gr = gr.as_df()
+		n_windows = gr.shape[0]
+		n_samples = gr.shape[1]
 		t_df = gr.set_index(['Chromosome', 'Start', 'End']).T
 		varieties = t_df.index
 		x:ndarray = StandardScaler(with_mean=True).fit_transform(t_df)
@@ -154,6 +165,8 @@ def cluster_by_haplotype (gr, dampings=[0.5,0.6,0.7,0.8,0.9], iterations=1000, s
 		for run in runs:
 			run.descriptive_stats = desc_stats
 			run.norm_descriptive_stats = desc_stats_norm
+			run.windows = n_windows
+			run.samples = n_samples
 	return runs
 
 def multiple_affinity_run(iterations, max_missing, min_iterations, varieties, x, dmp):
