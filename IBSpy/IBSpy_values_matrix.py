@@ -207,10 +207,13 @@ class IBSpyValuesMatrix:
         if self._values_matrix is not None:
             return self._values_matrix
         if os.path.isfile(self.path):
-            self.options.log(f"Loading {self.path}")
-            self._values_matrix = pd.read_csv(self.path, sep="\t")
-        else:
-            self.options.log("Building matrix")
+            try:
+                self.options.log(f"Loading {self.path}")
+                self._values_matrix = pd.read_csv(self.path, sep="\t")
+            except:
+                self.options.log(f"Failed to read {self.path}")
+        if self._values_matrix is None: 
+            self.options.log(f"Building matrix {self.path}")
             self._values_matrix = self._build_dataset()
         self.options.log("Converting to PyRanges")
         self._values_matrix = PyRanges(self._values_matrix, int64=True)

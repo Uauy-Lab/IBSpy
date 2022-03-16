@@ -187,7 +187,7 @@ class IBSpyOptions:
 
     def log(self, text) -> None:
         self.logger.info(text)
-        # print(text)
+        print(text)
         gb_mem = psutil.Process().memory_info().rss / (1024 * 1024 * 1024)
         gb_mem = round(gb_mem, 3)
         self.logger.debug(f"Mem: {gb_mem} GB")
