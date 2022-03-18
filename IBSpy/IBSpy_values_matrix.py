@@ -123,7 +123,7 @@ class IBSpyValuesMatrix:
         nrows = samples.shape[0]
         
         wrapped_function = lambda x: self._read_single_line(x, samples)
-        dfs = map(wrapped_function,range(0, nrows),self.options.chunks_in_pool )
+        dfs = map(wrapped_function,range(0, nrows))
         
         df = pd.concat(dfs)
         df = self.rename_seqnames(df)
