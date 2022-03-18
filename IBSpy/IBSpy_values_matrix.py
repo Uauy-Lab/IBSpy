@@ -88,6 +88,7 @@ class IBSpyValuesMatrix:
         values_matrix = pd.concat([names,values_matrix], axis=1)
         return values_matrix
 
+
     def _values_matrix_for_reference(self, reference:string) -> pd.DataFrame:
         samples = self.samples_df[self.samples_df['reference'] == reference]  
         path_ref=f'{self.options.folder_for_reference(reference=reference)}'      
@@ -120,9 +121,9 @@ class IBSpyValuesMatrix:
         self._run_summirize_lines(reference=reference)
         samples = self.samples_df[self.samples_df['reference'] == reference]  
         nrows = samples.shape[0]
-        with Pool(self.options.pool_size) as p:
-            wrapped_function = lambda x: self._read_single_line(x, samples)
-            dfs = p.map(wrapped_function,range(0, nrows),self.options.chunks_in_pool )
+        
+        wrapped_function = lambda x: self._read_single_line(x, samples)
+        dfs = map(wrapped_function,range(0, nrows),self.options.chunks_in_pool )
         
         df = pd.concat(dfs)
         df = self.rename_seqnames(df)
