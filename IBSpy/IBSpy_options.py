@@ -180,8 +180,10 @@ class IBSpyOptions:
         if self._chromosome_suffix is not None:
             return self._chromosome_suffix
         self._chromosome_suffix = {}
+        if self.chromosome_suffix_path is None: 
+            return self._chromosome_suffix
         map_df = pd.read_csv(self.chromosome_suffix_path, sep="\t")
-        for index, row in map_df.itterrows():
+        for index, row in map_df.iterrows():
             self._chromosome_suffix[row["reference"]] = row["suffix"]
         return self._chromosome_suffix
 

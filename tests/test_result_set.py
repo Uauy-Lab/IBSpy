@@ -17,8 +17,11 @@ class TestResultSet(unittest.TestCase):
     def setUp(self):
         self.out_folder="./tests/data/affinity/out/"
         try:
+            shutil.rmtree("./out/")
+        except OSError as error:
+            pass
+        try:
             shutil.rmtree(self.out_folder)
-            # shutil.rmtree("./out/")
         except OSError as error:
             pass
 
@@ -35,6 +38,7 @@ class TestResultSet(unittest.TestCase):
         self.options = IBSpy.IBSpyOptions()
         self.options.metadata = self.samples_metadata
         self.options.chromosomes = "./tests/data/affinity/chromosome_lengths.tsv"
+        self.options.chromosome_suffix_path = "./tests/data/reference_suffix.tsv"
         self.block_mapping_file = "./tests/data/affinity/jag_chi_test_windows.tsv"
         self.mapped_window_result1 = "./tests/data/affinity/mapped_window_1.tsv"
         self.mapped_window_result2 = "./tests/data/affinity/mapped_window_2.tsv"
