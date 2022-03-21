@@ -46,18 +46,18 @@ class TestAffinityPropagation(unittest.TestCase):
 	def test_cluster_by_haplotype_short(self):
 		df = pd.read_csv(self.test_prefix + "/0.tsv", delimiter="\t")
 		gr = PyRanges(df)
-		runs = cluster_by_haplotype(gr, seed=42, iterations=10, dampings=[0.6, 0.7], max_missing=10)
+		runs = cluster_by_haplotype(gr, seed=42, iterations=10, dampings=[0.6, 0.7], max_missing=10, min_iterations=5)
 		expected_predicted=[0,0,1,1]
 		expected_predicted2=[0,0,0,0]
 		for i, p in enumerate(runs):
 			ep = expected_predicted
+			print(p.predicted)
 			if i == 3:
 				ep = expected_predicted2
 			np.testing.assert_array_almost_equal(ep, p.predicted )
 			self.assertTrue(math.isnan(p.score))
 		
-		# df2 = pd.DataFrame(predicted)
-		# print(df2) 	
+		 	
 
 	def run_single_hap_run(self, input, predicted_expected, tmp_out):
 		df = pd.read_csv(input, delimiter="\t")

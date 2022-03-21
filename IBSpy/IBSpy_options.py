@@ -36,8 +36,13 @@ class IBSpyOptions:
         self.iterations=100
         self._seed = 42
         self._chromosome_lengths = None
+        self.name:string = "all"
+        self._chromosome_suffix: dict = None
+        self.chromosome_suffix_path : string = None
+   
 
 
+        
     @property
     def chromosomes(self):
         return self._chromosomes
@@ -170,6 +175,16 @@ class IBSpyOptions:
             self._mapping_seqnames[row['original']] = row['mapping']
         return self._mapping_seqnames
 
+    @property
+    def chromosome_suffix(self) -> dict:
+        if self._chromosome_suffix is not None:
+            return self._chromosome_suffix
+        self._chromosome_suffix = {}
+        map_df = pd.read_csv(self.chromosome_suffix_path, sep="\t")
+        for index, row in map_df.itterrows():
+            self._chromosome_suffix[row["reference"]] = row["suffix"]
+        return self._chromosome_suffix
+
     def chromosome_lengths(self):
         if self._chromosome_lengths is not None:
             return self._chromosome_lengths
@@ -231,6 +246,9 @@ def parse_IBSpyOptions_arguments():
         help="Preferences file ")
     parser.add_argument("-l", "--chromosomes", default=None, 
         help="Tab separated file with the following columns [assembly, chr, start, end]. The chromsosome lenght is used to determine the last position when using the tabix tables")
+    parser.add_argument("-N", "--name", default="all", help="Name for the analysis, when subsetting samples")
+    parser.add_argument("-S", "--chromosome_suffix_path", default=None, help="File with the chromosome suffixes for each reference. Columns [reference, suffix]")
+
     parser.parse_args(namespace=ret)
     return ret
 

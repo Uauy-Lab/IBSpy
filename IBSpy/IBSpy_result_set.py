@@ -166,11 +166,12 @@ class IBSpyResultsSet:
     def path_affinity(self,chr=None):
         prefix = self.options.output_folder
         file = self.options.file_prefix
+        name = self.options.name
         if chr is not None:
             chr = f".{chr}."
         else:
             chr = ""
-        return f"{prefix}/{file}{chr}.affinity.csv.gz"
+        return f"{prefix}/{file}{chr}.{name}.affinity.csv.gz"
 
     def run_affinity_propagation(self) -> pd.DataFrame :
         self.options.log("Preparing affinity propagation")
@@ -187,31 +188,37 @@ class IBSpyResultsSet:
             best = select_best_cluster(runs)
             return  best 
             #return gr
-        ret = list()
+        
         #chromosomes = self.values_matrix.values_matrix.chromosomes
         df = None
         chromosomes = self.options.chromosomes["chr"]
+        ret_all = list()
         for chr in chromosomes:
+            ret = list()
             self.options.log(f"Affi for {chr}")
             gc.collect()
+            affy_path = self.path_affinity(chr=f"{chr}")
+            
             for best, chromosome, start, end in self.map_window_iterator_tabix(function= run_single_run, chromosome=chr):
                 if best is not None:
                     best.chromosome = chromosome
                     best.start = start 
                     best.end = end
-                    #print("[run_affinity_propagation] Best:")
-                    #print(best.as_df())
-                   # print(best.dtypes)
                     ret.append(best.as_df()) 
                 else:
                     self.options.log(f"[run_affinity_propagation] failed to run {chromosome}:{start}-{end}")
             if(len(ret)) > 0:
                 df = pd.concat(ret)
-                df.to_csv(self.path_affinity(chr=f"{chr}"), sep="\t",index=False)
+                df.to_csv(affy_path, sep="\t",index=False)
+                ret_all.append(df)
             else:
                 self.options.log(f"Unable to run affinity prpagation for {chr}")
-        return df
-
+        all = None
+        if len(ret_all) > 0:
+            all = pd.concat(ret_all)
+            affy_path = self.path_affinity(chr=f"all")
+            all.to_csv()
+        return all
     
 
     

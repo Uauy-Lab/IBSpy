@@ -65,6 +65,8 @@ class IBSpyValuesMatrix:
         ibr = IBSpyResults(path, self.options)
         df: pd.DataFrame = ibr.count_by_windows()
         df.rename(columns = {'seqname':'Chromosome', 'chromosome':'Chromosome', 'start':'Start', 'end':"End", 'orientation':"Strand"}, inplace = True)
+        df = self.rename_seqnames(df)
+        df = self.add_suffix(df, reference)
         df.to_pickle(out_path, compression={'method': 'gzip', 'compresslevel': 9} )
         return i        
 
@@ -126,7 +128,6 @@ class IBSpyValuesMatrix:
         dfs = map(wrapped_function,range(0, nrows))
         
         df = pd.concat(dfs)
-        df = self.rename_seqnames(df)
         df.sort_values(by=["Chromosome", "Start","End"], inplace=True)
         df.to_csv(path_df,sep="\t",index=False )
         pysam.tabix_index(path_df,seq_col=0, start_col=1, end_col=2, line_skip=1,csi=True)
@@ -193,7 +194,7 @@ class IBSpyValuesMatrix:
 
         return self.rename_seqnames( pd.concat(dfs, join="inner") )
 
-    def rename_seqnames(self, df) -> pd.DataFrame:
+    def rename_seqnames(self, df: pd.DataFrame) -> pd.DataFrame:
         if self.options.chromosome_mapping is None:
             return df
         mapping = self.options.mapping_seqnames
@@ -201,6 +202,15 @@ class IBSpyValuesMatrix:
         df['Chromosome'] = df['Chromosome'].apply(lambda x: mapping.get(x, x)) 
         # print("...")
         # print(df)
+        return df
+
+    def add_suffix(self, df:pd.DataFrame, reference) -> pd.DataFrame:
+        if self.options.chromosome_suffix is None:
+            return df
+        mapping = self.options.chromosome_suffix
+        suffix = mapping.get(reference, None)
+        if suffix is not None:
+            df['Chromosome'] = df['Chromosome'].apply(lambda x: f"{x}{suffix}") 
         return df
 
     @property
