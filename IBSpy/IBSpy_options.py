@@ -249,7 +249,7 @@ def parse_IBSpyOptions_arguments():
     parser.add_argument("-l", "--chromosomes", default=None, 
         help="Tab separated file with the following columns [assembly, chr, start, end]. The chromsosome lenght is used to determine the last position when using the tabix tables")
     parser.add_argument("-N", "--name", default="all", help="Name for the analysis, when subsetting samples")
-    parser.add_argument("-S", "--chromosome_suffix_path", default=None, help="File with the chromosome suffixes for each reference. Columns [reference, suffix]")
+    parser.add_argument("-t", "--chromosome_suffix_path", default=None, help="File with the chromosome suffixes for each reference. Columns [reference, suffix]")
 
     parser.parse_args(namespace=ret)
     return ret
