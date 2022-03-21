@@ -87,6 +87,8 @@ class TestResultSet(unittest.TestCase):
     
     def test_values_matrix(self):
         expected = pd.read_csv(self.combine_resut, delimiter='\t')
+        self.options.chromosome_suffix_path = None
+       #self.options.chromosome_mapping = self.mapping_path
         ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
         matrix = ibspy_results.values_matrix
         matrix.to_csv(self.combine_resut_out, sep='\t')
@@ -103,6 +105,8 @@ class TestResultSet(unittest.TestCase):
         pdt.assert_series_equal(matrix["Chromosome"], expected["Chromosome"], check_names=False)
 
     def test_values_matrix_chromosome_iterator(self):
+        #self.options.chromosome_mapping = self.mapping_path
+        self.options.chromosome_suffix_path = None
         ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
         expected_seqname = ['chr1A', 'chr1A_WhJag']
         expected_len = [109,109]
