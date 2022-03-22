@@ -193,7 +193,10 @@ class IBSpyResultsSet:
         df = None
         chromosomes = self.options.chromosomes["chr"]
         ret_all = list()
+        opt_chromosome = self.options.chromosome
         for chr in chromosomes:
+            if opt_chromosome is not None and chr != opt_chromosome:
+                continue
             ret = list()
             self.options.log(f"Affi for {chr}")
             gc.collect()
@@ -216,8 +219,8 @@ class IBSpyResultsSet:
         all = None
         if len(ret_all) > 0:
             all = pd.concat(ret_all)
-            affy_path = self.path_affinity(chr=f"all")
-            all.to_csv()
+            # affy_path = self.path_affinity(chr=f"all")
+            # all.to_csv()
         return all
     
 

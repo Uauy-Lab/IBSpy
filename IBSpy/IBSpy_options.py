@@ -39,6 +39,7 @@ class IBSpyOptions:
         self.name:string = "all"
         self._chromosome_suffix: dict = None
         self.chromosome_suffix_path : string = None
+        self.chromosome: string = None 
    
 
 
@@ -234,8 +235,8 @@ def parse_IBSpyOptions_arguments():
         help="Size of the groups to merge for the affinity propagatin, in basepairs")
     parser.add_argument("-o", "--output_folder", default="./out/", 
         help="Folder with the output, including the cached files")
-    parser.add_argument("-C", "--no_cache_tables", default=False, action="store_true", 
-        help="By default, the intermediate tables are stored. This flag dissables the cache ")
+    # parser.add_argument("-C", "--no_cache_tables", default=False, action="store_true", 
+    #     help="By default, the intermediate tables are stored. This flag dissables the cache ")
     parser.add_argument("-c", "--chromosome_mapping", default=None, 
         help="Path to tab separated file to rename the chromosome names. Columns are [original, mapping]")
     parser.add_argument("-B", "--block_mapping", default=None,
@@ -250,7 +251,7 @@ def parse_IBSpyOptions_arguments():
         help="Tab separated file with the following columns [assembly, chr, start, end]. The chromsosome lenght is used to determine the last position when using the tabix tables")
     parser.add_argument("-N", "--name", default="all", help="Name for the analysis, when subsetting samples")
     parser.add_argument("-t", "--chromosome_suffix_path", default=None, help="File with the chromosome suffixes for each reference. Columns [reference, suffix]")
-
+    parser.add_argument("-C", "--chromosome", default=None, help="Run the analysis for a chromosome")
     parser.parse_args(namespace=ret)
     return ret
 
