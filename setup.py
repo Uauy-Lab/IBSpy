@@ -2,8 +2,34 @@ import setuptools
 # from distutils.core import setup, Extension
 from Cython.Build import cythonize
 import unittest
-
+import distutils.cmd
 from setuptools import Extension
+import subprocess
+
+class PyreverseCommand(distutils.cmd.Command):
+    description = 'run pyreverse to update the UML diagram'
+    user_options = []
+
+    def initialize_options(self):
+        """Set default values for options."""
+        # Each user option must be listed here with their default value.
+        #self.pylint_rcfile = ''
+        pass
+
+    def finalize_options(self):
+        """Post-process options."""
+        pass 
+
+    def run(self):
+        """Run command."""
+        command = ['pyreverse']
+        command.append('-ddocs')
+        command.append('-opng')
+        command.append('IBSpy')
+        self.announce(
+            'Running command: %s' % str(command),
+            level=distutils.log.INFO)
+        subprocess.check_call(command)
 
 def unit_tests():
     test_loader = unittest.TestLoader()
@@ -39,6 +65,9 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     test_suite='setup.unit_tests',
+    cmdclass={
+        'uml': PyreverseCommand,
+    },
     # test_suite='tests',
     #ext_modules=[module1]
     ext_modules = cythonize(

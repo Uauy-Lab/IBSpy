@@ -11,3 +11,4 @@ dill
 tables
 psutil
 pysam
+pylint
