@@ -63,13 +63,15 @@ class IBSpyResultsSet:
         return self.values_matrix.values_matrix.intersect(targets)
 
     def mapped_window_tabix(self, chromosome, start, end, assembly = None) -> PyRanges:
+        self.options.log(f"[mapped_window_tabix] {chromosome} {start} {end}")
         ret = []
         if self.block_mapping is None:
+            self.options.log("[mapped_window_tabix] not merging blocks")
             ret.append(self.values_matrix.values_for_region(chromosome, start, end))
         else: 
+            self.options.log("[mapped_window_tabix] searching for mapped")
             targets = self.block_mapping.all_regions_for(chromosome, start, end, assembly=assembly)
-            
-            # print("[mapped_window_tabix] searching for mapped")
+            print(targets)
             for index, row in targets.as_df().iterrows():
                 tmp =  self.values_matrix.values_for_region(row["Chromosome"], row["Start"], row["End"])
                 if tmp is not None:
@@ -105,7 +107,7 @@ class IBSpyResultsSet:
         self.options.log(f"[_function_window_wrapper_tabix] Running: {chromosome}:{start}-{end}")
         window = self.mapped_window_tabix(chromosome, start, end, assembly=assembly)
         # print(f"[_function_window_wrapper_tabix]About to run region: {chromosome}:{start}-{end}")
-        # print(window)
+        #print(window)
         window = window.drop_duplicates(keep="last")
         m=window.pivot(index=["Chromosome", "Start", "End"], columns="sample", values="variations")
         m.reset_index(inplace=True)
@@ -179,13 +181,19 @@ class IBSpyResultsSet:
         dampings = self.options.dampings
         iterations = self.options.iterations
         seed = self.options.seed
-        # # self.options.log(f"Searching for {self.path_affinity(chr=chr)}")
-        # # if os.path.isfile(self.path_affinity(chr=f"{chr}")): 
-        # #     return pd.read_csv(self.path_affinity(chr=f"{chr}"),sep="\t")
-        # self.options.log("Not found, building")
-        def run_single_run(gr ):
-            runs = cluster_by_haplotype(gr, seed=seed, iterations=iterations, dampings=dampings, max_missing=max_missing)
-            best = select_best_cluster(runs)
+        # self.options.log(f"Searching for {self.path_affinity(chr=chr)}")
+        # if os.path.isfile(self.path_affinity(chr=f"{chr}")): 
+        #      return pd.read_csv(self.path_affinity(chr=f"{chr}"),sep="\t")
+        # self.options.log(f"Building {self.path_affinity(chr=chr)}")
+        def run_single_run(gr: pd.DataFrame ):
+            try:
+                runs = cluster_by_haplotype(gr, seed=seed, iterations=iterations, dampings=dampings, max_missing=max_missing)
+                best = select_best_cluster(runs)
+            except ValueError as ex:
+                print("Failed to run cluster haplotyope")
+                print(gr)
+                gr.to_csv("./last_run_affinity_propagation_error.tsv",sep = "\t")
+                raise ex
             return  best 
             #return gr
         
@@ -195,6 +203,7 @@ class IBSpyResultsSet:
         ret_all = list()
         opt_chromosome = self.options.chromosome
         for chr in chromosomes:
+            print(f"Iteration for {chr}")
             if opt_chromosome is not None and chr != opt_chromosome:
                 continue
             ret = list()

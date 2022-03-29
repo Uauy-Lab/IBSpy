@@ -9,7 +9,8 @@ def main():
 	for k, v in prefs.items():
 		print(f"{k}:\t{v}", file=sys.stderr)
 	ibspy_results = IBSpy.IBSpyResultsSet(options= options)
-	affinity_groups = ibspy_results.run_affinity_propagation()
+	options.log("About to run affinity")
+	ibspy_results.run_affinity_propagation()
 	
 
 	#ibspy_results.values_matrix.save()

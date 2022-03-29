@@ -118,8 +118,12 @@ class IBSpyValuesMatrix:
         path_ref   = f'{self.options.folder_for_reference(reference=reference)}' 
         path_df    = f'{path_ref}/{self.options.file_prefix}.merged.tsv'
         path_tabix = f'{path_df}.gz'
+        self.options.log(f"Searching {path_tabix}")
         if os.path.isfile(path_tabix):
+            self.options.log(f'Found {path_tabix}')
             return pysam.TabixFile(filename=path_tabix,index=f"{path_tabix}.csi" )
+
+        self.options.log(f'building {path_tabix}')
         self._run_summirize_lines(reference=reference)
         samples = self.samples_df[self.samples_df['reference'] == reference]  
         nrows = samples.shape[0]

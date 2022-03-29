@@ -38,14 +38,14 @@ class BlockMapping:
 
 	def all_regions_for(self, chromosome, start, end, assembly = None):
 		region = pr.PyRanges(chromosomes=chromosome, starts=[start], ends=[end], strands=["+"], int64=self.int64)
-		# print(f"[all_regions_for] ({chromosome})")
+		print(f"[all_regions_for] ({chromosome})")
 		# print(region)
 		mapping = self.mapping_for_range(chromosome, start, end, assembly=assembly)
-		# print(mapping)
+		print(mapping)
 		if len(mapping) == 0:
 			return region
 		mapping = mapping[mapping.Chromosome != chromosome ]
-		# print(mapping)
+		print(mapping)
 		mapping = pr.concat([region, mapping])
 		merged = mapping.merge()
 		return merged
