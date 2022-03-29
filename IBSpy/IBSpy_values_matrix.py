@@ -119,7 +119,7 @@ class IBSpyValuesMatrix:
         path_ref   = f'{self.options.folder_for_reference(reference=reference)}' 
         path_df    = f'{path_ref}/{self.options.file_prefix}.merged.tsv'
         path_tabix = f'{path_df}.gz'
-        if self._tabix_cache[path_tabix] is not None:
+        if self._tabix_cache.get(path_tabix, None) is not None:
             return self._tabix_cache[path_tabix]
         
         self.options.log(f"Searching {path_tabix}")
@@ -141,7 +141,7 @@ class IBSpyValuesMatrix:
         pysam.tabix_index(path_df,seq_col=0, start_col=1, end_col=2, line_skip=1,csi=True)
         self._tabix_cache[path_tabix] = pysam.TabixFile(filename=path_tabix, index=f"{path_tabix}.csi" )
         return self._tabix_cache[path_tabix]
-        
+
     @property
     def merged_values(self) -> dict[str, pysam.TabixFile]:
         references = self.references
