@@ -170,7 +170,7 @@ class IBSpyResultsSet:
         file = self.options.file_prefix
         name = self.options.name
         if chr is not None:
-            chr = f".{chr}."
+            chr = f".{chr}"
         else:
             chr = ""
         return f"{prefix}/{file}{chr}.{name}.affinity.csv.gz"
