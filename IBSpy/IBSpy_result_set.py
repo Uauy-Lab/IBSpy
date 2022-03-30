@@ -71,7 +71,6 @@ class IBSpyResultsSet:
         else: 
             self.options.log("[mapped_window_tabix] searching for mapped")
             targets = self.block_mapping.all_regions_for(chromosome, start, end, assembly=assembly)
-            print(targets)
             for index, row in targets.as_df().iterrows():
                 tmp =  self.values_matrix.values_for_region(row["Chromosome"], row["Start"], row["End"])
                 if tmp is not None:
@@ -107,10 +106,7 @@ class IBSpyResultsSet:
         self.options.log(f"[_function_window_wrapper_tabix] Running: {chromosome}:{start}-{end}")
         window = self.mapped_window_tabix(chromosome, start, end, assembly=assembly)
         # print(f"[_function_window_wrapper_tabix]About to run region: {chromosome}:{start}-{end}")
-        #print(window)
         window = window.drop_duplicates(keep="last")
-        if options.samples is not None:
-            window = window[window["sample"] in options.samples]
 
         m=window.pivot(index=["Chromosome", "Start", "End"], columns="sample", values="variations")
         m.reset_index(inplace=True)

@@ -42,8 +42,10 @@ class TestResultSet(unittest.TestCase):
         self.block_mapping_file = "./tests/data/affinity/jag_chi_test_windows.tsv"
         self.mapped_window_result1 = "./tests/data/affinity/mapped_window_1.tsv"
         self.mapped_window_result2 = "./tests/data/affinity/mapped_window_2.tsv"
+        self.mapped_window_result3 = "./tests/data/affinity/mapped_window_3.tsv"
         self.mapped_window_result1_out = "./tests/data/affinity/out/mapped_window_1.tsv"
         self.mapped_window_result2_out = "./tests/data/affinity/out/mapped_window_2.tsv"
+        self.mapped_window_result3_out = "./tests/data/affinity/out/mapped_window_3.tsv"
         self.windows_for_affy = "./tests/data/affinity/windows"
         self.windows_for_affy_out = "./tests/data/affinity/out/windows"
         self.regions = [
@@ -133,6 +135,14 @@ class TestResultSet(unittest.TestCase):
         mapped_window.to_csv(self.mapped_window_result2_out, sep="\t")
         self.compare_dfs(self.mapped_window_result2, self.mapped_window_result2_out, extras=["Agron", "ability", "WATDE0010", "WATDE0020"])
 
+        self.options.samples = ["Agron", "ability", "WATDE0010"]
+        print("----------------------------")
+        print(self.options.samples)
+        ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
+        mapped_window = ibspy_results.mapped_window("chr1A__chi",  100001, 300000, assembly="chinese")
+        mapped_window.to_csv(self.mapped_window_result3, sep="\t")
+        #self.compare_dfs(self.mapped_window_result3, self.mapped_window_result3_out, extras=["Agron", "ability", "WATDE0010"])
+
     def test_mapped_window_iterator(self):
         self.options.chromosome_mapping = self.mapping_path
         self.options.block_mapping = self.block_mapping_file
@@ -167,8 +177,21 @@ class TestResultSet(unittest.TestCase):
         result_test = ibspy_results.mapped_window_tabix("chr1A__chi", 1, 5450000, assembly="chinese")
         print(result_test)
         print(result_test.dtypes)
+
+
+        self.options.samples = ["Agron", "ability", "WATDE0010"]
+        print("----------------------------")
+        print(self.options.samples)
+
+        ibspy_results = IBSpy.IBSpyResultsSet(options=self.options)
+        tabixes = ibspy_results.values_matrix.merged_values
+        print (ibspy_results.options.chromosomes)
+        print(tabixes["chinese"].contigs)
+        result_test = ibspy_results.mapped_window_tabix("chr1A__chi", 1, 5450000, assembly="chinese")
+        print(result_test)
+        print(result_test.dtypes)
        # for i,( window, chromosome, start, end)  in enumerate(self.regions):
-           
+        #TODO: Write asserts for this!   
 
 if __name__ == '__main__':
     unittest.main()

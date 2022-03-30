@@ -162,6 +162,7 @@ class IBSpyValuesMatrix:
 
     def values_for_region(self, chromosome, start, end):
         colnames = ["Chromosome",	"Start",	"End",	self.options.score,	"mean",	"median",	"variance",	"std",	"sample"]
+        samples = self.options.samples  
         for assembly in self.merged_values.keys():
             tabix = self.merged_values[assembly]
             if chromosome not in tabix.contigs:
@@ -181,6 +182,9 @@ class IBSpyValuesMatrix:
                 regions[['std']] = regions[['std']].apply(pd.to_numeric) 
                 # regions[['sample']] = regions[['sample']].apply(str) 
                 #regions[['Chromosome']] = regions[['Chromosome']].apply(str) 
+                if samples is not None:
+                    mask = [any([kw in r for kw in samples]) for r in regions["sample"]]
+                    regions = regions[mask]
                 regions=regions.convert_dtypes()
             # print(regions.dtypes)
             # print("[values_for_region]")
