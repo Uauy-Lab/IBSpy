@@ -179,7 +179,7 @@ class TestResultSet(unittest.TestCase):
         print(result_test.dtypes)
 
 
-        self.options.samples = ["Agron", "ability", "WATDE0010"]
+        self.options.samples = ["Agron", "ability", "WATDE"]
         print("----------------------------")
         print(self.options.samples)
 

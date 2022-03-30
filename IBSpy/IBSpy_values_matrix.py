@@ -183,7 +183,7 @@ class IBSpyValuesMatrix:
                 # regions[['sample']] = regions[['sample']].apply(str) 
                 #regions[['Chromosome']] = regions[['Chromosome']].apply(str) 
                 if samples is not None:
-                    mask = [any([kw in r for kw in samples]) for r in regions["sample"]]
+                    mask = [any([kw == r for kw in samples]) for r in regions["sample"]]
                     regions = regions[mask]
                 regions=regions.convert_dtypes()
             # print(regions.dtypes)
