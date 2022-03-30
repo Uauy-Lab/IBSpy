@@ -109,6 +109,9 @@ class IBSpyResultsSet:
         # print(f"[_function_window_wrapper_tabix]About to run region: {chromosome}:{start}-{end}")
         #print(window)
         window = window.drop_duplicates(keep="last")
+        if options.samples is not None:
+            window = window[window["sample"] in options.samples]
+
         m=window.pivot(index=["Chromosome", "Start", "End"], columns="sample", values="variations")
         m.reset_index(inplace=True)
         m.rename_axis(None, axis=1, inplace=True)
