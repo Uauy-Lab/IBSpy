@@ -191,7 +191,7 @@ class IBSpyValuesMatrix:
             # print(regions)
             # print("_____________")
             return regions
-        raise f"Chromsome not found: {chromosome}"
+        raise  ValueError(f"Chromsome not found: {chromosome}")
 
     def _build_dataset(self) -> pd.DataFrame:
         dfs = []
