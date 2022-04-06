@@ -180,13 +180,14 @@ class IBSpyResultsSet:
         dampings = self.options.dampings
         iterations = self.options.iterations
         seed = self.options.seed
+        min_iterations = self.options.min_iterations
         # self.options.log(f"Searching for {self.path_affinity(chr=chr)}")
         # if os.path.isfile(self.path_affinity(chr=f"{chr}")): 
         #      return pd.read_csv(self.path_affinity(chr=f"{chr}"),sep="\t")
         # self.options.log(f"Building {self.path_affinity(chr=chr)}")
         def run_single_run(gr: pd.DataFrame ):
             try:
-                runs = cluster_by_haplotype(gr, seed=seed, iterations=iterations, dampings=dampings, max_missing=max_missing)
+                runs = cluster_by_haplotype(gr, seed=seed, iterations=iterations, dampings=dampings, max_missing=max_missing, min_iterations=min_iterations)
                 best = select_best_cluster(runs)
             except ValueError as ex:
                 print("Failed to run cluster haplotyope")

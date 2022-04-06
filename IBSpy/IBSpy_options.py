@@ -31,9 +31,10 @@ class IBSpyOptions:
         self.log_level =  logging.INFO
         self._mapping_seqnames: dict = None
         self._logger: logging.Logger = None
-        self.dampings=[0.5, 0.6, 0.7, 0.8, 0.9]
-        self.max_missing=5
-        self.iterations=100
+        self._dampings=[0.5, 0.6, 0.7, 0.8, 0.9] #TODO: Add this as options
+        self.max_missing=5 #TODO: Add this as options (check if this is actually called. )
+        self.iterations=100 #TODO: Add this as options
+        self.min_iterations=10
         self._seed = 42
         self._chromosome_lengths = None
         self.name:string = "all"
@@ -42,7 +43,18 @@ class IBSpyOptions:
         self.chromosome: string = None 
    
 
-
+    @property
+    def dampings(self):
+        return self._dampings
+    @dampings.setter
+    def dampings(self, value):
+        tmp = parse_str_to_list(value)
+        def dampling_validate(d):
+            d = float(d)
+            if d < 0.5 or d >= 1:
+                raise ValueError(f"Dampings must be between >=0.5, <1 ('{d}' in [{value}])")
+            return d
+        self._dampings = map(dampling_validate, tmp)
         
     @property
     def chromosomes(self):
@@ -110,7 +122,7 @@ class IBSpyOptions:
     
     @preferences.setter
     def preferences(self, value):
-        ints = ["window_size", "affinity_blocks", "affinity_window_size", "pool_size", "chunks_in_pool"]
+        ints = ["window_size", "affinity_blocks", "affinity_window_size", "pool_size", "chunks_in_pool", "max_missing", "iterations"]
         bools = ["normalize", "cache_tables"]
         floats = ["filter_counts"]
         config = configparser.ConfigParser()
@@ -252,6 +264,10 @@ def parse_IBSpyOptions_arguments():
     parser.add_argument("-N", "--name", default="all", help="Name for the analysis, when subsetting samples")
     parser.add_argument("-t", "--chromosome_suffix_path", default=None, help="File with the chromosome suffixes for each reference. Columns [reference, suffix]")
     parser.add_argument("-C", "--chromosome", default=None, help="Run the analysis for a chromosome")
+    parser.add_argument("-d", "--dampings", default="0.5,0.6,0.7,0.8,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98", help="Damping values for the affinity propagation separade by commas. Values >=0.5 and <1")
+    parser.add_argument("-M", "--max_missing", default=6, type=int, help="Out of the  min_iterations, how many runs are allowed to fail in the clustering")
+    parser.add_argument("-I", "--iterations", default=100,type=int, help="Number of monter carlo runs for the affinity prpagation")
+    parser.add_argument("-i", "--min_iterations", default=10, type=int, help = "Initial numbber of montecarlo tests. If all of them converge to the same clustering, don't run all the iterations" )
     parser.parse_args(namespace=ret)
     return ret
 

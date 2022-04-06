@@ -34,6 +34,7 @@ class AffinityRunResults:
 		self.norm_descriptive_stats = {}
 		self.samples = 0
 		self.windows = 0
+		
 
 	@property
 	def failed(self):
@@ -43,14 +44,19 @@ class AffinityRunResults:
 	def n(self):
 		return self.samples * self.windows
 
+	@property
+	def n_haplotypes(self):
+		return len(set(self.predicted))
+
 	def as_df(self):
 
 		df = pd.DataFrame({
 			'Chromosome': self.chromosome,
 			'Start': self.start, 
 			'End': self.end, 
-			'variety': self.varieties, 
+			'genotype': self.varieties, #TODO Maybe change this to genotype. 
 			'group':self.predicted,
+			'n_haplotypes': self.n_haplotypes,
 			'mutual_info_score':self.mutual_info_score,
 			'sc_score':self.score,
 			'number_of_runs':self.number_of_runs,
@@ -69,7 +75,6 @@ class AffinityRunResults:
 			'skew_scaled': self.norm_descriptive_stats["skew"],
 			'kurt_scaled': self.norm_descriptive_stats["kurt"]
 			}
-
 			)
 		# print(df)
 		return df
@@ -137,7 +142,7 @@ def cluster_by_haplotype (gr, dampings=[0.5,0.6,0.7,0.8,0.9], iterations=1000, s
 		if not isinstance(gr, pd.DataFrame):
 			gr = gr.as_df()
 		n_windows = gr.shape[0]
-		n_samples = gr.shape[1]
+		n_samples = gr.shape[1] - 3 #Minus three as the columns Chromosomo, Start and End must not be called. 
 		t_df = gr.set_index(['Chromosome', 'Start', 'End']).T
 		varieties = t_df.index
 		x:ndarray = StandardScaler(with_mean=True).fit_transform(t_df)
@@ -167,6 +172,7 @@ def cluster_by_haplotype (gr, dampings=[0.5,0.6,0.7,0.8,0.9], iterations=1000, s
 			run.norm_descriptive_stats = desc_stats_norm
 			run.windows = n_windows
 			run.samples = n_samples
+			#TODO: Add number of haplotypes in window. 
 	return runs
 
 def multiple_affinity_run(iterations, max_missing, min_iterations, varieties, x, dmp):
