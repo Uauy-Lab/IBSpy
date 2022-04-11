@@ -54,7 +54,7 @@ class IBSpyOptions:
             if d < 0.5 or d >= 1:
                 raise ValueError(f"Dampings must be between >=0.5, <1 ('{d}' in [{value}])")
             return d
-        self._dampings = map(dampling_validate, tmp)
+        self._dampings = list(map(dampling_validate, tmp))
         
     @property
     def chromosomes(self):
