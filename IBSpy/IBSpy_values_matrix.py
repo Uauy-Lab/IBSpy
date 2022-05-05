@@ -139,7 +139,7 @@ class IBSpyValuesMatrix:
         
 
     @property
-    def merged_values(self) -> dict[str, pysam.TabixFile]:
+    def merged_values(self): # -> dict[str, pysam.TabixFile]:
         references = self.references
         # print(f"[merged_valie]")
         # print(references)

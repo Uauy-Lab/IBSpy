@@ -229,7 +229,8 @@ class IBSpyOptions:
             ret = None 
         if ret is None:
             print(df)
-            raise Exception(f"Unable to find chromosome {chromosome}")
+            raise ValueError(f"Unable to find chromosome {chromosome}")
+        return ret
 
 
     @property
@@ -242,12 +243,9 @@ class IBSpyOptions:
         if len(fields_2) != 2:
             raise ValueError(f"Invalid region (must contain '-' on the second field) {self._region}")
         chr   = fields_1[0]
-        start = fields_2[0]
-        end   = fields_2[1]
-
-
-
-        return chr, start, end, assembly
+        start = int(fields_2[0])
+        end   = int(fields_2[1])
+        return chr, start, end, self.assembly_for_chromosome(chr)
         
 
     @region.setter
@@ -301,6 +299,7 @@ def parse_IBSpyOptions_arguments():
     parser.add_argument("-I", "--iterations", default=100,type=int, help="Number of monter carlo runs for the affinity prpagation")
     parser.add_argument("-i", "--min_iterations", default=10, type=int, help = "Initial numbber of montecarlo tests. If all of them converge to the same clustering, don't run all the iterations" )
     parser.add_argument("-R", "--region", help="Region to extract (chr:start-end)")
+    parser.add_argument("-O", "--tsv_output", default="out.csv", help="path for the CSV with the extracted daata")
     parser.parse_args(namespace=ret)
     return ret
 
