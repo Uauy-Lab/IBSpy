@@ -77,7 +77,6 @@ class IBSpyOptions:
 
         return ret
 
-
     @property
     def seed(self):
         return self._seed 
@@ -222,6 +221,39 @@ class IBSpyOptions:
         gb_mem = round(gb_mem, 3)
         self.logger.debug(f"Mem: {gb_mem} GB")
 
+    def assembly_for_chromosome(self, chromosome):
+        df = self._chromosomes
+        try:
+            ret = df[df["chr"] == chromosome ]["assembly"].array[0]
+        except Exception as e:
+            ret = None 
+        if ret is None:
+            print(df)
+            raise Exception(f"Unable to find chromosome {chromosome}")
+
+
+    @property
+    def region(self):
+        reg:string = self._region.replace("'", "")
+        fields_1 = reg.split(":")
+        if len(fields_1) != 2:
+            raise ValueError(f"Invalid region (must contain ':') {self._region}")
+        fields_2 = fields_1[1].split("-")
+        if len(fields_2) != 2:
+            raise ValueError(f"Invalid region (must contain '-' on the second field) {self._region}")
+        chr   = fields_1[0]
+        start = fields_2[0]
+        end   = fields_2[1]
+
+
+
+        return chr, start, end, assembly
+        
+
+    @region.setter
+    def region(self, value):
+        self._region: string = value
+
 def parse_IBSpyOptions_arguments():
     ret = IBSpyOptions()
     parser = argparse.ArgumentParser()
@@ -268,6 +300,7 @@ def parse_IBSpyOptions_arguments():
     parser.add_argument("-M", "--max_missing", default=6, type=int, help="Out of the  min_iterations, how many runs are allowed to fail in the clustering")
     parser.add_argument("-I", "--iterations", default=100,type=int, help="Number of monter carlo runs for the affinity prpagation")
     parser.add_argument("-i", "--min_iterations", default=10, type=int, help = "Initial numbber of montecarlo tests. If all of them converge to the same clustering, don't run all the iterations" )
+    parser.add_argument("-R", "--region", help="Region to extract (chr:start-end)")
     parser.parse_args(namespace=ret)
     return ret
 

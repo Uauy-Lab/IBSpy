@@ -17,6 +17,9 @@ class TestOptions(unittest.TestCase):
         self.assertListEqual(test_2, self.result)
         test_3 = parse_str_to_list("tests/data/lines.txt")
         self.assertListEqual(test_3, self.result)
-        
+    
+    def test_regions(self):
+        pass 
+
 if __name__ == '__main__':
     unittest.main()
