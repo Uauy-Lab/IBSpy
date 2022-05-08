@@ -50,7 +50,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="IBSpy",
-    version="0.4.6",
+    version="0.4.7",
     author="Ricardo H. Ramirez-Gonzalez",
     author_email="ricardo.ramirez-gonzalez@jic.ac.uk",
     description="A package to detect IBS regions",
