@@ -41,6 +41,7 @@ class IBSpyOptions:
         self._chromosome_suffix: dict = None
         self.chromosome_suffix_path : string = None
         self.chromosome: string = None 
+        self.tsv_output = "out.tsv"
    
 
     @property

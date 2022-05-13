@@ -14,7 +14,7 @@ def main():
 	window = ibspy_results.mapped_window_tabix(chromosome, start, end, assembly=assembly)
 	# print(f"[_function_window_wrapper_tabix]About to run region: {chromosome}:{start}-{end}")
 	window = window.drop_duplicates(keep="last")
-	window.to_csv(options.csv_output, sep="\t",index=False)
+	window.to_csv(options.tsv_output, sep="\t",index=False)
 
 	#ibspy_results.values_matrix.save()
 if __name__ == '__main__':
